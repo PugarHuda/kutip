@@ -1,6 +1,13 @@
 import Link from "next/link";
 import type { Address } from "viem";
 import { agentReputationAbi, getReputationAddress } from "@/lib/reputation";
+import {
+  agentRegistry8004Abi,
+  erc6551RegistryAbi,
+  getAgentRegistryAddress,
+  getErc6551AccountImpl,
+  getErc6551RegistryAddress
+} from "@/lib/standards";
 import { getPublicClient } from "@/lib/ledger";
 import { explorerAddress, formatUSDC } from "@/lib/kite";
 import { StatTile } from "@/components/ui";
@@ -18,6 +25,12 @@ interface AgentCard {
   citationCount: bigint;
   totalEarnedWei: bigint;
   attestationCount: bigint;
+  registryCard?: {
+    name: string;
+    capabilities: string;
+    trustMethod: string;
+  };
+  tba?: Address;
 }
 
 async function fetchAgents(nft: Address): Promise<AgentCard[]> {
@@ -28,6 +41,10 @@ async function fetchAgents(nft: Address): Promise<AgentCard[]> {
       abi: agentReputationAbi,
       functionName: "tokenCount"
     })) as bigint;
+
+    const registry = getAgentRegistryAddress();
+    const erc6551 = getErc6551RegistryAddress();
+    const acctImpl = getErc6551AccountImpl();
 
     const ids = Array.from({ length: Number(count) }, (_, i) => BigInt(i + 1));
     return await Promise.all(
@@ -46,15 +63,57 @@ async function fetchAgents(nft: Address): Promise<AgentCard[]> {
           bigint,
           bigint
         ];
+
+        const agent = r[0];
+        let registryCard: AgentCard["registryCard"] | undefined;
+        let tba: Address | undefined;
+
+        if (registry) {
+          try {
+            const card = (await client.readContract({
+              address: registry,
+              abi: agentRegistry8004Abi,
+              functionName: "getAgent",
+              args: [agent]
+            })) as {
+              name: string;
+              capabilities: string;
+              trustMethod: string;
+            };
+            registryCard = {
+              name: card.name,
+              capabilities: card.capabilities,
+              trustMethod: card.trustMethod
+            };
+          } catch {
+            // not registered — fine
+          }
+        }
+
+        if (erc6551 && acctImpl) {
+          try {
+            tba = (await client.readContract({
+              address: erc6551,
+              abi: erc6551RegistryAbi,
+              functionName: "account",
+              args: [acctImpl, 2368n, nft, tokenId, 0n]
+            })) as Address;
+          } catch {
+            // TBA not mintable yet — fine
+          }
+        }
+
         return {
           tokenId: Number(tokenId),
-          agent: r[0],
+          agent,
           role: r[1],
           firstActiveAt: r[2],
           lastActiveAt: r[3],
           citationCount: r[4],
           totalEarnedWei: r[5],
-          attestationCount: r[6]
+          attestationCount: r[6],
+          registryCard,
+          tba
         };
       })
     );
@@ -156,7 +215,7 @@ export default async function AgentsPage() {
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="ink-3">Wallet</span>
+                    <span className="ink-3">AA wallet</span>
                     <a
                       href={explorerAddress(a.agent)}
                       target="_blank"
@@ -166,6 +225,43 @@ export default async function AgentsPage() {
                       {a.agent.slice(0, 6)}…{a.agent.slice(-4)}
                     </a>
                   </div>
+                  {a.tba && (
+                    <div className="flex justify-between items-center">
+                      <span className="ink-3 flex items-center gap-1.5">
+                        TBA{" "}
+                        <span
+                          className="chip"
+                          style={{ padding: "0 6px", fontSize: 9 }}
+                        >
+                          ERC-6551
+                        </span>
+                      </span>
+                      <a
+                        href={explorerAddress(a.tba)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="t-mono-sm text-kite-700 hover:text-kite-500"
+                      >
+                        {a.tba.slice(0, 6)}…{a.tba.slice(-4)}
+                      </a>
+                    </div>
+                  )}
+                  {a.registryCard && (
+                    <div className="flex justify-between items-center">
+                      <span className="ink-3 flex items-center gap-1.5">
+                        Trust{" "}
+                        <span
+                          className="chip chip--success"
+                          style={{ padding: "0 6px", fontSize: 9 }}
+                        >
+                          ERC-8004
+                        </span>
+                      </span>
+                      <span className="t-mono-sm ink-2">
+                        {a.registryCard.trustMethod}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center">
                     <span className="ink-3">Citations paid</span>
                     <span className="t-mono font-semibold">
@@ -184,6 +280,15 @@ export default async function AgentsPage() {
                       {formatUSDC(a.totalEarnedWei)}
                     </span>
                   </div>
+                  {a.registryCard?.capabilities && (
+                    <div className="pt-2 border-t border-token">
+                      <div className="ink-3 mb-1">Capabilities</div>
+                      <code className="t-mono-sm ink-2 block break-all">
+                        {a.registryCard.capabilities.slice(0, 100)}
+                        {a.registryCard.capabilities.length > 100 ? "…" : ""}
+                      </code>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center pt-2 border-t border-token">
                     <span className="ink-3">First active</span>
                     <span className="t-small ink-2">
@@ -218,7 +323,7 @@ export default async function AgentsPage() {
             )}
           </div>
           <span className="t-mono-sm ink-3">
-            ERC-6551 TBA wrap ready · production roadmap
+            ERC-8004 registry · ERC-6551 TBAs · all on Kite testnet
           </span>
         </div>
       </div>
