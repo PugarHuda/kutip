@@ -13,6 +13,7 @@ const LINKS: {
 }[] = [
   { href: "/", label: "Home", match: (p) => p === "/" },
   { href: "/research", label: "Research", match: (p) => p.startsWith("/research") },
+  { href: "/agents", label: "Agents", match: (p) => p.startsWith("/agents") },
   {
     href: "/leaderboard",
     label: "Author earnings",
