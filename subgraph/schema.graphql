@@ -1,4 +1,6 @@
-type Query @entity(immutable: true) {
+# Attestation — one row per QueryAttested event. Named Attestation (not Query)
+# because `Query` collides with GraphQL's reserved root type name.
+type Attestation @entity(immutable: false) {
   id: Bytes!                    # queryId (bytes32)
   payer: Bytes!                 # AA or EOA that submitted attestAndSplit
   totalPaid: BigInt!            # in token's smallest unit (18-dec on Kite)
@@ -7,12 +9,12 @@ type Query @entity(immutable: true) {
   block: BigInt!
   timestamp: BigInt!
   tx: Bytes!
-  citations: [Citation!]! @derivedFrom(field: "query")
+  citations: [Citation!]! @derivedFrom(field: "attestation")
 }
 
 type Citation @entity(immutable: true) {
-  id: ID!                       # queryId-author-index
-  query: Query!
+  id: String!                   # {txHash}-{logIndex}
+  attestation: Attestation!
   author: Author!
   weightBps: Int!
   amount: BigInt!               # USDC paid to author on this cite (18-dec)
@@ -21,7 +23,7 @@ type Citation @entity(immutable: true) {
   tx: Bytes!
 }
 
-type Author @entity {
+type Author @entity(immutable: false) {
   id: Bytes!                    # wallet address, lowercase
   totalEarnings: BigInt!
   citationCount: Int!
@@ -30,7 +32,7 @@ type Author @entity {
   citations: [Citation!]! @derivedFrom(field: "author")
 }
 
-type DayStat @entity {
+type DayStat @entity(immutable: false) {
   id: String!                   # "YYYY-MM-DD" UTC
   date: BigInt!                 # midnight UTC unix
   queriesAttested: Int!
@@ -38,7 +40,7 @@ type DayStat @entity {
   totalPaid: BigInt!
 }
 
-type AuthorDayStat @entity {
+type AuthorDayStat @entity(immutable: false) {
   id: String!                   # "{wallet}-YYYY-MM-DD"
   author: Author!
   date: BigInt!

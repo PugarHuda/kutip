@@ -59,7 +59,7 @@ export interface GoldskyAuthor {
   lastSeenAt: string;
 }
 
-export interface GoldskyQuery {
+export interface GoldskyAttestation {
   id: string;
   payer: string;
   totalPaid: string;
@@ -105,13 +105,13 @@ export async function fetchLeaderboardFromGoldsky(
   return data?.authors ?? null;
 }
 
-export async function fetchRecentQueriesFromGoldsky(
+export async function fetchRecentAttestationsFromGoldsky(
   limit = 20
-): Promise<GoldskyQuery[] | null> {
-  const data = await query<{ queries: GoldskyQuery[] }>({
+): Promise<GoldskyAttestation[] | null> {
+  const data = await query<{ attestations: GoldskyAttestation[] }>({
     query: `
       query Recent($limit: Int!) {
-        queries(first: $limit, orderBy: timestamp, orderDirection: desc) {
+        attestations(first: $limit, orderBy: timestamp, orderDirection: desc) {
           id
           payer
           totalPaid
@@ -125,7 +125,7 @@ export async function fetchRecentQueriesFromGoldsky(
     `,
     variables: { limit }
   });
-  return data?.queries ?? null;
+  return data?.attestations ?? null;
 }
 
 export async function fetchAuthorHistoryFromGoldsky(
