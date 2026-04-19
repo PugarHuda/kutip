@@ -1,8 +1,9 @@
-import { keccak256, toHex, type Address, type Hex } from "viem";
+import { keccak256, toBytes, toHex, type Address, type Hex } from "viem";
 import {
   getAuthor,
   registerRuntimePapers,
   searchPapers,
+  type Author,
   type Paper
 } from "./papers";
 import {
@@ -13,8 +14,11 @@ import {
   getLedgerAddress,
   hasServiceAccount,
   submitAttestation,
-  type AttestationParams
+  type AttestationParams,
+  type EscrowDeposit
 } from "./ledger";
+import { lookupClaim } from "./claim-registry";
+import { getEscrowAddress } from "./escrow";
 import { parseUSDC } from "./kite";
 import { saveSummary } from "./summary-store";
 import type { AgentEvent, Citation, ResearchResult } from "./types";
@@ -95,8 +99,16 @@ export async function runResearchAgent(opts: {
   });
 
   const citations = buildCitations(purchased, citationWeights);
-  const flatForContract = flattenCitationsForContract(purchased, citationWeights);
+  const totalPaidRaw = parseUSDC(budgetUSDC);
+  const { citations: flatForContract, escrowDeposits } =
+    flattenCitationsForContract(purchased, citationWeights, totalPaidRaw);
   const queryId = keccak256(toHex(`${query}:${Date.now()}`));
+
+  const claimedCount = flatForContract.length - escrowDeposits.length;
+  const escrowDetail =
+    escrowDeposits.length > 0
+      ? `${claimedCount} claimed · ${escrowDeposits.length} → escrow`
+      : `${flatForContract.length} authors · all claimed`;
 
   emit({
     type: "step",
@@ -104,16 +116,15 @@ export async function runResearchAgent(opts: {
       step: 4,
       label: "Building attribution ledger",
       status: "done",
-      detail: `${citations.length} citations · ${flatForContract.length} authors · weights normalized`
+      detail: `${citations.length} citations · ${escrowDetail} · weights normalized`
     }
   });
-
-  const totalPaidRaw = parseUSDC(budgetUSDC);
 
   const attestation = await attestOnChain({
     queryId,
     totalPaid: totalPaidRaw,
     citations: flatForContract,
+    escrowDeposits,
     emit
   });
 
@@ -161,6 +172,7 @@ async function attestOnChain(opts: {
   queryId: Hex;
   totalPaid: bigint;
   citations: AttestationParams["citations"];
+  escrowDeposits: EscrowDeposit[];
   emit: Emit;
 }): Promise<{
   txHash: Hex;
@@ -201,7 +213,8 @@ async function attestOnChain(opts: {
     const result = await submitAttestation({
       queryId: opts.queryId,
       totalPaid: opts.totalPaid,
-      citations: opts.citations
+      citations: opts.citations,
+      escrowDeposits: opts.escrowDeposits
     });
     if (!result) throw new Error("submitAttestation returned null");
 
@@ -482,31 +495,67 @@ function buildCitations(papers: Paper[], weights: Map<string, number>): Citation
     });
 }
 
+/** Flatten per-paper weights to per-author rows. When an author's ORCID
+ * is not bound to a wallet yet AND `KUTIP_ROUTE_UNCLAIMED_TO_ESCROW=1`,
+ * their row gets routed to the escrow address instead of the synthetic
+ * mock wallet — and the orcidHash + computed amount is recorded so
+ * `submitAttestation` can emit a `registerDeposit` call in the same
+ * atomic UserOp.
+ */
 function flattenCitationsForContract(
   papers: Paper[],
-  weights: Map<string, number>
-): { author: Address; weightBps: number }[] {
-  const pairs: { author: Address; weightBps: number }[] = [];
+  weights: Map<string, number>,
+  totalPaid: bigint
+): {
+  citations: { author: Address; weightBps: number }[];
+  escrowDeposits: EscrowDeposit[];
+} {
+  const routeToEscrow = process.env.KUTIP_ROUTE_UNCLAIMED_TO_ESCROW === "1";
+  const escrow = routeToEscrow ? getEscrowAddress() : null;
+  const authorsBps = Number(process.env.AUTHORS_BPS ?? 4000);
+
+  const citations: { author: Address; weightBps: number }[] = [];
+  const escrowDeposits: EscrowDeposit[] = [];
 
   for (const p of papers) {
     const paperWeight = weights.get(p.id) ?? 0;
     if (paperWeight === 0) continue;
-    const wallets = p.authors
-      .map((aid) => getAuthor(aid)?.wallet)
-      .filter((w): w is string => typeof w === "string" && w.startsWith("0x")) as Address[];
-    if (wallets.length === 0) continue;
 
-    const per = Math.floor(paperWeight / wallets.length);
-    wallets.forEach((wallet, i) => {
-      const w =
-        i === wallets.length - 1 ? paperWeight - per * (wallets.length - 1) : per;
-      if (w > 0) pairs.push({ author: wallet, weightBps: w });
-    });
+    // Expand per-author with the per-paper weight divided evenly.
+    const authorData: { author: Author; share: number }[] = [];
+    const per = Math.floor(paperWeight / p.authors.length);
+    for (let i = 0; i < p.authors.length; i++) {
+      const a = getAuthor(p.authors[i]);
+      if (!a || !a.wallet || !a.wallet.startsWith("0x")) continue;
+      const share =
+        i === p.authors.length - 1 ? paperWeight - per * (p.authors.length - 1) : per;
+      if (share > 0) authorData.push({ author: a, share });
+    }
+
+    for (const { author, share } of authorData) {
+      const claim = author.orcid ? lookupClaim(author.orcid) : undefined;
+      const isClaimed = claim !== undefined;
+
+      if (!isClaimed && escrow && author.orcid) {
+        // Route to escrow, record orcidHash + amount for registerDeposit
+        citations.push({ author: escrow, weightBps: share });
+        const orcidHash = keccak256(
+          toBytes(author.orcid.replace(/\s+/g, "").toUpperCase())
+        );
+        // amount = totalPaid * authorsBps/10000 * share/10000
+        const amount = (totalPaid * BigInt(authorsBps) * BigInt(share)) / 10_000n / 10_000n;
+        escrowDeposits.push({ orcidHash, amount });
+      } else {
+        // Claimed author OR routing disabled — pay directly
+        const wallet = (claim?.wallet ?? author.wallet) as Address;
+        citations.push({ author: wallet, weightBps: share });
+      }
+    }
   }
 
-  const sum = pairs.reduce((a, b) => a + b.weightBps, 0);
-  if (sum !== 10_000 && pairs.length > 0) {
-    pairs[pairs.length - 1].weightBps += 10_000 - sum;
+  const sum = citations.reduce((a, b) => a + b.weightBps, 0);
+  if (sum !== 10_000 && citations.length > 0) {
+    citations[citations.length - 1].weightBps += 10_000 - sum;
   }
-  return pairs;
+  return { citations, escrowDeposits };
 }

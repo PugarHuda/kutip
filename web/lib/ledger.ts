@@ -17,6 +17,7 @@ import {
   isAAEnabled,
   sendBatchUserOp
 } from "./agent-passport";
+import { escrowAbi, getEscrowAddress } from "./escrow";
 
 const RPC_URL = process.env.KITE_RPC_URL ?? kiteTestnet.rpcUrls.default.http[0];
 
@@ -172,10 +173,16 @@ export async function getCitationsForQuery(queryId: Hex): Promise<CitationEvent[
   }
 }
 
+export interface EscrowDeposit {
+  orcidHash: Hex;
+  amount: bigint;
+}
+
 export interface AttestationParams {
   queryId: Hex;
   totalPaid: bigint;
   citations: { author: Address; weightBps: number }[];
+  escrowDeposits?: EscrowDeposit[];
 }
 
 export interface AttestationResult {
@@ -224,6 +231,8 @@ async function submitViaAA(
 
   const summarizer = getSummarizerAAAddress();
   const subAgentFee = summarizer ? computeSubAgentFee(params.totalPaid) : 0n;
+  const escrow = getEscrowAddress();
+  const escrowDeposits = params.escrowDeposits ?? [];
 
   const calls: { target: Address; value: bigint; data: Hex }[] = [];
 
@@ -252,6 +261,36 @@ async function submitViaAA(
   calls.push({ target: ledger, value: 0n, data: attestData });
 
   const { userOpHash, txHash } = await sendBatchUserOp(calls);
+
+  // Escrow's operator = EOA (immutable), so registerDeposit calls must
+  // come from the EOA — they can't ride the AA's UserOp. Fire them
+  // sequentially as post-AA EOA txs. If any fails, funds still landed
+  // in escrow via the attestation (Citation.author = escrow); the
+  // operator can retry registerDeposit later to re-attribute. Never
+  // throw — best-effort attribution, always-green attestation.
+  if (escrow && escrowDeposits.length > 0) {
+    const wc = getWalletClient();
+    if (wc) {
+      for (const dep of escrowDeposits) {
+        try {
+          const h = await wc.wallet.writeContract({
+            account: wc.account,
+            chain: kiteTestnet,
+            address: escrow,
+            abi: escrowAbi,
+            functionName: "registerDeposit",
+            args: [dep.orcidHash, dep.amount]
+          });
+          await getPublicClient().waitForTransactionReceipt({ hash: h });
+        } catch (err) {
+          console.warn(
+            `[escrow] registerDeposit failed for ${dep.orcidHash.slice(0, 12)}…:`,
+            err
+          );
+        }
+      }
+    }
+  }
 
   return {
     mode: "aa",
