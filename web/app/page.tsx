@@ -3,6 +3,7 @@ import { getAAAddress, getSummarizerAAAddress, isAAEnabled } from "@/lib/agent-p
 import { getAuthorStats, getLedgerAddress } from "@/lib/ledger";
 import { listAuthors } from "@/lib/papers";
 import { formatUSDC, explorerAddress } from "@/lib/kite";
+import { facilitatorHandshake, PIEVERSE_URL } from "@/lib/pieverse";
 import type { Address } from "viem";
 import { MoneyFlow } from "@/components/money-flow";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
@@ -17,7 +18,10 @@ export default async function HomePage() {
 
   const authors = listAuthors();
   const wallets = authors.map((a) => a.wallet as Address);
-  const stats = await getAuthorStats(wallets);
+  const [stats, facilitator] = await Promise.all([
+    getAuthorStats(wallets),
+    facilitatorHandshake()
+  ]);
   const totalPaid = stats.reduce((acc, s) => acc + s.earnings, 0n);
   const totalCitations = stats.reduce((acc, s) => acc + Number(s.citations), 0);
   const authorsPaid = stats.filter((s) => s.citations > 0n).length;
@@ -125,6 +129,33 @@ export default async function HomePage() {
                   value={ledgerAddress}
                   sub="Revenue split contract"
                 />
+              )}
+              {facilitator.reachable && (
+                <div className="flex items-start justify-between gap-4 pt-3 border-t border-token">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="t-caption">x402 facilitator</span>
+                      <span
+                        className="chip chip--success"
+                        style={{ padding: "1px 7px", fontSize: 10 }}
+                      >
+                        Live · {facilitator.latencyMs}ms
+                      </span>
+                    </div>
+                    <a
+                      href={PIEVERSE_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block t-mono-sm text-kite-700 hover:text-kite-500 break-all"
+                    >
+                      {PIEVERSE_URL.replace("https://", "")}
+                    </a>
+                    <div className="t-small ink-3 mt-0.5">
+                      Pieverse v{facilitator.version ?? "?"} · Kite testnet{" "}
+                      {facilitator.supportsKiteTestnet ? "supported" : "not found"}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           )}
