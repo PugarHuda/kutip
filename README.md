@@ -1,7 +1,12 @@
-# Kutip — The Research Agent That Pays Its Sources
+# Kutip — Citations that pay.
 
 > **First production implementation of Kite's Proof of AI philosophy.**
 > Built for the Kite AI Global Hackathon 2026 — Novel Track.
+
+- **Live demo:** <https://kutip-zeta.vercel.app>
+- **Contract (Kite testnet):** [`0x99359DaF…E5Fa`](https://testnet.kitescan.ai/address/0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa)
+- **Agent AA wallet:** [`0x4da7f4cF…1776`](https://testnet.kitescan.ai/address/0x4da7f4cFd443084027a39cc0f7c41466d9511776)
+- **Repo:** <https://github.com/PugarHuda/kutip>
 
 ## What It Does
 
@@ -42,11 +47,13 @@ Authors get: surprise USDC in wallet
 
 | Layer | Choice |
 |---|---|
-| Frontend | Next.js 14 App Router + wagmi + viem + shadcn/ui |
-| Agent | Anthropic Claude Sonnet 4.6 (tool calling) |
+| Frontend | Next.js 14 App Router + wagmi + viem + Tailwind with design tokens |
+| Agent LLM | OpenRouter — GLM 4.5 Air primary, gpt-oss-120b fallback (free) |
+| Agent identity | EIP-4337 smart account via `gokite-aa-sdk`, Kite paymaster covers gas in Test USD |
+| Corpus | Static mock catalog + optional Semantic Scholar live search |
 | Payments | x402 via Pieverse facilitator |
 | Chain | Kite testnet (Chain ID 2368) |
-| Contracts | Solidity 0.8.24 + Foundry |
+| Contracts | Solidity 0.8.24 + Foundry, `AttributionLedger` (5/5 tests passing) |
 | Deploy | Vercel (FE+BE) + Kite testnet (contracts) |
 
 ## Project Structure
@@ -63,20 +70,22 @@ Kutip/
 ## Quick Start
 
 ```bash
-# 1. Install deps
-cd contracts && forge install
+# 1. Install deps (foundry libs are NOT submodules — run `forge install` once)
+cd contracts && forge install OpenZeppelin/openzeppelin-contracts foundry-rs/forge-std
 cd ../web && pnpm install
 
 # 2. Copy env
-cp .env.example .env
-# Fill PRIVATE_KEY, ANTHROPIC_API_KEY, KITE_RPC_URL
+cp .env.example ../.env
+# Fill PRIVATE_KEY, OPENROUTER_API_KEY, wallet addresses
 
-# 3. Deploy contract
+# 3. Deploy contract to Kite testnet
 cd contracts
-forge script script/Deploy.s.sol --rpc-url $KITE_RPC_URL --broadcast
+forge script script/Deploy.s.sol:Deploy \
+  --rpc-url $KITE_RPC_URL --private-key $PRIVATE_KEY --broadcast
 
-# 4. Run web
-cd ../web
+# 4. Sync env into web app, run dev
+cd ..
+pnpm run env:sync
 pnpm dev
 ```
 
