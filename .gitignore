@@ -1,0 +1,68 @@
+# ==============
+# Secrets
+# ==============
+.env
+.env.local
+.env.*.local
+*.pem
+
+# ==============
+# Dependencies
+# ==============
+node_modules/
+.pnpm-store/
+.yarn/
+
+# ==============
+# Build outputs
+# ==============
+.next/
+out/
+dist/
+build/
+
+# ==============
+# Foundry
+# ==============
+contracts/cache/
+contracts/out/
+contracts/broadcast/
+contracts/lib/
+
+# ==============
+# Logs
+# ==============
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# ==============
+# Editor / OS
+# ==============
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==============
+# Testing
+# ==============
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# ==============
+# Deployment
+# ==============
+.vercel/
+
+# ==============
+# Runtime data
+# ==============
+*.sqlite
+*.db
+data/generated/

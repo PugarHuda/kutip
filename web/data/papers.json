@@ -1,0 +1,167 @@
+[
+  {
+    "id": "p001",
+    "doi": "10.1038/s41586-2024-carbon-01",
+    "title": "Direct air capture at scale: progress, challenges, and pathways",
+    "authors": ["a001", "a002"],
+    "year": 2024,
+    "journal": "Nature",
+    "abstract": "We review technological, economic, and policy trajectories for gigaton-scale direct air capture. Three pathways — solid-sorbent modular, liquid-solvent utility, and mineralization hybrids — are benchmarked against net-zero targets.",
+    "keywords": ["carbon capture", "direct air capture", "net zero", "climate"],
+    "priceUSDC": 400000
+  },
+  {
+    "id": "p002",
+    "doi": "10.1126/sciadv.adm2024",
+    "title": "Mineral carbonation kinetics in basaltic reservoirs: a field-scale study",
+    "authors": ["a003"],
+    "year": 2024,
+    "journal": "Science Advances",
+    "abstract": "Field data from Icelandic basalt injection site shows 95% CO2 mineralization within 24 months, faster than laboratory predictions by factor of 1.8x.",
+    "keywords": ["mineralization", "basalt", "CO2 storage"],
+    "priceUSDC": 350000
+  },
+  {
+    "id": "p003",
+    "doi": "10.1016/j.joule.2024.biochar",
+    "title": "Biochar as a scalable negative emissions pathway: lifecycle analysis across 12 feedstocks",
+    "authors": ["a004", "a005"],
+    "year": 2024,
+    "journal": "Joule",
+    "abstract": "Multi-feedstock LCA identifies agricultural residue biochar as lowest-cost (<$80/tCO2e) pathway with co-benefits for soil carbon.",
+    "keywords": ["biochar", "negative emissions", "LCA"],
+    "priceUSDC": 300000
+  },
+  {
+    "id": "p004",
+    "doi": "10.1038/s41560-2024-solar-perov",
+    "title": "Tandem perovskite-silicon solar cells cross 34% efficiency threshold",
+    "authors": ["a006", "a002"],
+    "year": 2024,
+    "journal": "Nature Energy",
+    "abstract": "A vapor-deposition stabilization strategy lifts tandem efficiency to 34.2% with operational stability >1000 hours at 85°C.",
+    "keywords": ["perovskite", "solar", "tandem"],
+    "priceUSDC": 450000
+  },
+  {
+    "id": "p005",
+    "doi": "10.1073/pnas.ocean-alk-2024",
+    "title": "Ocean alkalinity enhancement: promise, uncertainty, and governance",
+    "authors": ["a007"],
+    "year": 2024,
+    "journal": "PNAS",
+    "abstract": "We propose a tiered governance framework for ocean alkalinity trials incorporating MRV, environmental safeguards, and benefit-sharing.",
+    "keywords": ["ocean alkalinity", "OAE", "governance"],
+    "priceUSDC": 350000
+  },
+  {
+    "id": "p006",
+    "doi": "10.1038/s41586-2023-afforest",
+    "title": "The afforestation gap: satellite evidence on planted forest carbon yields",
+    "authors": ["a008", "a005"],
+    "year": 2023,
+    "journal": "Nature",
+    "abstract": "Analysis of 27,000 plantations shows median realized carbon yields are 42% below reported baselines, driven by mortality and species mismatch.",
+    "keywords": ["afforestation", "reforestation", "carbon accounting"],
+    "priceUSDC": 400000
+  },
+  {
+    "id": "p007",
+    "doi": "10.1021/acsnano.enzyme-2024",
+    "title": "Engineered carbonic anhydrase immobilization for post-combustion capture",
+    "authors": ["a009"],
+    "year": 2024,
+    "journal": "ACS Nano",
+    "abstract": "A metal-organic framework host enhances enzyme turnover by 12x vs free enzyme, enabling continuous capture at flue-gas temperatures.",
+    "keywords": ["enzyme", "carbonic anhydrase", "MOF"],
+    "priceUSDC": 350000
+  },
+  {
+    "id": "p008",
+    "doi": "10.1038/s41558-2024-policy",
+    "title": "Carbon removal incentive design: lessons from the 45Q, CCfD, and ERF experiments",
+    "authors": ["a010", "a001"],
+    "year": 2024,
+    "journal": "Nature Climate Change",
+    "abstract": "Comparative analysis of three major CDR incentive regimes reveals durability-pricing and MRV rigor as strongest determinants of project survival.",
+    "keywords": ["policy", "45Q", "CCfD", "incentive"],
+    "priceUSDC": 400000
+  },
+  {
+    "id": "p009",
+    "doi": "10.1039/ee-electrolysis-2024",
+    "title": "Low-temperature CO2 electrolysis to ethylene: a roadmap for industrial deployment",
+    "authors": ["a011", "a006"],
+    "year": 2024,
+    "journal": "Energy & Environmental Science",
+    "abstract": "Bipolar membrane systems demonstrate 72% Faradaic efficiency for ethylene at ambient temperature with projected costs <$800/t by 2030.",
+    "keywords": ["CO2 electrolysis", "ethylene", "CCU"],
+    "priceUSDC": 400000
+  },
+  {
+    "id": "p010",
+    "doi": "10.1038/s41893-2024-blue",
+    "title": "Blue carbon restoration: quantifying 30-year sequestration trajectories in mangroves",
+    "authors": ["a012"],
+    "year": 2024,
+    "journal": "Nature Sustainability",
+    "abstract": "Long-term monitoring of 68 mangrove restoration sites reveals cumulative sequestration of 2.8-4.1 tCO2/ha/yr with strong co-benefits for coastal protection.",
+    "keywords": ["blue carbon", "mangrove", "restoration"],
+    "priceUSDC": 300000
+  },
+  {
+    "id": "p011",
+    "doi": "10.1126/science.adv-2023-dac",
+    "title": "Heat-exchanger thermodynamic limits for solid-sorbent DAC",
+    "authors": ["a013", "a003"],
+    "year": 2023,
+    "journal": "Science",
+    "abstract": "First-principles thermodynamic bounds on solid-sorbent DAC systems show minimum 1.2 GJ/tCO2 theoretical, with current systems at 6-8 GJ/tCO2.",
+    "keywords": ["DAC", "thermodynamics", "sorbent"],
+    "priceUSDC": 450000
+  },
+  {
+    "id": "p012",
+    "doi": "10.1016/j.oneear.storage-2024",
+    "title": "Storage capacity assessment for saline aquifers in Southeast Asia",
+    "authors": ["a014"],
+    "year": 2024,
+    "journal": "One Earth",
+    "abstract": "Regional assessment identifies 140-210 GtCO2 storage capacity across Indonesian, Malaysian, and Vietnamese basins with suitability scoring.",
+    "keywords": ["CO2 storage", "saline aquifer", "southeast asia"],
+    "priceUSDC": 300000
+  },
+  {
+    "id": "p013",
+    "doi": "10.1038/s41560-2024-grid",
+    "title": "Grid integration of 100% renewable systems: reliability under extreme weather",
+    "authors": ["a006", "a015"],
+    "year": 2024,
+    "journal": "Nature Energy",
+    "abstract": "Multi-scenario modeling demonstrates 100% renewable grids maintain >99.95% reliability with 8-12 hour storage plus geographic dispersion.",
+    "keywords": ["renewable", "grid", "reliability", "storage"],
+    "priceUSDC": 400000
+  },
+  {
+    "id": "p014",
+    "doi": "10.1021/acssuschem.bioenergy-2024",
+    "title": "BECCS deployment constraints: sustainability, land, and biodiversity trade-offs",
+    "authors": ["a016", "a004"],
+    "year": 2024,
+    "journal": "ACS Sustainable Chem. Eng.",
+    "abstract": "Bioenergy with CCS pathways constrained to 1.5-3.5 GtCO2/yr by sustainable biomass availability without biodiversity loss.",
+    "keywords": ["BECCS", "biomass", "sustainability"],
+    "priceUSDC": 350000
+  },
+  {
+    "id": "p015",
+    "doi": "10.1038/s41586-2024-verification",
+    "title": "Cryptographic verification of carbon removal: a registry architecture",
+    "authors": ["a017", "a010"],
+    "year": 2024,
+    "journal": "Nature",
+    "abstract": "We propose a distributed ledger architecture enabling third-party verification of carbon removal claims with 100x reduction in verification cost.",
+    "keywords": ["verification", "MRV", "blockchain", "registry"],
+    "priceUSDC": 450000
+  }
+]

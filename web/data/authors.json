@@ -1,0 +1,121 @@
+[
+  {
+    "id": "a001",
+    "name": "Dr. Sarah Chen",
+    "affiliation": "Stanford University",
+    "wallet": "0x1111111111111111111111111111111111111111",
+    "orcid": "0000-0001-1234-0001"
+  },
+  {
+    "id": "a002",
+    "name": "Dr. Marcus Hoffmann",
+    "affiliation": "ETH Zürich",
+    "wallet": "0x2222222222222222222222222222222222222222",
+    "orcid": "0000-0001-1234-0002"
+  },
+  {
+    "id": "a003",
+    "name": "Dr. Ingibjörg Sigurdsson",
+    "affiliation": "University of Iceland",
+    "wallet": "0x3333333333333333333333333333333333333333",
+    "orcid": "0000-0001-1234-0003"
+  },
+  {
+    "id": "a004",
+    "name": "Dr. Priya Sharma",
+    "affiliation": "IIT Delhi",
+    "wallet": "0x4444444444444444444444444444444444444444",
+    "orcid": "0000-0001-1234-0004"
+  },
+  {
+    "id": "a005",
+    "name": "Dr. Arjun Mehta",
+    "affiliation": "Oxford University",
+    "wallet": "0x5555555555555555555555555555555555555555",
+    "orcid": "0000-0001-1234-0005"
+  },
+  {
+    "id": "a006",
+    "name": "Dr. Anna Kowalski",
+    "affiliation": "MIT",
+    "wallet": "0x6666666666666666666666666666666666666666",
+    "orcid": "0000-0001-1234-0006"
+  },
+  {
+    "id": "a007",
+    "name": "Dr. James Okonkwo",
+    "affiliation": "Woods Hole Oceanographic",
+    "wallet": "0x7777777777777777777777777777777777777777",
+    "orcid": "0000-0001-1234-0007"
+  },
+  {
+    "id": "a008",
+    "name": "Dr. Lucia Fernandez",
+    "affiliation": "CONICET Argentina",
+    "wallet": "0x8888888888888888888888888888888888888888",
+    "orcid": "0000-0001-1234-0008"
+  },
+  {
+    "id": "a009",
+    "name": "Dr. Hiroshi Tanaka",
+    "affiliation": "University of Tokyo",
+    "wallet": "0x9999999999999999999999999999999999999999",
+    "orcid": "0000-0001-1234-0009"
+  },
+  {
+    "id": "a010",
+    "name": "Dr. Elena Vasquez",
+    "affiliation": "Harvard Kennedy School",
+    "wallet": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "orcid": "0000-0001-1234-0010"
+  },
+  {
+    "id": "a011",
+    "name": "Dr. Kwame Osei",
+    "affiliation": "Caltech",
+    "wallet": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "orcid": "0000-0001-1234-0011"
+  },
+  {
+    "id": "a012",
+    "name": "Dr. Siti Rahayu",
+    "affiliation": "Universitas Indonesia",
+    "wallet": "0xcccccccccccccccccccccccccccccccccccccccc",
+    "orcid": "0000-0001-1234-0012"
+  },
+  {
+    "id": "a013",
+    "name": "Dr. Rafael Souza",
+    "affiliation": "USP São Paulo",
+    "wallet": "0xdddddddddddddddddddddddddddddddddddddddd",
+    "orcid": "0000-0001-1234-0013"
+  },
+  {
+    "id": "a014",
+    "name": "Dr. Budi Santoso",
+    "affiliation": "ITB Bandung",
+    "wallet": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "orcid": "0000-0001-1234-0014"
+  },
+  {
+    "id": "a015",
+    "name": "Dr. Emma Thompson",
+    "affiliation": "Imperial College London",
+    "wallet": "0xffffffffffffffffffffffffffffffffffffffff",
+    "orcid": "0000-0001-1234-0015"
+  },
+  {
+    "id": "a016",
+    "name": "Dr. Thiago Lima",
+    "affiliation": "UFRJ Rio",
+    "wallet": "0x1010101010101010101010101010101010101010",
+    "orcid": "0000-0001-1234-0016"
+  },
+  {
+    "id": "a017",
+    "name": "Dr. Chang Wei",
+    "affiliation": "Tsinghua University",
+    "wallet": "0x2020202020202020202020202020202020202020",
+    "orcid": "0000-0001-1234-0017"
+  }
+]

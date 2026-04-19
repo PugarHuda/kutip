@@ -1,0 +1,619 @@
+"use client";
+
+import { Fragment, useMemo, useState } from "react";
+import type { AgentEvent, AgentStep, ResearchResult } from "@/lib/types";
+import { ArrowRightIcon, CheckIcon, ChevronDownIcon, SearchIcon } from "@/components/icons";
+import { Addr, Cite, PayoutRow, Tx } from "@/components/ui";
+
+const SUGGESTIONS = [
+  "Top carbon capture methods in 2024",
+  "Latest progress on direct air capture cost reduction",
+  "Compare mineralization vs biochar for long-term storage"
+];
+
+const STEP_OUTLINE = [
+  ["Search", "Paper catalog retrieval"],
+  ["Purchase", "x402 per-paper settlement"],
+  ["Read", "LLM synthesis & citations"],
+  ["Attribute", "Build citation ledger"],
+  ["Settle", "Submit attestation on-chain"]
+];
+
+const KITESCAN_TX = "https://testnet.kitescan.ai/tx/";
+const KITESCAN_ADDR = "https://testnet.kitescan.ai/address/";
+
+type Phase = "idle" | "running" | "result";
+
+export default function ResearchPage() {
+  const [query, setQuery] = useState("");
+  const [budget, setBudget] = useState(1);
+  const [steps, setSteps] = useState<AgentStep[]>([]);
+  const [result, setResult] = useState<ResearchResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [running, setRunning] = useState(false);
+  const [expandLog, setExpandLog] = useState(false);
+
+  const phase: Phase = result ? "result" : running ? "running" : "idle";
+
+  async function runQuery() {
+    const q = query.trim();
+    if (!q || running) return;
+    setSteps([]);
+    setResult(null);
+    setError(null);
+    setRunning(true);
+
+    try {
+      const res = await fetch("/api/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q, budgetUSDC: budget })
+      });
+      if (!res.body) throw new Error("No response body");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const messages = buffer.split("\n\n");
+        buffer = messages.pop() ?? "";
+
+        for (const msg of messages) {
+          if (!msg.startsWith("data: ")) continue;
+          const event = JSON.parse(msg.slice(6)) as AgentEvent;
+          handleEvent(event);
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "unknown");
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  function handleEvent(event: AgentEvent) {
+    if (event.type === "step") {
+      setSteps((prev) => {
+        const existing = prev.findIndex((s) => s.step === event.step.step);
+        if (existing >= 0) {
+          const copy = [...prev];
+          copy[existing] = event.step;
+          return copy;
+        }
+        return [...prev, event.step];
+      });
+    } else if (event.type === "result") {
+      setResult(event.result);
+    } else {
+      setError(event.message);
+    }
+  }
+
+  return (
+    <main className="min-h-[calc(100vh-60px)] grid grid-cols-1 lg:grid-cols-[420px_1fr]">
+      <ResearchSidebar
+        phase={phase}
+        query={query}
+        setQuery={setQuery}
+        budget={budget}
+        setBudget={setBudget}
+        onSubmit={runQuery}
+        disabled={running || !query.trim()}
+      />
+      <div className="px-6 lg:px-8 py-8 lg:py-10 lg:border-l border-token">
+        {phase === "idle" && !error && <IdleView setQuery={setQuery} />}
+        {phase === "running" && <RunningView steps={steps} />}
+        {phase === "result" && result && (
+          <ResultView result={result} steps={steps} expandLog={expandLog} setExpandLog={setExpandLog} />
+        )}
+        {error && (
+          <div className="card p-5 bg-rose-50 border-rose-500 text-rose-700 text-sm">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+function ResearchSidebar({
+  phase,
+  query,
+  setQuery,
+  budget,
+  setBudget,
+  onSubmit,
+  disabled
+}: {
+  phase: Phase;
+  query: string;
+  setQuery: (q: string) => void;
+  budget: number;
+  setBudget: (b: number) => void;
+  onSubmit: () => void;
+  disabled: boolean;
+}) {
+  return (
+    <aside className="p-6 lg:p-7 lg:sticky lg:top-0 self-start">
+      <div className="t-caption">Your question</div>
+      <textarea
+        className="card mt-2 p-3.5 min-h-[100px] w-full text-[15px] leading-[22px] resize-none bg-transparent focus:outline-none focus:border-kite-500 transition-colors"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="e.g., What are the top carbon capture methods in 2024?"
+        maxLength={500}
+        rows={3}
+      />
+      <div className="flex justify-end mt-1">
+        <span className="t-mono-sm ink-3">{query.length} / 500</span>
+      </div>
+
+      {phase === "idle" && (
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {SUGGESTIONS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              className="chip chip--mono cursor-pointer"
+              style={{
+                border: "1px solid var(--border)",
+                background: "var(--surface-raised)"
+              }}
+              onClick={() => setQuery(s)}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="t-caption mt-6">Budget</div>
+      <div className="flex gap-1.5 mt-2">
+        {[1, 2, 5, 10].map((v) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => setBudget(v)}
+            className="flex-1 h-10 rounded-lg font-mono text-[13px] font-semibold transition-colors"
+            style={
+              budget === v
+                ? {
+                    border: "1px solid var(--kite-500)",
+                    background: "var(--kite-500)",
+                    color: "#fff"
+                  }
+                : {
+                    border: "1px solid var(--border)",
+                    background: "var(--surface)",
+                    color: "var(--ink)"
+                  }
+            }
+          >
+            {v}
+          </button>
+        ))}
+      </div>
+      <div className="t-small ink-3 mt-2">USDC · paid by agent smart account</div>
+
+      <button
+        type="button"
+        className="btn btn--primary btn--lg w-full mt-5 justify-center"
+        disabled={disabled}
+        onClick={onSubmit}
+      >
+        {phase === "idle" && (
+          <>
+            Pay {budget} USDC &amp; research <ArrowRightIcon />
+          </>
+        )}
+        {phase === "running" && (
+          <>
+            Paying
+            <DotPulse />
+          </>
+        )}
+        {phase === "result" && (
+          <>
+            Ask a follow-up <ArrowRightIcon />
+          </>
+        )}
+      </button>
+
+      <div className="mt-5 p-3.5 surface-raised border border-token rounded-[10px]">
+        <div className="flex justify-between items-center">
+          <span className="t-caption">Wallet</span>
+          <span className="status-dot status-dot--done" style={{ width: 6, height: 6 }} />
+        </div>
+        <div className="flex justify-between items-baseline mt-1.5">
+          <Addr full="0x5C91B851D9Aa20172e6067d9236920A6CBabf40c">0x5c91…0bf40c</Addr>
+          <span className="t-mono font-semibold">EOA master</span>
+        </div>
+      </div>
+
+      <div className="t-small ink-3 mt-4 pt-4 border-t border-token">
+        Your USDC splits to authors only if citations land. Attestation is fail-closed.
+      </div>
+    </aside>
+  );
+}
+
+function DotPulse() {
+  return (
+    <span className="inline-flex gap-1 ml-1">
+      <span className="w-1 h-1 rounded-full bg-current animate-breathe" />
+      <span
+        className="w-1 h-1 rounded-full bg-current animate-breathe"
+        style={{ animationDelay: "0.15s" }}
+      />
+      <span
+        className="w-1 h-1 rounded-full bg-current animate-breathe"
+        style={{ animationDelay: "0.3s" }}
+      />
+    </span>
+  );
+}
+
+function IdleView({ setQuery }: { setQuery: (q: string) => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[640px] text-center">
+      <div className="w-14 h-14 rounded-2xl bg-kite-100 text-kite-500 flex items-center justify-center mb-5">
+        <SearchIcon size={24} />
+      </div>
+      <h2 className="t-h2 max-w-[420px] m-0">Ask a question. Pay the authors you learn from.</h2>
+      <p className="t-body ink-2 max-w-[440px] mt-2.5">
+        Type your question on the left and set a USDC budget. We&apos;ll show the agent&apos;s work,
+        live, and hand you a cryptographic receipt at the end.
+      </p>
+      <button
+        type="button"
+        className="btn btn--primary mt-5"
+        onClick={() => setQuery("What are the top carbon capture methods in 2024?")}
+      >
+        Try the sample query <ArrowRightIcon />
+      </button>
+
+      <div className="mt-12 w-full max-w-[560px]">
+        <div className="t-caption mb-3">How a query runs</div>
+        <div className="grid grid-cols-5 gap-2">
+          {STEP_OUTLINE.map(([label], i) => (
+            <div
+              key={label}
+              className="p-3 rounded-lg text-left surface-raised border border-token"
+            >
+              <div className="t-mono-sm ink-3">{String(i + 1).padStart(2, "0")}</div>
+              <div className="t-small font-semibold mt-1">{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RunningView({ steps }: { steps: AgentStep[] }) {
+  const currentIdx = steps.findIndex((s) => s.status === "running");
+  const effectiveCurrent = currentIdx >= 0 ? currentIdx : Math.max(0, steps.length - 1);
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-5">
+        <div>
+          <div className="t-caption">Agent log</div>
+          <h2 className="t-h2 mt-1 mb-0">Researching…</h2>
+        </div>
+        <span className="chip chip--pending">
+          {Math.min(steps.length, 5)} / 5 steps
+        </span>
+      </div>
+
+      <div className="card p-0 overflow-hidden">
+        {Array.from({ length: 5 }).map((_, i) => {
+          const s = steps[i];
+          const state: AgentStep["status"] =
+            s?.status ?? (i === effectiveCurrent && steps.length > 0 ? "pending" : "pending");
+          const isRunning = state === "running";
+          const label = s?.label ?? STEP_OUTLINE[i]?.[0] ?? `Step ${i + 1}`;
+          const detail = s?.detail ?? STEP_OUTLINE[i]?.[1] ?? "";
+          return (
+            <div
+              key={i}
+              className="grid items-center gap-3.5 py-4 px-5 border-b border-token last:border-b-0 transition-opacity"
+              style={{
+                gridTemplateColumns: "44px 1fr 70px",
+                borderLeft: isRunning ? "2px solid var(--kite-500)" : "2px solid transparent",
+                background: isRunning
+                  ? "color-mix(in srgb, var(--kite-500) 5%, transparent)"
+                  : "transparent",
+                opacity: state === "pending" ? 0.5 : 1
+              }}
+            >
+              <div className="flex justify-center">
+                <StepIcon state={state} n={i + 1} />
+              </div>
+              <div>
+                <div className="t-h3 text-[16px] font-semibold">{label}</div>
+                <div className="t-small ink-2 mt-0.5">{detail}</div>
+              </div>
+              <div
+                className="t-mono-sm text-right"
+                style={{ color: state === "pending" ? "var(--ink-4)" : "var(--ink-3)" }}
+              >
+                {state === "done" ? "done" : isRunning ? "…" : "—"}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="t-small ink-3 mt-3.5">
+        Log is kept after completion — it&apos;s evidence, not chrome.
+      </div>
+    </div>
+  );
+}
+
+function StepIcon({ state, n }: { state: AgentStep["status"]; n: number }) {
+  if (state === "done") {
+    return (
+      <div className="w-7 h-7 rounded-full flex items-center justify-center bg-emerald-50 text-emerald-700">
+        <CheckIcon size={15} />
+      </div>
+    );
+  }
+  if (state === "running") {
+    return (
+      <div className="w-7 h-7 rounded-full flex items-center justify-center bg-kite-500 text-white animate-breathe">
+        <span className="t-mono-sm font-bold">{n}</span>
+      </div>
+    );
+  }
+  if (state === "error") {
+    return (
+      <div className="w-7 h-7 rounded-full flex items-center justify-center bg-rose-50 text-rose-700">
+        <span className="t-mono-sm font-bold">×</span>
+      </div>
+    );
+  }
+  return (
+    <div
+      className="w-7 h-7 rounded-full flex items-center justify-center"
+      style={{ border: "1.5px solid var(--border-strong)" }}
+    >
+      <span className="t-mono-sm ink-3">{n}</span>
+    </div>
+  );
+}
+
+function ResultView({
+  result,
+  steps,
+  expandLog,
+  setExpandLog
+}: {
+  result: ResearchResult;
+  steps: AgentStep[];
+  expandLog: boolean;
+  setExpandLog: (v: boolean) => void;
+}) {
+  const txShort = result.attestationTx
+    ? `${result.attestationTx.slice(0, 10)}…${result.attestationTx.slice(-4)}`
+    : null;
+  const totalPaid = (result.totalPaidUSDC / 1e18).toFixed(2);
+  const citationCount = result.paperDetails.reduce(
+    (acc, p) => acc + p.authors.length,
+    0
+  );
+  const authorCount = new Set(
+    result.paperDetails.flatMap((p) => p.authors.map((a) => a.wallet))
+  ).size;
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="card animate-fade-up flex justify-between items-center p-3 px-4 surface-raised">
+        <div className="flex gap-2.5 items-center">
+          <div className="w-[22px] h-[22px] rounded-full bg-emerald-500 text-white flex items-center justify-center">
+            <CheckIcon size={13} />
+          </div>
+          <span className="t-small">
+            <strong>{Math.min(steps.length, 5)} steps complete</strong> · {result.paperDetails.length}{" "}
+            papers · {citationCount} citations
+          </span>
+        </div>
+        <button
+          type="button"
+          className="btn btn--ghost btn--sm"
+          onClick={() => setExpandLog(!expandLog)}
+        >
+          {expandLog ? "Collapse" : "Expand"} log <ChevronDownIcon />
+        </button>
+      </div>
+
+      {expandLog && (
+        <div className="card p-0 overflow-hidden animate-fade-up">
+          {steps.map((s, i) => (
+            <div
+              key={i}
+              className="grid items-center gap-3 px-5 py-3 border-b border-token last:border-b-0"
+              style={{ gridTemplateColumns: "44px 1fr 70px" }}
+            >
+              <div className="flex justify-center">
+                <StepIcon state={s.status} n={s.step} />
+              </div>
+              <div>
+                <div className="t-small font-semibold">{s.label}</div>
+                {s.detail && <div className="t-small ink-3 mt-0.5">{s.detail}</div>}
+              </div>
+              <div className="t-mono-sm text-right ink-3">{s.status}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div
+        className="card animate-fade-up p-7"
+        style={{ animationDelay: "60ms" }}
+      >
+        <div className="t-caption">Summary</div>
+        <div
+          className="t-serif mt-2 mb-5"
+          style={{ fontSize: 24, lineHeight: "32px", color: "var(--ink)" }}
+        >
+          "{result.query}"
+        </div>
+        <div className="t-body m-0 max-w-[780px]">
+          <RenderWithCitations text={result.summary} />
+        </div>
+      </div>
+
+      <div
+        className="card pattern-grid animate-fade-up p-0 overflow-hidden relative"
+        style={{ animationDelay: "120ms" }}
+      >
+        <div className="flex items-center justify-between px-6 py-5 border-b border-token surface">
+          <div>
+            <div className="t-caption text-emerald-700">Attribution receipt</div>
+            <div className="t-h2 mt-1">
+              {authorCount} author{authorCount === 1 ? "" : "s"} paid ·{" "}
+              <span className="t-mono" style={{ fontSize: 28 }}>
+                {totalPaid} USDC
+              </span>
+            </div>
+          </div>
+          {txShort && result.attestationTx && (
+            <a
+              href={KITESCAN_TX + result.attestationTx}
+              target="_blank"
+              rel="noreferrer"
+              className="chip chip--success chip--lg animate-pulse-ring rounded-full"
+            >
+              <CheckIcon size={12} /> Tx {txShort}
+            </a>
+          )}
+          {!txShort && (
+            <span className="chip chip--pending chip--lg rounded-full">
+              Demo mode · no on-chain tx
+            </span>
+          )}
+        </div>
+        <div className="surface">
+          {result.paperDetails.flatMap((p, pIdx) =>
+            p.authors.map((a, aIdx) => {
+              const globalIdx =
+                result.paperDetails.slice(0, pIdx).reduce((acc, pp) => acc + pp.authors.length, 0) +
+                aIdx;
+              const top = globalIdx === 0;
+              const amount = (
+                (result.totalPaidUSDC * 0.4 * (a.share / 10000)) /
+                1e18
+              ).toFixed(4);
+              return (
+                <PayoutRow
+                  key={`${p.id}-${a.wallet}-${aIdx}`}
+                  index={globalIdx}
+                  top={top}
+                  name={a.name}
+                  affiliation={`Paper ${p.id} · ${p.journalYear}`}
+                  wallet={`${a.wallet.slice(0, 6)}…${a.wallet.slice(-4)}`}
+                  walletFull={a.wallet}
+                  walletHref={KITESCAN_ADDR + a.wallet}
+                  amount={`${amount} USDC`}
+                  tx={txShort ?? "demo"}
+                  txHref={result.attestationTx ? KITESCAN_TX + result.attestationTx : undefined}
+                />
+              );
+            })
+          )}
+          <div className="flex justify-between items-center px-5 py-3.5 border-t border-token surface-raised">
+            <span className="t-small ink-2">Authors share (40%)</span>
+            <span className="t-mono font-bold text-[15px]">
+              {(result.totalPaidUSDC * 0.4 / 1e18).toFixed(4)} USDC
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="card animate-fade-up flex items-center justify-between px-5 py-4"
+        style={{ animationDelay: "180ms" }}
+      >
+        <div>
+          <div className="t-small">
+            <strong>Full bibliography</strong> · {result.paperDetails.length} papers cited
+          </div>
+          <div className="t-small ink-3 mt-0.5">DOI · per-paper weight · per-author split</div>
+        </div>
+        <details className="cursor-pointer">
+          <summary className="btn btn--ghost btn--sm list-none">
+            Expand <ChevronDownIcon />
+          </summary>
+          <ul className="mt-3 space-y-2 text-sm">
+            {result.paperDetails.map((p) => (
+              <li key={p.id} className="pl-3 border-l-2 border-kite-200">
+                <div className="t-serif text-[15px]">{p.title}</div>
+                <div className="t-small ink-3">{p.journalYear}</div>
+                <div className="t-mono-sm ink-3">
+                  {p.id} · {p.authors.map((a) => a.name).join(" · ")}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </details>
+      </div>
+
+      <div className="flex justify-between items-center pt-2">
+        <div className="flex gap-2.5">
+          <button type="button" className="btn btn--ghost btn--sm">
+            Download receipt (JSON)
+          </button>
+          <button type="button" className="btn btn--ghost btn--sm">
+            Download summary (Markdown)
+          </button>
+        </div>
+        <a
+          href={`/verify/${result.queryId}`}
+          target="_blank"
+          rel="noreferrer"
+          className="btn btn--ghost btn--sm"
+        >
+          /verify permalink ↗
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function RenderWithCitations({ text }: { text: string }) {
+  const parts = useMemo(() => {
+    const segments: Array<{ type: "text" | "cite"; value: string }> = [];
+    const regex = /\[(\d+)\]/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        segments.push({ type: "text", value: text.slice(lastIndex, match.index) });
+      }
+      segments.push({ type: "cite", value: match[1] });
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < text.length) {
+      segments.push({ type: "text", value: text.slice(lastIndex) });
+    }
+    return segments;
+  }, [text]);
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.type === "cite" ? (
+          <Cite key={i} n={Number(part.value)} />
+        ) : (
+          <Fragment key={i}>{part.value}</Fragment>
+        )
+      )}
+    </>
+  );
+}

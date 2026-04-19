@@ -1,0 +1,26 @@
+{
+  "name": "kutip",
+  "version": "0.1.0",
+  "description": "The research agent that pays its sources — Kite AI Hackathon 2026",
+  "private": true,
+  "scripts": {
+    "dev": "cd web && pnpm dev",
+    "build": "cd web && pnpm build",
+    "typecheck": "cd web && pnpm typecheck",
+    "contracts:build": "cd contracts && forge build",
+    "contracts:test": "cd contracts && forge test -vvv",
+    "contracts:deploy": "cd contracts && forge script script/Deploy.s.sol:Deploy --rpc-url $KITE_RPC_URL --private-key $PRIVATE_KEY --broadcast -vvv",
+    "env:sync": "node scripts/sync-env.mjs",
+    "setup": "pnpm install && cd web && pnpm install && cd ../contracts && forge install"
+  },
+  "keywords": [
+    "kite-ai",
+    "hackathon",
+    "x402",
+    "ai-agent",
+    "proof-of-ai",
+    "attribution"
+  ],
+  "author": "Pugar Huda Mantoro",
+  "license": "MIT"
+}
