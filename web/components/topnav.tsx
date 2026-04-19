@@ -20,6 +20,11 @@ const LINKS: {
     match: (p) => p.startsWith("/leaderboard")
   },
   { href: "/claim", label: "Claim", match: (p) => p.startsWith("/claim") },
+  {
+    href: "/escrow",
+    label: "Escrow",
+    match: (p) => p.startsWith("/escrow")
+  },
   { href: "/verify", label: "Verify", match: (p) => p.startsWith("/verify") }
 ];
 
