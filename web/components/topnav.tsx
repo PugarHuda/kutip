@@ -25,6 +25,11 @@ const LINKS: {
     label: "Escrow",
     match: (p) => p.startsWith("/escrow")
   },
+  {
+    href: "/bounties",
+    label: "Bounties",
+    match: (p) => p.startsWith("/bounties")
+  },
   { href: "/verify", label: "Verify", match: (p) => p.startsWith("/verify") }
 ];
 
