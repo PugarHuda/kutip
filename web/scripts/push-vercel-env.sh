@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Push environment variables from web/.env.local to Vercel project (production).
-# Run from web/ directory after `vercel link`.
+# Push all environment variables from web/.env.local to Vercel production.
+# The .env.local is authoritative — it's already been filtered by
+# `pnpm run env:sync` to only include web-safe keys.
+#
+# Run from web/ directory after `vercel link` + `vercel login`.
 
 set -u
 
@@ -11,36 +14,23 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
-# Keys to push — NEXT_PUBLIC_* are browser-safe, rest are server-only.
-KEYS=(
-  KITE_RPC_URL
-  PRIVATE_KEY
-  OPENROUTER_API_KEY
-  OPENROUTER_MODEL
-  OPENROUTER_FALLBACK_MODEL
-  NEXT_PUBLIC_ATTRIBUTION_LEDGER
-  ATTRIBUTION_LEDGER_DEPLOY_BLOCK
-  NEXT_PUBLIC_AGENT_OPERATOR_ADDRESS
-  NEXT_PUBLIC_ECOSYSTEM_FUND_ADDRESS
-  NEXT_PUBLIC_KITE_EXPLORER
-  KUTIP_USE_AA
-  KUTIP_USE_SEMANTIC_SCHOLAR
-  KUTIP_DEMO_MODE
-)
+pushed=0
+failed=0
 
 while IFS='=' read -r key value; do
   [ -z "$key" ] && continue
   [[ "$key" =~ ^# ]] && continue
-  for target in "${KEYS[@]}"; do
-    if [ "$key" = "$target" ] && [ -n "$value" ]; then
-      # remove & re-add so re-runs update the value
-      vercel env rm "$key" production --yes > /dev/null 2>&1 || true
-      printf "%s" "$value" | vercel env add "$key" production > /dev/null 2>&1 \
-        && echo "+ $key" \
-        || echo "! $key (failed)"
-      break
-    fi
-  done
+  [ -z "$value" ] && continue
+
+  # remove & re-add so re-runs update the value
+  vercel env rm "$key" production --yes > /dev/null 2>&1 || true
+  if printf "%s" "$value" | vercel env add "$key" production > /dev/null 2>&1; then
+    echo "+ $key"
+    pushed=$((pushed + 1))
+  else
+    echo "! $key (failed)"
+    failed=$((failed + 1))
+  fi
 done < "$ENV_FILE"
 
-echo "done."
+echo "done. pushed=$pushed failed=$failed"
