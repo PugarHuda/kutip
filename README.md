@@ -4,9 +4,26 @@
 > Built for the Kite AI Global Hackathon 2026 — Novel Track.
 
 - **Live demo:** <https://kutip-zeta.vercel.app>
-- **Contract (Kite testnet):** [`0x99359DaF…E5Fa`](https://testnet.kitescan.ai/address/0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa)
-- **Agent AA wallet:** [`0x4da7f4cF…1776`](https://testnet.kitescan.ai/address/0x4da7f4cFd443084027a39cc0f7c41466d9511776)
 - **Repo:** <https://github.com/PugarHuda/kutip>
+
+### Contracts (Kite testnet · chain 2368)
+
+| Contract | Address | Tests |
+|---|---|---|
+| AttributionLedger | [`0x99359DaF…E5Fa`](https://testnet.kitescan.ai/address/0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa) | 5 |
+| UnclaimedYieldEscrow | [`0xcbab887d…547b40`](https://testnet.kitescan.ai/address/0xcbab887da9c2a16612a9120b4170e74c50547b40) | 8 |
+| BountyMarket | [`0x1ba00a38…b3f72`](https://testnet.kitescan.ai/address/0x1ba00a38b25adf68ac599cd25094e2aa923b3f72) | 7 |
+| AgentReputation (ERC-721) | [`0x8f53EB5C…db15`](https://testnet.kitescan.ai/address/0x8f53EB5C04B773F0F31FE41623EA19d2Fd84db15) | 7 |
+| AgentRegistry8004 (ERC-8004) | [`0xde6d6ab9…7dcd`](https://testnet.kitescan.ai/address/0xde6d6ab98f216e6421c1b73bdab2f03064d27dcd) | 7 |
+| ERC6551 Registry | [`0x2f432eff…1012`](https://testnet.kitescan.ai/address/0x2f432effbbd83df8df610e5e0c0057b65bd31012) | — |
+| ERC6551 Account impl | [`0x7d9c63f1…f456`](https://testnet.kitescan.ai/address/0x7d9c63f12af5ad7a18bb8d39ac8c1dd23e95f456) | — |
+
+### Agent identities
+
+| Role | Address | TBA (ERC-6551) |
+|---|---|---|
+| Researcher (AA) | [`0x4da7f4cF…1776`](https://testnet.kitescan.ai/address/0x4da7f4cFd443084027a39cc0f7c41466d9511776) | [`0xb1fa88ba…df04`](https://testnet.kitescan.ai/address/0xb1fa88ba20561378a67c3a2d477a2461c704df04) |
+| Summarizer (AA) | [`0xA6C36bA2…ef5c`](https://testnet.kitescan.ai/address/0xA6C36bA2BC8E84fCF276721F30FC79ceD609ef5c) | [`0xb92d4841…8323`](https://testnet.kitescan.ai/address/0xb92d484150efadfb23c55749afad3d7072bd8323) |
 
 ## What It Does
 
