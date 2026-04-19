@@ -115,6 +115,26 @@ await check("GET /research", async () => {
   assert(res.ok, `status ${res.status}`);
 });
 
+await check("GET /registry — hub page", async () => {
+  const res = await fetch(`${BASE}/registry`);
+  assert(res.ok, `status ${res.status}`);
+  const html = await res.text();
+  assert(
+    html.includes("Who is on the other side"),
+    "registry headline missing"
+  );
+});
+
+await check("GET /market — hub page", async () => {
+  const res = await fetch(`${BASE}/market`);
+  assert(res.ok, `status ${res.status}`);
+  const html = await res.text();
+  assert(
+    html.includes("Where capital meets citations"),
+    "market headline missing"
+  );
+});
+
 await check("GET /agents — shows ERC-8004 + ERC-6551", async () => {
   const res = await fetch(`${BASE}/agents`);
   assert(res.ok, `status ${res.status}`);

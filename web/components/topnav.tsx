@@ -12,24 +12,27 @@ const LINKS: {
   match: (p: string) => boolean;
 }[] = [
   { href: "/", label: "Home", match: (p) => p === "/" },
-  { href: "/research", label: "Research", match: (p) => p.startsWith("/research") },
-  { href: "/agents", label: "Agents", match: (p) => p.startsWith("/agents") },
   {
-    href: "/leaderboard",
-    label: "Author earnings",
-    mobileLabel: "Earnings",
-    match: (p) => p.startsWith("/leaderboard")
-  },
-  { href: "/claim", label: "Claim", match: (p) => p.startsWith("/claim") },
-  {
-    href: "/escrow",
-    label: "Escrow",
-    match: (p) => p.startsWith("/escrow")
+    href: "/research",
+    label: "Research",
+    match: (p) => p.startsWith("/research")
   },
   {
-    href: "/bounties",
-    label: "Bounties",
-    match: (p) => p.startsWith("/bounties")
+    href: "/registry",
+    label: "Registry",
+    match: (p) =>
+      p.startsWith("/registry") ||
+      p.startsWith("/agents") ||
+      p.startsWith("/leaderboard") ||
+      p.startsWith("/claim")
+  },
+  {
+    href: "/market",
+    label: "Market",
+    match: (p) =>
+      p.startsWith("/market") ||
+      p.startsWith("/escrow") ||
+      p.startsWith("/bounties")
   },
   { href: "/verify", label: "Verify", match: (p) => p.startsWith("/verify") }
 ];

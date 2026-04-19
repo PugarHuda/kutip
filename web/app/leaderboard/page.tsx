@@ -64,7 +64,12 @@ function RealSpark({ points }: { points: number[] }) {
   );
 }
 
-export default async function LeaderboardPage() {
+export default async function LeaderboardPage({
+  searchParams
+}: {
+  searchParams?: { showAll?: string };
+}) {
+  const showAll = searchParams?.showAll === "1";
   const authors = listAuthors();
   const wallets = authors.map((a) => a.wallet as Address);
 
@@ -149,6 +154,12 @@ export default async function LeaderboardPage() {
   const totalEarnings = rows.reduce((acc, r) => acc + r.earnings, 0n);
   const totalCitations = rows.reduce((acc, r) => acc + r.citations, 0);
   const authorsPaid = rows.filter((r) => r.earnings > 0n).length;
+  const unclaimedCount = rows.length - authorsPaid;
+
+  // By default hide 0-earnings rows — reduces wall of zeros for first-time viewers.
+  const visibleRows = showAll
+    ? rows
+    : rows.filter((r) => r.earnings > 0n || r.citations > 0);
 
   return (
     <main className="min-h-[calc(100vh-60px)]">
@@ -239,7 +250,7 @@ export default async function LeaderboardPage() {
               )
             )}
           </div>
-          {rows.map((r, i) => {
+          {visibleRows.map((r, i) => {
             const top = i === 0 && r.earnings > 0n;
             const trend: "up" | "down" | "flat" =
               r.citations > 0 ? "up" : r.earnings > 0n ? "flat" : "flat";
@@ -254,7 +265,7 @@ export default async function LeaderboardPage() {
                   background: top ? "var(--emerald-50)" : "transparent",
                   borderLeft: top ? "2px solid var(--emerald-500)" : "2px solid transparent",
                   borderBottom:
-                    i < rows.length - 1 ? "1px solid var(--border)" : "none"
+                    i < visibleRows.length - 1 ? "1px solid var(--border)" : "none"
                 }}
               >
                 <span className="t-mono-sm ink-3">{String(i + 1).padStart(2, "0")}</span>
@@ -287,12 +298,34 @@ export default async function LeaderboardPage() {
           })}
         </div>
 
-        <div className="mt-4 flex justify-between items-center">
+        {!showAll && unclaimedCount > 0 && (
+          <div className="mt-4 flex justify-center">
+            <a
+              href="/leaderboard?showAll=1"
+              className="t-small ink-3 hover:text-kite-500 transition-colors"
+            >
+              Show all {rows.length} authors ({unclaimedCount} unclaimed) →
+            </a>
+          </div>
+        )}
+
+        {showAll && (
+          <div className="mt-4 flex justify-center">
+            <a
+              href="/leaderboard"
+              className="t-small ink-3 hover:text-kite-500 transition-colors"
+            >
+              ← Hide unclaimed rows
+            </a>
+          </div>
+        )}
+
+        <div className="mt-6 flex justify-between items-center">
           <div className="t-small ink-3">
             {ledgerAddr ? (
               <>
                 {dataSource === "goldsky" ? (
-                  <>Stats indexed by Goldsky subgraph · sparklines show real 7-day history</>
+                  <>Stats indexed by Goldsky subgraph</>
                 ) : (
                   <>
                     Stats read live from{" "}
@@ -302,18 +335,18 @@ export default async function LeaderboardPage() {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      AttributionLedger contract on Kite testnet{" "}
+                      AttributionLedger on Kite testnet{" "}
                       <ExternalLinkIcon size={11} />
                     </a>
                   </>
                 )}
               </>
             ) : (
-              <>AttributionLedger not yet deployed — values shown are placeholders.</>
+              <>AttributionLedger not yet deployed.</>
             )}
           </div>
           <span className="t-mono-sm ink-3">
-            {dataSource === "goldsky" ? "goldsky · cached 15s" : "rpc · per-request"}
+            {dataSource === "goldsky" ? "goldsky" : "rpc"}
           </span>
         </div>
       </div>

@@ -62,8 +62,8 @@ export default async function HomePage() {
             <Link href="/research" className="btn btn--primary btn--lg">
               Start a research query <ArrowRightIcon />
             </Link>
-            <Link href="/leaderboard" className="btn btn--ghost btn--lg">
-              See author earnings
+            <Link href="/registry" className="btn btn--ghost btn--lg">
+              See who&apos;s getting paid
             </Link>
           </div>
 
@@ -131,40 +131,47 @@ export default async function HomePage() {
                 />
               )}
               {facilitator.reachable && (
-                <div className="flex items-start justify-between gap-4 pt-3 border-t border-token">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="t-caption">x402 facilitator</span>
-                      <span
-                        className="chip chip--success"
-                        style={{ padding: "1px 7px", fontSize: 10 }}
+                <details className="pt-3 border-t border-token group">
+                  <summary className="t-small ink-3 cursor-pointer list-none flex items-center justify-between hover:text-kite-700">
+                    <span>Infrastructure details</span>
+                    <span className="t-mono-sm ink-3 group-open:rotate-180 transition-transform">
+                      ▾
+                    </span>
+                  </summary>
+                  <div className="mt-3 flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="t-caption">x402 facilitator</span>
+                        <span
+                          className="chip chip--success"
+                          style={{ padding: "1px 7px", fontSize: 10 }}
+                        >
+                          Live · {facilitator.latencyMs}ms
+                        </span>
+                      </div>
+                      <a
+                        href={PIEVERSE_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block t-mono-sm text-kite-700 hover:text-kite-500 break-all"
                       >
-                        Live · {facilitator.latencyMs}ms
-                      </span>
-                    </div>
-                    <a
-                      href={PIEVERSE_URL}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block t-mono-sm text-kite-700 hover:text-kite-500 break-all"
-                    >
-                      {PIEVERSE_URL.replace("https://", "")}
-                    </a>
-                    <div className="t-small ink-3 mt-0.5">
-                      Pieverse v{facilitator.version ?? "?"} · Kite testnet{" "}
-                      {facilitator.supportsKiteTestnet ? "supported" : "not found"}
+                        {PIEVERSE_URL.replace("https://", "")}
+                      </a>
+                      <div className="t-small ink-3 mt-0.5">
+                        Pieverse v{facilitator.version ?? "?"} · Kite testnet{" "}
+                        {facilitator.supportsKiteTestnet ? "supported" : "not found"}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </details>
               )}
             </div>
           )}
         </div>
       </div>
 
-      <footer className="max-w-[1280px] mx-auto flex justify-between items-center mt-20 pt-5 border-t border-token">
+      <footer className="max-w-[1280px] mx-auto mt-20 pt-5 border-t border-token">
         <span className="t-small ink-3">Built on Kite testnet · Hackathon 2026</span>
-        <span className="t-mono-sm ink-3">chain id 2368 · block time 1s · gas ≈ 0</span>
       </footer>
     </main>
   );

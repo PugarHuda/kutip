@@ -577,22 +577,14 @@ function ResultView({
         </details>
       </div>
 
-      <div className="flex justify-between items-center pt-2">
-        <div className="flex gap-2.5">
-          <button type="button" className="btn btn--ghost btn--sm">
-            Download receipt (JSON)
-          </button>
-          <button type="button" className="btn btn--ghost btn--sm">
-            Download summary (Markdown)
-          </button>
-        </div>
+      <div className="flex justify-end items-center pt-2">
         <a
           href={`/verify/${result.queryId}`}
           target="_blank"
           rel="noreferrer"
-          className="btn btn--ghost btn--sm"
+          className="btn btn--primary btn--sm"
         >
-          /verify permalink ↗
+          View on-chain proof ↗
         </a>
       </div>
     </div>
