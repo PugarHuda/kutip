@@ -7,6 +7,20 @@
 - Webcam corner for face narration (builds trust)
 - Background music: light lofi at -20dB
 
+### Timing reality (from 2026-04-19 prod stress test)
+
+| Phase | Latency |
+|---|---|
+| Vercel cold start | ~15s (first query after idle) |
+| Warm query end-to-end | ~25-30s |
+| p95 worst case | ~58s |
+
+**Pre-warm before recording.** Run one throwaway query before hitting record.
+Otherwise the shot will have a 15s pause that reads as "broken."
+
+Warmup cron hits `/api/warmup` every 30 min — if you haven't visited the site
+in 2+ hours, expect another cold start. Re-warm.
+
 ## Shot List
 
 ### Shot 1 — Hook (0:00 → 0:10)

@@ -4,7 +4,10 @@ import { runResearchAgent } from "@/lib/agent";
 import type { AgentEvent } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// p95 observed during stress test was ~58s (cold start + LLM + bundler).
+// Bumped to 120s so a slow OpenRouter response doesn't get guillotined by
+// Vercel's default 60s cap. Hobby tier currently allows up to 300s.
+export const maxDuration = 120;
 
 const QuerySchema = z.object({
   query: z.string().min(5).max(500),
