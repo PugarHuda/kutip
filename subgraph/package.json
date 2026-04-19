@@ -1,0 +1,16 @@
+{
+  "name": "kutip-subgraph",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Goldsky subgraph for Kutip AttributionLedger on Kite testnet",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "goldsky subgraph deploy kutip/0.1.0",
+    "deploy-quick": "goldsky subgraph deploy kutip/0.1.0 --from-abi ./abis/AttributionLedger.json --network kite-ai-testnet"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.80.0",
+    "@graphprotocol/graph-ts": "0.35.1"
+  }
+}

@@ -1,6 +1,11 @@
 import { listAuthors } from "@/lib/papers";
 import { getAuthorStats, getLedgerAddress } from "@/lib/ledger";
 import { explorerAddress, formatUSDC } from "@/lib/kite";
+import {
+  fetchAuthorHistoryFromGoldsky,
+  fetchLeaderboardFromGoldsky,
+  isSubgraphEnabled
+} from "@/lib/goldsky";
 import { Addr, StatTile } from "@/components/ui";
 import { ExternalLinkIcon } from "@/components/icons";
 import type { Address } from "viem";
@@ -30,22 +35,119 @@ function Spark({ trend }: { trend: "up" | "down" | "flat" }) {
   );
 }
 
+/** Real 7-day sparkline from subgraph data — one line per point. */
+function RealSpark({ points }: { points: number[] }) {
+  if (points.length === 0) return <Spark trend="flat" />;
+  const max = Math.max(...points, 1);
+  const w = 46;
+  const h = 22;
+  const pad = 2;
+  const step = (w - pad * 2) / Math.max(points.length - 1, 1);
+  const d = points
+    .map((v, i) => {
+      const x = pad + i * step;
+      const y = h - pad - (v / max) * (h - pad * 2);
+      return `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join(" ");
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="block">
+      <path
+        d={d}
+        stroke="var(--emerald-500)"
+        strokeWidth="1.5"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default async function LeaderboardPage() {
   const authors = listAuthors();
   const wallets = authors.map((a) => a.wallet as Address);
-  const stats = await getAuthorStats(wallets);
 
-  const rows = authors
-    .map((a, i) => ({
-      ...a,
+  const useSubgraph = isSubgraphEnabled();
+  const walletToMeta = new Map(
+    authors.map((a) => [a.wallet.toLowerCase(), a])
+  );
+
+  type Row = {
+    id: string;
+    name: string;
+    affiliation: string;
+    wallet: string;
+    orcid: string;
+    earnings: bigint;
+    citations: number;
+    sparkPoints: number[];
+  };
+
+  let rows: Row[];
+  let dataSource: "goldsky" | "rpc";
+
+  if (useSubgraph) {
+    const leaderboard = await fetchLeaderboardFromGoldsky(50);
+    if (leaderboard) {
+      dataSource = "goldsky";
+      // Per-author 7d sparkline — fire in parallel for top 20
+      const history = await Promise.all(
+        leaderboard.slice(0, 20).map((a) => fetchAuthorHistoryFromGoldsky(a.id, 7))
+      );
+      rows = leaderboard.map((a, i) => {
+        const meta = walletToMeta.get(a.id.toLowerCase());
+        const days = history[i] ?? [];
+        return {
+          id: a.id,
+          name: meta?.name ?? `Unclaimed · ${a.id.slice(0, 10)}…`,
+          affiliation: meta?.affiliation ?? "unknown author",
+          wallet: a.id,
+          orcid: meta?.orcid ?? "",
+          earnings: BigInt(a.totalEarnings),
+          citations: a.citationCount,
+          sparkPoints: days
+            .slice()
+            .reverse()
+            .map((d) => Number(d.earnings) / 1e18)
+        };
+      });
+    } else {
+      dataSource = "rpc";
+      const stats = await getAuthorStats(wallets);
+      rows = authors.map((a, i) => ({
+        id: a.id,
+        name: a.name,
+        affiliation: a.affiliation,
+        wallet: a.wallet,
+        orcid: a.orcid,
+        earnings: stats[i].earnings,
+        citations: Number(stats[i].citations),
+        sparkPoints: []
+      }));
+    }
+  } else {
+    dataSource = "rpc";
+    const stats = await getAuthorStats(wallets);
+    rows = authors.map((a, i) => ({
+      id: a.id,
+      name: a.name,
+      affiliation: a.affiliation,
+      wallet: a.wallet,
+      orcid: a.orcid,
+      earnings: stats[i].earnings,
       citations: Number(stats[i].citations),
-      earnings: stats[i].earnings
-    }))
-    .sort((a, b) => Number(b.earnings - a.earnings) || b.citations - a.citations);
+      sparkPoints: []
+    }));
+  }
+
+  rows.sort(
+    (a, b) => Number(b.earnings - a.earnings) || b.citations - a.citations
+  );
 
   const ledgerAddr = getLedgerAddress();
-  const totalEarnings = stats.reduce((acc, s) => acc + s.earnings, 0n);
-  const totalCitations = stats.reduce((acc, s) => acc + Number(s.citations), 0);
+  const totalEarnings = rows.reduce((acc, r) => acc + r.earnings, 0n);
+  const totalCitations = rows.reduce((acc, r) => acc + r.citations, 0);
   const authorsPaid = rows.filter((r) => r.earnings > 0n).length;
 
   return (
@@ -142,6 +244,7 @@ export default async function LeaderboardPage() {
             const trend: "up" | "down" | "flat" =
               r.citations > 0 ? "up" : r.earnings > 0n ? "flat" : "flat";
             const walletShort = `${r.wallet.slice(0, 6)}…${r.wallet.slice(-4)}`;
+            const useRealSpark = r.sparkPoints.length > 1;
             return (
               <div
                 key={r.id}
@@ -173,7 +276,11 @@ export default async function LeaderboardPage() {
                   </Addr>
                 </span>
                 <span className="flex justify-end">
-                  <Spark trend={trend} />
+                  {useRealSpark ? (
+                    <RealSpark points={r.sparkPoints} />
+                  ) : (
+                    <Spark trend={trend} />
+                  )}
                 </span>
               </div>
             );
@@ -184,22 +291,30 @@ export default async function LeaderboardPage() {
           <div className="t-small ink-3">
             {ledgerAddr ? (
               <>
-                Stats read live from{" "}
-                <a
-                  className="tx"
-                  href={explorerAddress(ledgerAddr)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  AttributionLedger contract on Kite testnet{" "}
-                  <ExternalLinkIcon size={11} />
-                </a>
+                {dataSource === "goldsky" ? (
+                  <>Stats indexed by Goldsky subgraph · sparklines show real 7-day history</>
+                ) : (
+                  <>
+                    Stats read live from{" "}
+                    <a
+                      className="tx"
+                      href={explorerAddress(ledgerAddr)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      AttributionLedger contract on Kite testnet{" "}
+                      <ExternalLinkIcon size={11} />
+                    </a>
+                  </>
+                )}
               </>
             ) : (
               <>AttributionLedger not yet deployed — values shown are placeholders.</>
             )}
           </div>
-          <span className="t-mono-sm ink-3">live · re-rendered every request</span>
+          <span className="t-mono-sm ink-3">
+            {dataSource === "goldsky" ? "goldsky · cached 15s" : "rpc · per-request"}
+          </span>
         </div>
       </div>
     </main>

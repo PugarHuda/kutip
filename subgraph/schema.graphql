@@ -1,0 +1,47 @@
+type Query @entity(immutable: true) {
+  id: Bytes!                    # queryId (bytes32)
+  payer: Bytes!                 # AA or EOA that submitted attestAndSplit
+  totalPaid: BigInt!            # in token's smallest unit (18-dec on Kite)
+  authorsShare: BigInt!
+  citationCount: Int!
+  block: BigInt!
+  timestamp: BigInt!
+  tx: Bytes!
+  citations: [Citation!]! @derivedFrom(field: "query")
+}
+
+type Citation @entity(immutable: true) {
+  id: ID!                       # queryId-author-index
+  query: Query!
+  author: Author!
+  weightBps: Int!
+  amount: BigInt!               # USDC paid to author on this cite (18-dec)
+  block: BigInt!
+  timestamp: BigInt!
+  tx: Bytes!
+}
+
+type Author @entity {
+  id: Bytes!                    # wallet address, lowercase
+  totalEarnings: BigInt!
+  citationCount: Int!
+  firstSeenAt: BigInt!
+  lastSeenAt: BigInt!
+  citations: [Citation!]! @derivedFrom(field: "author")
+}
+
+type DayStat @entity {
+  id: String!                   # "YYYY-MM-DD" UTC
+  date: BigInt!                 # midnight UTC unix
+  queriesAttested: Int!
+  citationsPaid: Int!
+  totalPaid: BigInt!
+}
+
+type AuthorDayStat @entity {
+  id: String!                   # "{wallet}-YYYY-MM-DD"
+  author: Author!
+  date: BigInt!
+  citations: Int!
+  earnings: BigInt!
+}

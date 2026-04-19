@@ -34,7 +34,8 @@ const WEB_KEYS = new Set([
   "KUTIP_DEMO_MODE",
   "KUTIP_USE_AA",
   "KUTIP_USE_SEMANTIC_SCHOLAR",
-  "ATTRIBUTION_LEDGER_DEPLOY_BLOCK"
+  "ATTRIBUTION_LEDGER_DEPLOY_BLOCK",
+  "NEXT_PUBLIC_SUBGRAPH_URL"
 ]);
 
 const lines = readFileSync(rootEnv, "utf-8").split(/\r?\n/);

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Addr } from "@/components/ui";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 
-const EXAMPLE_ORCID = "0000-0001-1234-0001";
+const EXAMPLE_ORCID = "0000-0002-1825-0097"; // Josiah Carberry — real public test ORCID
 
 type Status =
   | { kind: "idle" }
@@ -15,6 +15,20 @@ type Status =
   | { kind: "submitting"; address: string }
   | { kind: "bound"; address: string; name: string }
   | { kind: "error"; message: string };
+
+type Preview =
+  | { state: "hidden" }
+  | { state: "loading" }
+  | {
+      state: "real";
+      name: string;
+      biography?: string;
+      worksCount?: number;
+      matchesCatalog: boolean;
+    }
+  | { state: "catalog"; name: string; affiliation: string }
+  | { state: "invalid"; message: string }
+  | { state: "unknown"; message: string };
 
 interface EthereumProvider {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
@@ -26,9 +40,65 @@ function eth(): EthereumProvider | null {
   return w.ethereum ?? null;
 }
 
+const ORCID_PATTERN = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+
 export default function ClaimPage() {
   const [orcid, setOrcid] = useState(EXAMPLE_ORCID);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [preview, setPreview] = useState<Preview>({ state: "hidden" });
+
+  useEffect(() => {
+    const normalized = orcid.replace(/\s+/g, "").toUpperCase();
+    if (!normalized) {
+      setPreview({ state: "hidden" });
+      return;
+    }
+    if (!ORCID_PATTERN.test(normalized)) {
+      setPreview({ state: "invalid", message: "Expected 0000-0000-0000-0000 format" });
+      return;
+    }
+
+    let cancelled = false;
+    setPreview({ state: "loading" });
+    const handle = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/orcid-check?orcid=${encodeURIComponent(normalized)}`
+        );
+        const data = await res.json();
+        if (cancelled) return;
+        if (data.status === "real") {
+          setPreview({
+            state: "real",
+            name: data.name ?? "Unnamed researcher",
+            biography: data.biography,
+            worksCount: data.worksCount,
+            matchesCatalog: Boolean(data.matchesCatalog)
+          });
+        } else if (data.status === "catalog") {
+          setPreview({
+            state: "catalog",
+            name: data.name,
+            affiliation: data.affiliation ?? ""
+          });
+        } else {
+          setPreview({
+            state: "unknown",
+            message: data.error ?? "ORCID not verifiable"
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setPreview({ state: "unknown", message: "lookup failed — network?" });
+        }
+      }
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+  }, [orcid]);
 
   async function connect() {
     const provider = eth();
@@ -98,6 +168,8 @@ export default function ClaimPage() {
     status.kind === "submitting" ||
     status.kind === "bound";
 
+  const canSign = connected && (preview.state === "real" || preview.state === "catalog");
+
   return (
     <main className="min-h-[calc(100vh-60px)] px-6 py-12 lg:py-14">
       <div className="max-w-[640px] mx-auto">
@@ -147,16 +219,18 @@ export default function ClaimPage() {
             placeholder="0000-0000-0000-0000"
             className="card mt-2 p-3 w-full font-mono text-sm bg-transparent focus:outline-none focus:border-kite-500"
           />
-          <div className="t-small ink-3 mt-2">
-            For the demo, this has to match an ORCID already in the mock catalog.
-            Try <code className="t-mono-sm">0000-0001-1234-0001</code> (Dr. Sarah Chen).
-          </div>
+          <OrcidPreview preview={preview} />
 
           <label className="t-caption mt-7 block">Step 3 — Sign the binding</label>
           <button
             type="button"
             onClick={signAndSubmit}
-            disabled={!connected || status.kind === "signing" || status.kind === "submitting" || status.kind === "bound"}
+            disabled={
+              !canSign ||
+              status.kind === "signing" ||
+              status.kind === "submitting" ||
+              status.kind === "bound"
+            }
             className="btn btn--primary btn--lg w-full justify-center mt-2.5"
           >
             {status.kind === "signing" && "Sign in your wallet…"}
@@ -175,6 +249,12 @@ export default function ClaimPage() {
               )}
           </button>
 
+          {!canSign && connected && preview.state !== "loading" && (
+            <div className="t-small ink-3 mt-2.5">
+              Verify your ORCID above first — the button lights up when it resolves.
+            </div>
+          )}
+
           {status.kind === "bound" && (
             <div className="mt-5 p-4 rounded-lg bg-emerald-50 text-[color:var(--emerald-700)] text-sm">
               <strong>{status.name}</strong> is now bound to{" "}
@@ -191,12 +271,71 @@ export default function ClaimPage() {
         </div>
 
         <div className="t-small ink-3 mt-6">
-          Demo note · claims live in a per-process map and reset on Vercel cold
-          starts. Production would store them in an on-chain NameRegistry contract
-          with ORCID DID resolution (ERC-8004 compatible).
+          Try <code className="t-mono-sm">0000-0002-1825-0097</code> (Josiah Carberry —
+          public ORCID test record) or a catalog ID like{" "}
+          <code className="t-mono-sm">0000-0001-1234-0001</code> (demo-only).
+          Production would store claims in an on-chain NameRegistry (ERC-8004 compatible)
+          instead of the per-process map we use here.
         </div>
       </div>
     </main>
+  );
+}
+
+function OrcidPreview({ preview }: { preview: Preview }) {
+  if (preview.state === "hidden") return null;
+  if (preview.state === "loading") {
+    return (
+      <div className="mt-2 t-small ink-3 animate-breathe">Looking up on orcid.org…</div>
+    );
+  }
+  if (preview.state === "invalid") {
+    return <div className="mt-2 t-small ink-3">{preview.message}</div>;
+  }
+  if (preview.state === "unknown") {
+    return (
+      <div className="mt-2 p-3 rounded-md border border-amber-500/30 bg-amber-50 text-[color:var(--amber-700)] text-sm">
+        {preview.message}
+      </div>
+    );
+  }
+  if (preview.state === "real") {
+    return (
+      <div className="mt-2 p-3 rounded-md border border-emerald-500/30 bg-emerald-50 text-[color:var(--emerald-700)] text-sm">
+        <div className="flex items-center justify-between">
+          <strong>{preview.name}</strong>
+          <span
+            className="chip chip--success"
+            style={{ padding: "1px 8px", fontSize: 10 }}
+          >
+            Verified · orcid.org
+          </span>
+        </div>
+        <div className="t-small mt-1 text-[color:var(--ink-2)]">
+          {typeof preview.worksCount === "number" && (
+            <>
+              {preview.worksCount} works published ·{" "}
+            </>
+          )}
+          {preview.matchesCatalog
+            ? "matches a paper in the Kutip catalog"
+            : "new to the Kutip catalog — you can still claim"}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-2 p-3 rounded-md border border-kite-500/30 bg-kite-500/5 text-sm">
+      <div className="flex items-center justify-between">
+        <strong>{preview.name}</strong>
+        <span className="chip" style={{ padding: "1px 8px", fontSize: 10 }}>
+          Demo catalog
+        </span>
+      </div>
+      {preview.affiliation && (
+        <div className="t-small ink-2 mt-1">{preview.affiliation}</div>
+      )}
+    </div>
   );
 }
 

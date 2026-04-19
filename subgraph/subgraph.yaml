@@ -1,0 +1,32 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+description: Kutip — AttributionLedger index (attestations + citations + daily stats) on Kite testnet
+repository: https://github.com/PugarHuda/kutip
+dataSources:
+  - kind: ethereum
+    name: AttributionLedger
+    network: kite-ai-testnet
+    source:
+      address: "0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa"
+      abi: AttributionLedger
+      startBlock: 20944832
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Query
+        - Citation
+        - Author
+        - DayStat
+        - AuthorDayStat
+      abis:
+        - name: AttributionLedger
+          file: ./abis/AttributionLedger.json
+      eventHandlers:
+        - event: QueryAttested(indexed bytes32,indexed address,uint256,uint16)
+          handler: handleQueryAttested
+        - event: CitationPaid(indexed bytes32,indexed address,uint16,uint256)
+          handler: handleCitationPaid
+      file: ./src/mapping.ts

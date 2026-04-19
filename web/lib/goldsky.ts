@@ -1,0 +1,174 @@
+/**
+ * Goldsky subgraph GraphQL client.
+ *
+ * The subgraph indexes AttributionLedger events on Kite testnet and exposes
+ * Query, Citation, Author, DayStat, AuthorDayStat entities. Deploying it
+ * turns the leaderboard + /verify index from O(n) RPC scans (~1-3s) into
+ * O(log n) GraphQL reads (~50-200ms) and unlocks real 7-day history
+ * sparklines.
+ *
+ * Wiring: set `NEXT_PUBLIC_SUBGRAPH_URL` to the Goldsky GraphQL endpoint
+ * after deploy. When unset, every caller below returns null so the page
+ * falls back to the RPC path. Never throws — page must keep working.
+ */
+
+export function getSubgraphUrl(): string | null {
+  const raw = process.env.NEXT_PUBLIC_SUBGRAPH_URL?.trim();
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+export function isSubgraphEnabled(): boolean {
+  return getSubgraphUrl() !== null;
+}
+
+async function query<T>(body: { query: string; variables?: Record<string, unknown> }): Promise<T | null> {
+  const url = getSubgraphUrl();
+  if (!url) return null;
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      next: { revalidate: 15 },
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data?: T; errors?: unknown };
+    if (json.errors) {
+      console.warn("[goldsky] GraphQL errors:", json.errors);
+      return null;
+    }
+    return json.data ?? null;
+  } catch (err) {
+    console.warn("[goldsky] query failed:", err);
+    return null;
+  }
+}
+
+export interface GoldskyAuthor {
+  id: string;
+  totalEarnings: string;
+  citationCount: number;
+  firstSeenAt: string;
+  lastSeenAt: string;
+}
+
+export interface GoldskyQuery {
+  id: string;
+  payer: string;
+  totalPaid: string;
+  authorsShare: string;
+  citationCount: number;
+  block: string;
+  timestamp: string;
+  tx: string;
+}
+
+export interface GoldskyDayStat {
+  id: string;
+  date: string;
+  queriesAttested: number;
+  citationsPaid: number;
+  totalPaid: string;
+}
+
+export interface GoldskyAuthorDayStat {
+  id: string;
+  date: string;
+  citations: number;
+  earnings: string;
+}
+
+export async function fetchLeaderboardFromGoldsky(
+  limit = 25
+): Promise<GoldskyAuthor[] | null> {
+  const data = await query<{ authors: GoldskyAuthor[] }>({
+    query: `
+      query Leaderboard($limit: Int!) {
+        authors(first: $limit, orderBy: totalEarnings, orderDirection: desc) {
+          id
+          totalEarnings
+          citationCount
+          firstSeenAt
+          lastSeenAt
+        }
+      }
+    `,
+    variables: { limit }
+  });
+  return data?.authors ?? null;
+}
+
+export async function fetchRecentQueriesFromGoldsky(
+  limit = 20
+): Promise<GoldskyQuery[] | null> {
+  const data = await query<{ queries: GoldskyQuery[] }>({
+    query: `
+      query Recent($limit: Int!) {
+        queries(first: $limit, orderBy: timestamp, orderDirection: desc) {
+          id
+          payer
+          totalPaid
+          authorsShare
+          citationCount
+          block
+          timestamp
+          tx
+        }
+      }
+    `,
+    variables: { limit }
+  });
+  return data?.queries ?? null;
+}
+
+export async function fetchAuthorHistoryFromGoldsky(
+  authorId: string,
+  days = 7
+): Promise<GoldskyAuthorDayStat[] | null> {
+  const data = await query<{ authorDayStats: GoldskyAuthorDayStat[] }>({
+    query: `
+      query AuthorHistory($author: Bytes!, $days: Int!) {
+        authorDayStats(
+          where: { author: $author }
+          orderBy: date
+          orderDirection: desc
+          first: $days
+        ) {
+          id
+          date
+          citations
+          earnings
+        }
+      }
+    `,
+    variables: { author: authorId.toLowerCase(), days }
+  });
+  return data?.authorDayStats ?? null;
+}
+
+export async function fetchGlobalDailyStatsFromGoldsky(
+  days = 30
+): Promise<GoldskyDayStat[] | null> {
+  const data = await query<{ dayStats: GoldskyDayStat[] }>({
+    query: `
+      query DailyStats($days: Int!) {
+        dayStats(orderBy: date, orderDirection: desc, first: $days) {
+          id
+          date
+          queriesAttested
+          citationsPaid
+          totalPaid
+        }
+      }
+    `,
+    variables: { days }
+  });
+  return data?.dayStats ?? null;
+}

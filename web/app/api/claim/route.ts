@@ -3,6 +3,7 @@ import { z } from "zod";
 import { verifyMessage, type Address, type Hex } from "viem";
 import { buildClaimMessage, listClaims, recordClaim } from "@/lib/claim-registry";
 import { listAuthors } from "@/lib/papers";
+import { lookupOrcid } from "@/lib/orcid";
 
 export const runtime = "nodejs";
 
@@ -24,14 +25,26 @@ export async function POST(req: NextRequest) {
 
   const { orcid, wallet, signature } = parsed.data;
   const addr = wallet as Address;
-  const authors = listAuthors();
-  const matching = authors.find((a) => a.orcid === orcid);
 
-  if (!matching) {
+  // Dual-track validation: real orcid.org OR local demo catalog.
+  const [api, catalog] = await Promise.all([
+    lookupOrcid(orcid),
+    Promise.resolve(listAuthors().find((a) => a.orcid === orcid))
+  ]);
+
+  const resolvedName = api.real ? api.name : catalog?.name;
+  const source: "orcid.org" | "catalog" | null = api.real
+    ? "orcid.org"
+    : catalog
+    ? "catalog"
+    : null;
+
+  if (!source || !resolvedName) {
     return NextResponse.json(
       {
-        error: "ORCID not in catalog",
-        hint: "Demo only recognises ORCIDs from data/authors.json — try 0000-0001-1234-0001 (Dr. Sarah Chen)"
+        error: "ORCID not verifiable",
+        hint:
+          "ORCID must exist on orcid.org OR match a researcher in the demo catalog. Try 0000-0002-1825-0097 (Josiah Carberry · public test) or a catalog ID like 0000-0001-1234-0001."
       },
       { status: 404 }
     );
@@ -57,7 +70,14 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    bound: { name: matching.name, orcid, wallet: addr }
+    bound: {
+      name: resolvedName,
+      orcid,
+      wallet: addr,
+      source,
+      biography: api.real ? api.biography : undefined,
+      worksCount: api.real ? api.worksCount : undefined
+    }
   });
 }
 
