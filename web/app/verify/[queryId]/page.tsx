@@ -7,6 +7,7 @@ import {
 } from "@/lib/ledger";
 import { explorerAddress, explorerTx, formatUSDC } from "@/lib/kite";
 import { listAuthors } from "@/lib/papers";
+import { getAccessMetrics, loadSummary } from "@/lib/summary-store";
 import { Addr, PayoutRow } from "@/components/ui";
 import { CheckIcon, CopyIcon, ExternalLinkIcon } from "@/components/icons";
 
@@ -26,6 +27,8 @@ export default async function VerifyPage({ params }: { params: { queryId: string
   const authors = listAuthors();
   const walletToAuthor = new Map(authors.map((a) => [a.wallet.toLowerCase(), a]));
   const queryShort = `${queryId.slice(0, 10)}…${queryId.slice(-6)}`;
+  const cachedSummary = loadSummary(queryId);
+  const paywallMetrics = getAccessMetrics(queryId);
   const now = Date.now();
   const ageMin = record
     ? Math.max(0, Math.round((now / 1000 - Number(record.timestamp)) / 60))
@@ -172,6 +175,60 @@ export default async function VerifyPage({ params }: { params: { queryId: string
                 </span>
               </div>
             </div>
+          </div>
+        )}
+
+        {cachedSummary && (
+          <div
+            className="mt-7 card p-6"
+            style={{
+              background: "var(--surface-raised)",
+              borderColor: "var(--kite-200)"
+            }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="t-caption text-kite-700">Reverse x402 · paywalled for agents</div>
+              <span
+                className="chip"
+                style={{ padding: "1px 8px", fontSize: 10 }}
+              >
+                0.10 USDC / cite
+              </span>
+            </div>
+            <div className="t-small ink-2 mb-3 max-w-[620px]">
+              Downstream agents pay Kutip via x402 to cite this summary in their
+              own answers. The loop closes: Kutip pays humans → Kutip earns
+              from agents that reference it → humans keep earning too.
+            </div>
+            {paywallMetrics && paywallMetrics.accessCount > 0 ? (
+              <div className="flex gap-6 text-sm">
+                <div>
+                  <div className="t-caption">Access count</div>
+                  <div className="t-mono font-semibold text-[15px] mt-0.5">
+                    {paywallMetrics.accessCount}
+                  </div>
+                </div>
+                <div>
+                  <div className="t-caption">Revenue earned</div>
+                  <div className="t-mono font-semibold text-[15px] mt-0.5 text-emerald-700">
+                    {(Number(paywallMetrics.revenueEarned) / 1e18).toFixed(2)} USDC
+                  </div>
+                </div>
+                {paywallMetrics.lastAccessAt && (
+                  <div>
+                    <div className="t-caption">Last access</div>
+                    <div className="t-small mt-0.5 ink-2">
+                      {new Date(paywallMetrics.lastAccessAt).toISOString().slice(11, 19)} UTC
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="t-small ink-3">
+                No agents have cited this yet — be the first by calling{" "}
+                <code className="t-mono-sm">GET /api/summaries/{queryShort}</code>
+              </div>
+            )}
           </div>
         )}
 

@@ -16,6 +16,7 @@ import {
   type AttestationParams
 } from "./ledger";
 import { parseUSDC } from "./kite";
+import { saveSummary } from "./summary-store";
 import type { AgentEvent, Citation, ResearchResult } from "./types";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -134,7 +135,7 @@ export async function runResearchAgent(opts: {
     };
   });
 
-  return {
+  const result: ResearchResult = {
     queryId,
     query,
     summary,
@@ -147,6 +148,13 @@ export async function runResearchAgent(opts: {
     subAgentFeeUSDC: attestation?.subAgentFeeUSDC,
     paperDetails
   };
+
+  // Cache for reverse-x402 resale. Other agents can now pay Kutip to cite
+  // this summary via /api/summaries/[queryId]. Closes the recursive loop:
+  // Kutip pays humans → Kutip earns from agents → Kutip pays humans …
+  saveSummary(result);
+
+  return result;
 }
 
 async function attestOnChain(opts: {
