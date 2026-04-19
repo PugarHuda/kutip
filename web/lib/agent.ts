@@ -143,6 +143,8 @@ export async function runResearchAgent(opts: {
     attestationTx: attestation?.txHash,
     attestationMode: attestation?.mode,
     attestationPayer: attestation?.payer,
+    subAgentAddress: attestation?.subAgentAddress,
+    subAgentFeeUSDC: attestation?.subAgentFeeUSDC,
     paperDetails
   };
 }
@@ -152,7 +154,13 @@ async function attestOnChain(opts: {
   totalPaid: bigint;
   citations: AttestationParams["citations"];
   emit: Emit;
-}): Promise<{ txHash: Hex; mode: "aa" | "eoa"; payer: string } | null> {
+}): Promise<{
+  txHash: Hex;
+  mode: "aa" | "eoa";
+  payer: string;
+  subAgentAddress?: string;
+  subAgentFeeUSDC?: string;
+} | null> {
   const ledger = getLedgerAddress();
   const hasAccount = hasServiceAccount();
 
@@ -199,16 +207,29 @@ async function attestOnChain(opts: {
         ? `agent ${result.payer.slice(0, 8)}…${result.payer.slice(-4)}`
         : `eoa ${result.payer.slice(0, 8)}…${result.payer.slice(-4)}`;
 
+    const subAgentNote = result.subAgent
+      ? ` · sub-agent fee ${(Number(result.subAgent.fee) / 1e18).toFixed(4)} USDC`
+      : "";
+
     opts.emit({
       type: "step",
       step: {
         step: 5,
         label: doneLabel,
         status: "done",
-        detail: `${payerLabel} · tx ${result.txHash.slice(0, 10)}…`
+        detail: `${payerLabel} · tx ${result.txHash.slice(0, 10)}…${subAgentNote}`
       }
     });
-    return { txHash: result.txHash, mode: result.mode, payer: result.payer };
+
+    return {
+      txHash: result.txHash,
+      mode: result.mode,
+      payer: result.payer,
+      subAgentAddress: result.subAgent?.address,
+      subAgentFeeUSDC: result.subAgent
+        ? (Number(result.subAgent.fee) / 1e18).toFixed(4)
+        : undefined
+    };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "unknown error";
     opts.emit({

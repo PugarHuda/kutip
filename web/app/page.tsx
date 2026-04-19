@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAAAddress, isAAEnabled } from "@/lib/agent-passport";
+import { getAAAddress, getSummarizerAAAddress, isAAEnabled } from "@/lib/agent-passport";
 import { getAuthorStats, getLedgerAddress } from "@/lib/ledger";
 import { listAuthors } from "@/lib/papers";
 import { formatUSDC, explorerAddress } from "@/lib/kite";
@@ -12,6 +12,7 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   const aaAddress = isAAEnabled() ? getAAAddress() : null;
+  const summarizerAddress = isAAEnabled() ? getSummarizerAAAddress() : null;
   const ledgerAddress = getLedgerAddress();
 
   const authors = listAuthors();
@@ -103,10 +104,18 @@ export default async function HomePage() {
             <div className="mt-4 card p-4 text-sm flex flex-col gap-3">
               {aaAddress && (
                 <IdentityRow
-                  label="Agent (AA)"
-                  badge="Own identity"
+                  label="Researcher (AA)"
+                  badge="Main agent"
                   value={aaAddress}
-                  sub="EIP-4337 smart account"
+                  sub="EIP-4337 smart account · pays authors"
+                />
+              )}
+              {summarizerAddress && (
+                <IdentityRow
+                  label="Summarizer (AA)"
+                  badge="Sub-agent"
+                  value={summarizerAddress}
+                  sub="Receives 5% per query from the Researcher"
                 />
               )}
               {ledgerAddress && (

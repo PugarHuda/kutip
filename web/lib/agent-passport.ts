@@ -75,6 +75,18 @@ export function getAAAddress(): Address | null {
   return getAAContext()?.aaAddress ?? null;
 }
 
+/**
+ * Derive a second AA account from the same EOA using a different salt.
+ * The Summarizer is its own on-chain identity — it receives the
+ * sub-agent fee from the Researcher before each attestation settles.
+ * This demonstrates agent-to-agent composition on Kite chain.
+ */
+export function getSummarizerAAAddress(): Address | null {
+  const ctx = getAAContext();
+  if (!ctx) return null;
+  return ctx.sdk.getAccountAddress(ctx.signerAddress, 1n) as Address;
+}
+
 export interface BatchedCall {
   target: Address;
   value: bigint;

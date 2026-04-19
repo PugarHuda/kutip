@@ -13,6 +13,8 @@ export interface ResearchResult {
   attestationTx?: string;
   attestationMode?: "aa" | "eoa";
   attestationPayer?: string;
+  subAgentAddress?: string;
+  subAgentFeeUSDC?: string;
   paperDetails: {
     id: string;
     title: string;

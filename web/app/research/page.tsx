@@ -533,6 +533,19 @@ function ResultView({
               {(result.totalPaidUSDC * 0.4 / 1e18).toFixed(4)} USDC
             </span>
           </div>
+          {result.subAgentAddress && result.subAgentFeeUSDC && (
+            <div className="flex justify-between items-center px-5 py-3.5 border-t border-token">
+              <div>
+                <div className="t-small ink-2">Sub-agent fee → Summarizer</div>
+                <div className="t-mono-sm ink-3 mt-0.5">
+                  {result.subAgentAddress.slice(0, 6)}…{result.subAgentAddress.slice(-4)} (AA)
+                </div>
+              </div>
+              <span className="t-mono font-semibold text-[15px] text-kite-700">
+                + {result.subAgentFeeUSDC} USDC
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

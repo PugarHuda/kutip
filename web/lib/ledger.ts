@@ -11,7 +11,12 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { attributionLedgerAbi, erc20TransferAbi } from "./abi";
 import { KITE_TESTNET_USDC, kiteTestnet } from "./kite";
-import { getAAAddress, isAAEnabled, sendBatchUserOp } from "./agent-passport";
+import {
+  getAAAddress,
+  getSummarizerAAAddress,
+  isAAEnabled,
+  sendBatchUserOp
+} from "./agent-passport";
 
 const RPC_URL = process.env.KITE_RPC_URL ?? kiteTestnet.rpcUrls.default.http[0];
 
@@ -180,6 +185,19 @@ export interface AttestationResult {
   userOpHash?: Hex;
   aaAddress?: Address;
   payer: Address;
+  subAgent?: {
+    address: Address;
+    fee: bigint;
+  };
+}
+
+// 5% of the query budget goes to the Summarizer sub-agent.
+// Capped at 0.05 USDT so a large query doesn't burn the AA pocket.
+const SUB_AGENT_FEE_BPS = 500n;
+const SUB_AGENT_FEE_CAP = 50000000000000000n; // 0.05 * 10^18
+function computeSubAgentFee(totalPaid: bigint): bigint {
+  const pct = (totalPaid * SUB_AGENT_FEE_BPS) / 10000n;
+  return pct > SUB_AGENT_FEE_CAP ? SUB_AGENT_FEE_CAP : pct;
 }
 
 export async function submitAttestation(
@@ -204,6 +222,20 @@ async function submitViaAA(
   const aaAddress = getAAAddress();
   if (!aaAddress) throw new Error("AA address unavailable despite isAAEnabled()");
 
+  const summarizer = getSummarizerAAAddress();
+  const subAgentFee = summarizer ? computeSubAgentFee(params.totalPaid) : 0n;
+
+  const calls: { target: Address; value: bigint; data: Hex }[] = [];
+
+  if (summarizer && subAgentFee > 0n) {
+    const subFeeData = encodeFunctionData({
+      abi: erc20TransferAbi,
+      functionName: "transfer",
+      args: [summarizer, subAgentFee]
+    });
+    calls.push({ target: KITE_TESTNET_USDC, value: 0n, data: subFeeData });
+  }
+
   const transferData = encodeFunctionData({
     abi: erc20TransferAbi,
     functionName: "transfer",
@@ -216,17 +248,21 @@ async function submitViaAA(
     args: [params.queryId, params.totalPaid, params.citations]
   });
 
-  const { userOpHash, txHash } = await sendBatchUserOp([
-    { target: KITE_TESTNET_USDC, value: 0n, data: transferData },
-    { target: ledger, value: 0n, data: attestData }
-  ]);
+  calls.push({ target: KITE_TESTNET_USDC, value: 0n, data: transferData });
+  calls.push({ target: ledger, value: 0n, data: attestData });
+
+  const { userOpHash, txHash } = await sendBatchUserOp(calls);
 
   return {
     mode: "aa",
     txHash,
     userOpHash,
     aaAddress,
-    payer: aaAddress
+    payer: aaAddress,
+    subAgent:
+      summarizer && subAgentFee > 0n
+        ? { address: summarizer, fee: subAgentFee }
+        : undefined
   };
 }
 

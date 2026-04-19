@@ -81,6 +81,21 @@ export default async function LeaderboardPage() {
           />
         </div>
 
+        {totalEarnings === 0n && (
+          <div className="card p-8 mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div className="t-h3">No earnings yet.</div>
+              <div className="t-small ink-2 mt-1 max-w-[560px]">
+                Run your first research query and every cited author on the list below
+                will receive a USDC payout the moment the attestation lands on chain.
+              </div>
+            </div>
+            <a href="/research" className="btn btn--primary">
+              Start a research query →
+            </a>
+          </div>
+        )}
+
         <div className="flex justify-between items-center mb-4">
           <div className="flex gap-1.5">
             <button
@@ -102,9 +117,9 @@ export default async function LeaderboardPage() {
           </div>
         </div>
 
-        <div className="card p-0 overflow-hidden">
+        <div className="card p-0 overflow-x-auto">
           <div
-            className="grid gap-4 px-5 py-3 surface-raised border-b border-token"
+            className="grid gap-4 px-5 py-3 surface-raised border-b border-token min-w-[760px]"
             style={{ gridTemplateColumns: "54px 1.6fr 1.5fr 100px 130px 160px 80px" }}
           >
             {["#", "Author", "Affiliation", "Citations ↕", "USDC earned ↓", "Wallet", "7-day"].map(
@@ -130,7 +145,7 @@ export default async function LeaderboardPage() {
             return (
               <div
                 key={r.id}
-                className="grid gap-4 px-5 py-3.5 items-center transition-colors hover:surface-raised"
+                className="grid gap-4 px-5 py-3.5 items-center transition-colors hover:surface-raised min-w-[760px]"
                 style={{
                   gridTemplateColumns: "54px 1.6fr 1.5fr 100px 130px 160px 80px",
                   background: top ? "var(--emerald-50)" : "transparent",

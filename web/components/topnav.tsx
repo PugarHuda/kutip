@@ -5,10 +5,21 @@ import { usePathname } from "next/navigation";
 import { BrandMark, CheckIcon, CopyIcon } from "./icons";
 import { ThemeToggle } from "./theme-toggle";
 
-const LINKS: { href: string; label: string; match: (p: string) => boolean }[] = [
+const LINKS: {
+  href: string;
+  label: string;
+  mobileLabel?: string;
+  match: (p: string) => boolean;
+}[] = [
   { href: "/", label: "Home", match: (p) => p === "/" },
   { href: "/research", label: "Research", match: (p) => p.startsWith("/research") },
-  { href: "/leaderboard", label: "Author earnings", match: (p) => p.startsWith("/leaderboard") },
+  {
+    href: "/leaderboard",
+    label: "Author earnings",
+    mobileLabel: "Earnings",
+    match: (p) => p.startsWith("/leaderboard")
+  },
+  { href: "/claim", label: "Claim", match: (p) => p.startsWith("/claim") },
   { href: "/verify", label: "Verify", match: (p) => p.startsWith("/verify") }
 ];
 
@@ -26,7 +37,7 @@ export function TopNav() {
         </span>
       </Link>
 
-      <div className="flex gap-1 items-center">
+      <div className="flex gap-1 items-center flex-wrap">
         {LINKS.map((link) => (
           <Link
             key={link.href}
@@ -34,18 +45,21 @@ export function TopNav() {
             className="topnav__link"
             data-active={link.match(pathname)}
           >
-            {link.label}
+            <span className="hidden sm:inline">{link.label}</span>
+            <span className="sm:hidden">{link.mobileLabel ?? link.label}</span>
           </Link>
         ))}
       </div>
 
-      <div className="flex gap-2.5 items-center">
+      <div className="flex gap-2 items-center">
         <ThemeToggle />
         <span className="chip chip--success">
-          <CheckIcon size={10} /> Kite testnet
+          <CheckIcon size={10} />{" "}
+          <span className="hidden sm:inline">Kite testnet</span>
+          <span className="sm:hidden">Kite</span>
         </span>
         <button
-          className="addr"
+          className="addr hidden sm:inline-flex"
           type="button"
           aria-label={`Copy wallet ${WALLET_DISPLAY}`}
           onClick={() => {

@@ -1,5 +1,6 @@
 import papers from "@/data/papers.json";
 import authors from "@/data/authors.json";
+import { lookupClaim } from "./claim-registry";
 
 export interface Paper {
   id: string;
@@ -43,7 +44,12 @@ export function getPaper(id: string): Paper | undefined {
 }
 
 export function getAuthor(id: string): Author | undefined {
-  return authorMap.get(id) ?? runtimeAuthorMap.get(id);
+  const base = authorMap.get(id) ?? runtimeAuthorMap.get(id);
+  if (!base) return undefined;
+  if (!base.orcid) return base;
+  const claim = lookupClaim(base.orcid);
+  if (!claim) return base;
+  return { ...base, wallet: claim.wallet, affiliation: `${base.affiliation} · claimed ✓` };
 }
 
 export function listPapers(): Paper[] {
