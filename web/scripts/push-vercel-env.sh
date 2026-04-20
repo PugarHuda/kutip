@@ -17,10 +17,18 @@ fi
 pushed=0
 failed=0
 
+# Keys that must be set on Vercel dashboard directly — different values for
+# localhost vs production, skip the local overwrite.
+SKIP_ON_PROD="NEXT_PUBLIC_SITE_URL ORCID_REDIRECT_URL"
+
 while IFS='=' read -r key value; do
   [ -z "$key" ] && continue
   [[ "$key" =~ ^# ]] && continue
   [ -z "$value" ] && continue
+  if [[ " $SKIP_ON_PROD " == *" $key "* ]]; then
+    echo "- $key (skipped — set directly on Vercel)"
+    continue
+  fi
 
   # remove & re-add so re-runs update the value
   vercel env rm "$key" production --yes > /dev/null 2>&1 || true
