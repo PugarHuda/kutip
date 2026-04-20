@@ -145,7 +145,7 @@ export default function ResearchPage() {
         budget={budget}
         setBudget={setBudget}
         onSubmit={runQuery}
-        disabled={running || !query.trim()}
+        disabled={running || query.trim().length < 5}
         steps={steps}
       />
       <div className="px-6 lg:px-8 py-8 lg:py-10 lg:border-l border-token">
@@ -362,6 +362,17 @@ function ResearchSidebar({
         )}
         {phase === "result" && insufficient && <>Insufficient balance</>}
       </button>
+
+      {phase === "idle" && !query.trim() && (
+        <div className="t-small ink-3 mt-2 text-center">
+          Type a question above to continue →
+        </div>
+      )}
+      {phase === "idle" && query.trim() && query.trim().length < 5 && (
+        <div className="t-small text-rose-500 mt-2 text-center">
+          Question must be at least 5 characters
+        </div>
+      )}
 
       {phase === "running" && (
         <div className="mt-3 p-3.5 rounded-[10px] border border-kite-500 animate-fade-up"
