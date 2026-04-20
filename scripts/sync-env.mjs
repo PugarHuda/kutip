@@ -46,7 +46,11 @@ const WEB_KEYS = new Set([
   "NEXT_PUBLIC_SUBGRAPH_URL",
   "KUTIP_MIRROR_ADDRESS",
   "KUTIP_MIRROR_RPC_URL",
-  "KUTIP_MIRROR_CHAIN_ID"
+  "KUTIP_MIRROR_CHAIN_ID",
+  "ORCID_CLIENT_ID",
+  "ORCID_CLIENT_SECRET",
+  "ORCID_COOKIE_SECRET",
+  "ORCID_OAUTH_BASE"
 ]);
 
 const lines = readFileSync(rootEnv, "utf-8").split(/\r?\n/);
