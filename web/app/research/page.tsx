@@ -225,7 +225,8 @@ function ResearchSidebar({
 
   function applyCustom(value: string) {
     setCustomInput(value);
-    const n = parseFloat(value);
+    const normalized = value.replace(",", ".");
+    const n = parseFloat(normalized);
     if (!Number.isNaN(n) && n >= 0.1 && n <= 20) {
       setBudget(Math.round(n * 100) / 100);
     }
