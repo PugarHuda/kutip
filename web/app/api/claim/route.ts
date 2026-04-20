@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { verifyMessage, type Address, type Hex } from "viem";
-import { buildClaimMessage, listClaims, recordClaim } from "@/lib/claim-registry";
+import {
+  bindOnChain,
+  buildClaimMessage,
+  isOnChainClaimEnabled,
+  listClaims,
+  recordClaim
+} from "@/lib/claim-registry";
 import { listAuthors } from "@/lib/papers";
 import { lookupOrcid } from "@/lib/orcid";
 import {
@@ -97,12 +103,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "signature does not match wallet" }, { status: 401 });
   }
 
-  recordClaim({
+  const claim = {
     orcid,
     wallet: addr,
     signature: signature as Hex,
     signedAt: new Date().toISOString()
-  });
+  };
+  recordClaim(claim);
+
+  // Persist on-chain via operator AA. Non-blocking on failure — the
+  // cached claim still works for the current session, and a retry path
+  // can replay missed bindings later.
+  let bindTx: string | undefined;
+  if (isOnChainClaimEnabled()) {
+    try {
+      const h = await bindOnChain(claim);
+      bindTx = h ?? undefined;
+    } catch (err) {
+      console.warn("[claim] on-chain persist failed, cached only:", err);
+    }
+  }
 
   return NextResponse.json({
     ok: true,
@@ -112,7 +132,9 @@ export async function POST(req: NextRequest) {
       wallet: addr,
       source,
       biography: api.real ? api.biography : undefined,
-      worksCount: api.real ? api.worksCount : undefined
+      worksCount: api.real ? api.worksCount : undefined,
+      bindTx,
+      onChain: Boolean(bindTx)
     }
   });
 }

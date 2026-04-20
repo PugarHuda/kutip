@@ -35,6 +35,11 @@ const LINKS: {
       p.startsWith("/escrow") ||
       p.startsWith("/bounties")
   },
+  {
+    href: "/gasless",
+    label: "Infra",
+    match: (p) => p.startsWith("/gasless") || p.startsWith("/governance")
+  },
   { href: "/verify", label: "Verify", match: (p) => p.startsWith("/verify") }
 ];
 

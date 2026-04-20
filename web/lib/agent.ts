@@ -1,6 +1,7 @@
 import { keccak256, toBytes, toHex, type Address, type Hex } from "viem";
 import {
   getAuthor,
+  listAuthors,
   registerRuntimePapers,
   searchPapers,
   type Author,
@@ -20,7 +21,7 @@ import {
 } from "./ledger";
 import { erc20TransferAbi } from "./abi";
 import { getAAAddress, isAAEnabled } from "./agent-passport";
-import { lookupClaim } from "./claim-registry";
+import { lookupClaim, warmClaimCache } from "./claim-registry";
 import { getEscrowAddress } from "./escrow";
 import { KITE_TESTNET_USDC, parseUSDC, formatUSDC } from "./kite";
 import { saveSummary } from "./summary-store";
@@ -149,6 +150,13 @@ export async function runResearchAgent(opts: {
 
   const citations = buildCitations(purchased, citationWeights);
   const totalPaidRaw = parseUSDC(budgetUSDC);
+
+  // Warm claim cache from NameRegistry so flattenCitationsForContract
+  // routes to real wallets instead of placeholders after a cold start.
+  const orcids = listAuthors()
+    .map((a) => a.orcid)
+    .filter((o): o is string => Boolean(o));
+  await warmClaimCache(orcids);
 
   // Pre-flight: if payer is broke, fail fast with an actionable message
   // instead of burning LLM quota + surfacing the cryptic 'execution reverted'.
