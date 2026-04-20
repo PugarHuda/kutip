@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BrandMark, CheckIcon, CopyIcon } from "./icons";
+import { BrandMark, CheckIcon } from "./icons";
 import { ThemeToggle } from "./theme-toggle";
+import { ConnectWallet } from "./connect-wallet";
 
 const LINKS: {
   href: string;
@@ -36,8 +37,6 @@ const LINKS: {
   },
   { href: "/verify", label: "Verify", match: (p) => p.startsWith("/verify") }
 ];
-
-const WALLET_DISPLAY = "0x5c91…bf40c";
 
 export function TopNav() {
   const pathname = usePathname();
@@ -72,17 +71,7 @@ export function TopNav() {
           <span className="hidden sm:inline">Kite testnet</span>
           <span className="sm:hidden">Kite</span>
         </span>
-        <button
-          className="addr hidden sm:inline-flex"
-          type="button"
-          aria-label={`Copy wallet ${WALLET_DISPLAY}`}
-          onClick={() => {
-            navigator.clipboard?.writeText("0x5C91B851D9Aa20172e6067d9236920A6CBabf40c");
-          }}
-        >
-          {WALLET_DISPLAY}
-          <CopyIcon />
-        </button>
+        <ConnectWallet />
       </div>
     </nav>
   );

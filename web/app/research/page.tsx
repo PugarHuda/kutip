@@ -669,6 +669,27 @@ function ResultView({
         </details>
       </div>
 
+      <div
+        className="card animate-fade-up flex items-center justify-between px-5 py-4"
+        style={{
+          animationDelay: "220ms",
+          background:
+            "linear-gradient(90deg, color-mix(in srgb, var(--kite-500) 7%, transparent), transparent)"
+        }}
+      >
+        <div>
+          <div className="t-small">
+            <strong>Are you one of these authors?</strong>
+          </div>
+          <div className="t-small ink-3 mt-0.5">
+            Bind your ORCID to claim the earnings above — unclaimed shares accrue 5% APY in escrow.
+          </div>
+        </div>
+        <a href="/claim" className="btn btn--ghost btn--sm whitespace-nowrap">
+          Claim via ORCID <ArrowRightIcon />
+        </a>
+      </div>
+
       <div className="flex justify-end items-center pt-2">
         <a
           href={`/verify/${result.queryId}`}

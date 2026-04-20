@@ -77,6 +77,39 @@ export default async function RegistryPage() {
         </div>
       </header>
 
+      <Link
+        href="/claim"
+        className="block no-underline text-inherit"
+      >
+        <div
+          className="px-8 py-5 border-b border-token hover:surface-raised transition-colors"
+          style={{
+            background:
+              "linear-gradient(90deg, color-mix(in srgb, var(--kite-500) 7%, transparent), transparent)"
+          }}
+        >
+          <div className="max-w-[1040px] mx-auto flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-start gap-3">
+              <span className="chip chip--success shrink-0" style={{ marginTop: 2 }}>
+                For authors
+              </span>
+              <div>
+                <div className="t-h3 text-[16px] font-semibold leading-tight">
+                  Are you a cited author? Bind your ORCID to claim earnings.
+                </div>
+                <div className="t-small ink-3 mt-1">
+                  Unclaimed payouts accrue 5% APY in escrow until you verify
+                  ownership via your ORCID iD.
+                </div>
+              </div>
+            </div>
+            <span className="flex items-center gap-1.5 t-small text-kite-500 font-medium">
+              Open /claim <ArrowRightIcon size={14} />
+            </span>
+          </div>
+        </div>
+      </Link>
+
       <div className="px-8 py-7 max-w-[1040px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-5">
         <Link
           href="/agents"

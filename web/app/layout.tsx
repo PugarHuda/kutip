@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight, JetBrains_Mono, Newsreader } from "next/font/google";
 import { TopNav } from "@/components/topnav";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const inter = Inter({
@@ -41,8 +42,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${interTight.variable} ${newsreader.variable} ${jetbrains.variable}`}
     >
       <body className="font-sans min-h-screen antialiased">
-        <TopNav />
-        {children}
+        <Providers>
+          <TopNav />
+          {children}
+        </Providers>
       </body>
     </html>
   );
