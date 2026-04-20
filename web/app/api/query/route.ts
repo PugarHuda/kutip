@@ -11,7 +11,7 @@ export const maxDuration = 120;
 
 const QuerySchema = z.object({
   query: z.string().min(5).max(500),
-  budgetUSDC: z.number().min(1).max(20)
+  budgetUSDC: z.number().min(0.1).max(20)
 });
 
 export async function POST(req: NextRequest) {

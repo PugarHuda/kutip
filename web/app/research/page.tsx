@@ -69,7 +69,7 @@ type Phase = "idle" | "running" | "result";
 
 export default function ResearchPage() {
   const [query, setQuery] = useState("");
-  const [budget, setBudget] = useState(1);
+  const [budget, setBudget] = useState(0.5);
   const [steps, setSteps] = useState<AgentStep[]>([]);
   const [result, setResult] = useState<ResearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -184,7 +184,7 @@ function ResearchSidebar({
   const researcherBal = balances?.researcher?.balance
     ? BigInt(balances.researcher.balance)
     : null;
-  const requiredRaw = BigInt(budget) * 10n ** 18n;
+  const requiredRaw = BigInt(Math.round(budget * 100)) * 10n ** 16n;
   const subAgentFee = requiredRaw / 20n; // 5%
   const requiredTotal = requiredRaw + subAgentFee;
   const insufficient = researcherBal !== null && researcherBal < requiredTotal;
@@ -225,7 +225,7 @@ function ResearchSidebar({
 
       <div className="t-caption mt-6">Budget</div>
       <div className="flex gap-1.5 mt-2">
-        {[1, 2, 5, 10].map((v) => (
+        {[0.5, 1, 2, 5].map((v) => (
           <button
             key={v}
             type="button"
