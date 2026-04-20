@@ -674,6 +674,12 @@ function RunningView({ steps }: { steps: AgentStep[] }) {
                   {label}
                 </div>
                 <div className="t-small ink-2 mt-0.5">{detail}</div>
+                {isRunning && (
+                  <StepTicker
+                    messages={STEP_THEMES[i]?.tickerMessages ?? []}
+                    elapsedMs={t ? now - t.startedAt : 0}
+                  />
+                )}
               </div>
               <div
                 className="t-mono-sm text-right font-semibold"
@@ -701,6 +707,107 @@ function RunningView({ steps }: { steps: AgentStep[] }) {
   );
 }
 
+function StepTicker({
+  messages,
+  elapsedMs
+}: {
+  messages: string[];
+  elapsedMs: number;
+}) {
+  if (messages.length === 0) return null;
+  const idx = Math.min(
+    messages.length - 1,
+    Math.floor(elapsedMs / 1800)
+  );
+  return (
+    <div className="t-mono-sm mt-1.5 flex items-center gap-1.5 text-kite-700 font-medium animate-fade-up" key={idx}>
+      <span className="inline-flex gap-0.5">
+        <span className="w-1 h-1 rounded-full bg-current animate-breathe" />
+        <span className="w-1 h-1 rounded-full bg-current animate-breathe" style={{ animationDelay: "0.15s" }} />
+        <span className="w-1 h-1 rounded-full bg-current animate-breathe" style={{ animationDelay: "0.3s" }} />
+      </span>
+      <span>{messages[idx]}</span>
+    </div>
+  );
+}
+
+const STEP_THEMES: {
+  ringGradient: string;
+  runningIcon: (props: { size?: number }) => JSX.Element;
+  tickerMessages: string[];
+}[] = [
+  {
+    ringGradient: "conic-gradient(from 0deg, #6366f1, #a855f7, #6366f1)",
+    runningIcon: ({ size = 15 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-dot">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+    ),
+    tickerMessages: [
+      "Searching Semantic Scholar",
+      "Ranking relevance",
+      "Filtering catalog"
+    ]
+  },
+  {
+    ringGradient: "conic-gradient(from 0deg, #10b981, #34d399, #10b981)",
+    runningIcon: ({ size = 15 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-breathe">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 8v8M9 11h6M9 13h6" />
+      </svg>
+    ),
+    tickerMessages: [
+      "Requesting x402 receipts",
+      "Settling per-paper",
+      "Confirming payment"
+    ]
+  },
+  {
+    ringGradient: "conic-gradient(from 0deg, #f59e0b, #fbbf24, #f59e0b)",
+    runningIcon: ({ size = 15 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-breathe">
+        <path d="M12 2a5 5 0 0 1 5 5c0 3-2 3-2 7h-6c0-4-2-4-2-7a5 5 0 0 1 5-5Z" />
+        <path d="M10 17h4M11 21h2" />
+      </svg>
+    ),
+    tickerMessages: [
+      "Reading papers",
+      "Extracting citations",
+      "Drafting summary"
+    ]
+  },
+  {
+    ringGradient: "conic-gradient(from 0deg, #ec4899, #f472b6, #ec4899)",
+    runningIcon: ({ size = 15 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-dot">
+        <path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" />
+      </svg>
+    ),
+    tickerMessages: [
+      "Normalizing weights",
+      "Resolving ORCID bindings",
+      "Routing to escrow"
+    ]
+  },
+  {
+    ringGradient: "conic-gradient(from 0deg, #06b6d4, #22d3ee, #06b6d4)",
+    runningIcon: ({ size = 15 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-breathe">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <path d="M8 12h8M8 8h8M8 16h4" />
+      </svg>
+    ),
+    tickerMessages: [
+      "Approving paymaster",
+      "Signing UserOp",
+      "Submitting to bundler",
+      "Waiting for tx inclusion"
+    ]
+  }
+];
+
 function StepIcon({ state, n }: { state: AgentStep["status"]; n: number }) {
   if (state === "done") {
     return (
@@ -710,9 +817,16 @@ function StepIcon({ state, n }: { state: AgentStep["status"]; n: number }) {
     );
   }
   if (state === "running") {
+    const theme = STEP_THEMES[n - 1];
     return (
-      <div className="w-7 h-7 rounded-full flex items-center justify-center bg-kite-500 text-white animate-breathe">
-        <span className="t-mono-sm font-bold">{n}</span>
+      <div className="relative w-8 h-8">
+        <div
+          className="absolute inset-0 rounded-full animate-spin-slow"
+          style={{ background: theme.ringGradient }}
+        />
+        <div className="absolute inset-[2px] rounded-full bg-kite-500 flex items-center justify-center text-white">
+          <theme.runningIcon size={14} />
+        </div>
       </div>
     );
   }

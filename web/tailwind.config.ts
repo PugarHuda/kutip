@@ -59,6 +59,10 @@ const config: Config = {
         shimmer: {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(350%)" }
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" }
         }
       },
       animation: {
@@ -66,7 +70,8 @@ const config: Config = {
         "pulse-ring": "pulse-ring 1.8s ease-out infinite",
         "fade-up": "fade-up 400ms ease-out both",
         "pulse-dot": "pulse-dot 1.6s ease-in-out infinite",
-        shimmer: "shimmer 1.8s ease-in-out infinite"
+        shimmer: "shimmer 1.8s ease-in-out infinite",
+        "spin-slow": "spin-slow 2.4s linear infinite"
       }
     }
   },
