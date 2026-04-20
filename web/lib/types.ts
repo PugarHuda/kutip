@@ -17,6 +17,7 @@ export interface ResearchResult {
   subAgentFeeUSDC?: string;
   sessionId?: string;
   sessionDelegator?: string;
+  sessionNewSpentToday?: string;
   paperDetails: {
     id: string;
     title: string;

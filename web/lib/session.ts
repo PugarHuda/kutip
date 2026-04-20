@@ -64,7 +64,7 @@ export function sessionIdFrom(intent: SpendingIntent, signature: string): string
   return keccak256(toHex(payload)).slice(0, 18);
 }
 
-export async function verifyAndStore(
+export async function verifyIntent(
   intent: SpendingIntent,
   signature: `0x${string}`
 ): Promise<SessionDelegation> {
@@ -82,11 +82,11 @@ export async function verifyAndStore(
 
   const now = Math.floor(Date.now() / 1000);
   if (intent.validUntil <= BigInt(now)) {
-    throw new Error("Delegation expired before it could be stored");
+    throw new Error("Delegation expired");
   }
 
   const id = sessionIdFrom(intent, signature);
-  const delegation: SessionDelegation = {
+  return {
     id,
     intent,
     signature,
@@ -95,8 +95,46 @@ export async function verifyAndStore(
     dayAnchor: startOfUtcDay(now),
     revokedAt: null
   };
-  store.set(id, delegation);
+}
+
+/** @deprecated Use verifyIntent + client-side state — see Vercel serverless note in session.ts */
+export async function verifyAndStore(
+  intent: SpendingIntent,
+  signature: `0x${string}`
+): Promise<SessionDelegation> {
+  const delegation = await verifyIntent(intent, signature);
+  store.set(delegation.id, delegation);
   return delegation;
+}
+
+export interface SessionEnvelope {
+  intent: SpendingIntent;
+  signature: `0x${string}`;
+  spentToday: bigint;
+}
+
+export async function checkSpendStateless(
+  env: SessionEnvelope,
+  amount: bigint
+): Promise<{ session: SessionDelegation; newSpentToday: bigint }> {
+  const session = await verifyIntent(env.intent, env.signature);
+
+  if (amount > session.intent.maxPerQueryUSDC) {
+    throw new Error(
+      `Per-query cap exceeded: this query would spend ${fmt(amount)} but max is ${fmt(session.intent.maxPerQueryUSDC)} USDC`
+    );
+  }
+
+  const projected = env.spentToday + amount;
+  if (projected > session.intent.dailyCapUSDC) {
+    const remaining = session.intent.dailyCapUSDC - env.spentToday;
+    const leftStr = remaining < 0n ? "0.00" : fmt(remaining);
+    throw new Error(
+      `Daily cap would be exceeded: ${leftStr} USDC left today, query needs ${fmt(amount)}`
+    );
+  }
+
+  return { session, newSpentToday: projected };
 }
 
 export function getSession(id: string): SessionDelegation | null {

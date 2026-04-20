@@ -24,24 +24,11 @@ import { lookupClaim } from "./claim-registry";
 import { getEscrowAddress } from "./escrow";
 import { KITE_TESTNET_USDC, parseUSDC, formatUSDC } from "./kite";
 import { saveSummary } from "./summary-store";
-import { checkSpend, recordSpend } from "./session";
 import type { AgentEvent, Citation, ResearchResult } from "./types";
 
 /** 5% sub-agent fee cap at 0.05 Test USD — mirrored in ledger.ts. */
 const SUB_AGENT_FEE_BPS = 500n;
 const SUB_AGENT_FEE_CAP = 50000000000000000n;
-
-function preflightSession(
-  sessionId: string | undefined,
-  totalPaid: bigint
-): { sessionId: string; userLabel: string } | null {
-  if (!sessionId) return null; // legacy unrestricted mode — warn once in logs below
-  const { session } = checkSpend({ sessionId, amount: totalPaid });
-  return {
-    sessionId,
-    userLabel: `${session.intent.user.slice(0, 6)}…${session.intent.user.slice(-4)}`
-  };
-}
 
 async function preflightBalance(totalPaid: bigint): Promise<void> {
   // Only check when we're going to actually spend — demo mode / no
@@ -92,10 +79,10 @@ type Emit = (event: AgentEvent) => void;
 export async function runResearchAgent(opts: {
   query: string;
   budgetUSDC: number;
-  sessionId?: string;
+  sessionInfo?: { sessionId: string; userLabel: string };
   emit: Emit;
 }): Promise<ResearchResult> {
-  const { query, budgetUSDC, sessionId, emit } = opts;
+  const { query, budgetUSDC, sessionInfo, emit } = opts;
 
   const searchLabel = isSemanticScholarEnabled()
     ? "Searching Semantic Scholar corpus"
@@ -162,10 +149,6 @@ export async function runResearchAgent(opts: {
   const citations = buildCitations(purchased, citationWeights);
   const totalPaidRaw = parseUSDC(budgetUSDC);
 
-  // Session delegation check: if user pre-authorized a spending intent,
-  // enforce per-query cap + daily budget. Throws before we touch on-chain.
-  const session = preflightSession(sessionId, totalPaidRaw);
-
   // Pre-flight: if payer is broke, fail fast with an actionable message
   // instead of burning LLM quota + surfacing the cryptic 'execution reverted'.
   await preflightBalance(totalPaidRaw);
@@ -198,12 +181,6 @@ export async function runResearchAgent(opts: {
     emit
   });
 
-  // Session enforcement: only record spend after attestation settles.
-  // A revert means no USDC moved, so the session's daily cap stays intact.
-  if (session && attestation?.txHash) {
-    recordSpend(session.sessionId, totalPaidRaw);
-  }
-
   const paperDetails = purchased.map((p) => {
     const weight = citationWeights.get(p.id) ?? 0;
     const authors = p.authors.map((aid) => {
@@ -233,8 +210,8 @@ export async function runResearchAgent(opts: {
     attestationPayer: attestation?.payer,
     subAgentAddress: attestation?.subAgentAddress,
     subAgentFeeUSDC: attestation?.subAgentFeeUSDC,
-    sessionId: session?.sessionId,
-    sessionDelegator: session?.userLabel,
+    sessionId: sessionInfo?.sessionId,
+    sessionDelegator: sessionInfo?.userLabel,
     paperDetails
   };
 

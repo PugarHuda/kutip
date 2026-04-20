@@ -4,20 +4,12 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { AgentEvent, AgentStep, ResearchResult } from "@/lib/types";
 import { ArrowRightIcon, CheckIcon, ChevronDownIcon, SearchIcon } from "@/components/icons";
 import { Addr, Cite, PayoutRow, Tx } from "@/components/ui";
-import { SessionManager } from "@/components/session-manager";
-
-interface SessionDto {
-  id: string;
-  user: string;
-  agent: string;
-  maxPerQueryUSDC: string;
-  dailyCapUSDC: string;
-  validUntil: string;
-  spentToday: string;
-  createdAt: number;
-  revokedAt: number | null;
-  purpose: string;
-}
+import {
+  SessionManager,
+  updateLocalSpent,
+  type SessionEnvelope
+} from "@/components/session-manager";
+import { useAccount } from "wagmi";
 
 interface WalletBalance {
   address: string;
@@ -89,8 +81,9 @@ export default function ResearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [expandLog, setExpandLog] = useState(false);
-  const [session, setSession] = useState<SessionDto | null>(null);
-  const onSessionChange = useCallback((s: SessionDto | null) => setSession(s), []);
+  const [session, setSession] = useState<SessionEnvelope | null>(null);
+  const onSessionChange = useCallback((s: SessionEnvelope | null) => setSession(s), []);
+  const { address } = useAccount();
 
   const phase: Phase = result ? "result" : running ? "running" : "idle";
 
@@ -109,7 +102,13 @@ export default function ResearchPage() {
         body: JSON.stringify({
           query: q,
           budgetUSDC: budget,
-          sessionId: session?.id
+          session: session
+            ? {
+                intent: session.intent,
+                signature: session.signature,
+                spentToday: session.spentToday
+              }
+            : undefined
         })
       });
       if (!res.body) throw new Error("No response body");
@@ -151,6 +150,9 @@ export default function ResearchPage() {
       });
     } else if (event.type === "result") {
       setResult(event.result);
+      if (address && event.result.sessionNewSpentToday) {
+        updateLocalSpent(address, event.result.sessionNewSpentToday);
+      }
     } else {
       setError(event.message);
     }
@@ -206,7 +208,7 @@ function ResearchSidebar({
   onSubmit: () => void;
   disabled: boolean;
   steps: AgentStep[];
-  onSessionChange: (s: SessionDto | null) => void;
+  onSessionChange: (s: SessionEnvelope | null) => void;
 }) {
   const balances = useBalances();
   const researcherBal = balances?.researcher?.balance
@@ -563,8 +565,9 @@ function RunningView({ steps }: { steps: AgentStep[] }) {
       <div className="card p-0 overflow-hidden">
         {Array.from({ length: 5 }).map((_, i) => {
           const s = steps[i];
+          const optimisticRunning = steps.length === 0 && i === 0;
           const state: AgentStep["status"] =
-            s?.status ?? (i === effectiveCurrent && steps.length > 0 ? "pending" : "pending");
+            s?.status ?? (optimisticRunning ? "running" : "pending");
           const isRunning = state === "running";
           const label = s?.label ?? STEP_OUTLINE[i]?.[0] ?? `Step ${i + 1}`;
           const detail = s?.detail ?? STEP_OUTLINE[i]?.[1] ?? "";
