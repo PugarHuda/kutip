@@ -8,7 +8,7 @@
     "journal": "Nature",
     "abstract": "We review technological, economic, and policy trajectories for gigaton-scale direct air capture. Three pathways — solid-sorbent modular, liquid-solvent utility, and mineralization hybrids — are benchmarked against net-zero targets.",
     "keywords": ["carbon capture", "direct air capture", "net zero", "climate"],
-    "priceUSDC": 400000
+    "priceUSDC": 40000
   },
   {
     "id": "p002",
@@ -19,7 +19,7 @@
     "journal": "Science Advances",
     "abstract": "Field data from Icelandic basalt injection site shows 95% CO2 mineralization within 24 months, faster than laboratory predictions by factor of 1.8x.",
     "keywords": ["mineralization", "basalt", "CO2 storage"],
-    "priceUSDC": 350000
+    "priceUSDC": 35000
   },
   {
     "id": "p003",
@@ -30,7 +30,7 @@
     "journal": "Joule",
     "abstract": "Multi-feedstock LCA identifies agricultural residue biochar as lowest-cost (<$80/tCO2e) pathway with co-benefits for soil carbon.",
     "keywords": ["biochar", "negative emissions", "LCA"],
-    "priceUSDC": 300000
+    "priceUSDC": 30000
   },
   {
     "id": "p004",
@@ -41,7 +41,7 @@
     "journal": "Nature Energy",
     "abstract": "A vapor-deposition stabilization strategy lifts tandem efficiency to 34.2% with operational stability >1000 hours at 85°C.",
     "keywords": ["perovskite", "solar", "tandem"],
-    "priceUSDC": 450000
+    "priceUSDC": 45000
   },
   {
     "id": "p005",
@@ -52,7 +52,7 @@
     "journal": "PNAS",
     "abstract": "We propose a tiered governance framework for ocean alkalinity trials incorporating MRV, environmental safeguards, and benefit-sharing.",
     "keywords": ["ocean alkalinity", "OAE", "governance"],
-    "priceUSDC": 350000
+    "priceUSDC": 35000
   },
   {
     "id": "p006",
@@ -63,7 +63,7 @@
     "journal": "Nature",
     "abstract": "Analysis of 27,000 plantations shows median realized carbon yields are 42% below reported baselines, driven by mortality and species mismatch.",
     "keywords": ["afforestation", "reforestation", "carbon accounting"],
-    "priceUSDC": 400000
+    "priceUSDC": 40000
   },
   {
     "id": "p007",
@@ -74,7 +74,7 @@
     "journal": "ACS Nano",
     "abstract": "A metal-organic framework host enhances enzyme turnover by 12x vs free enzyme, enabling continuous capture at flue-gas temperatures.",
     "keywords": ["enzyme", "carbonic anhydrase", "MOF"],
-    "priceUSDC": 350000
+    "priceUSDC": 35000
   },
   {
     "id": "p008",
@@ -85,7 +85,7 @@
     "journal": "Nature Climate Change",
     "abstract": "Comparative analysis of three major CDR incentive regimes reveals durability-pricing and MRV rigor as strongest determinants of project survival.",
     "keywords": ["policy", "45Q", "CCfD", "incentive"],
-    "priceUSDC": 400000
+    "priceUSDC": 40000
   },
   {
     "id": "p009",
@@ -96,7 +96,7 @@
     "journal": "Energy & Environmental Science",
     "abstract": "Bipolar membrane systems demonstrate 72% Faradaic efficiency for ethylene at ambient temperature with projected costs <$800/t by 2030.",
     "keywords": ["CO2 electrolysis", "ethylene", "CCU"],
-    "priceUSDC": 400000
+    "priceUSDC": 40000
   },
   {
     "id": "p010",
@@ -107,7 +107,7 @@
     "journal": "Nature Sustainability",
     "abstract": "Long-term monitoring of 68 mangrove restoration sites reveals cumulative sequestration of 2.8-4.1 tCO2/ha/yr with strong co-benefits for coastal protection.",
     "keywords": ["blue carbon", "mangrove", "restoration"],
-    "priceUSDC": 300000
+    "priceUSDC": 30000
   },
   {
     "id": "p011",
@@ -118,7 +118,7 @@
     "journal": "Science",
     "abstract": "First-principles thermodynamic bounds on solid-sorbent DAC systems show minimum 1.2 GJ/tCO2 theoretical, with current systems at 6-8 GJ/tCO2.",
     "keywords": ["DAC", "thermodynamics", "sorbent"],
-    "priceUSDC": 450000
+    "priceUSDC": 45000
   },
   {
     "id": "p012",
@@ -129,7 +129,7 @@
     "journal": "One Earth",
     "abstract": "Regional assessment identifies 140-210 GtCO2 storage capacity across Indonesian, Malaysian, and Vietnamese basins with suitability scoring.",
     "keywords": ["CO2 storage", "saline aquifer", "southeast asia"],
-    "priceUSDC": 300000
+    "priceUSDC": 30000
   },
   {
     "id": "p013",
@@ -140,7 +140,7 @@
     "journal": "Nature Energy",
     "abstract": "Multi-scenario modeling demonstrates 100% renewable grids maintain >99.95% reliability with 8-12 hour storage plus geographic dispersion.",
     "keywords": ["renewable", "grid", "reliability", "storage"],
-    "priceUSDC": 400000
+    "priceUSDC": 40000
   },
   {
     "id": "p014",
@@ -151,7 +151,7 @@
     "journal": "ACS Sustainable Chem. Eng.",
     "abstract": "Bioenergy with CCS pathways constrained to 1.5-3.5 GtCO2/yr by sustainable biomass availability without biodiversity loss.",
     "keywords": ["BECCS", "biomass", "sustainability"],
-    "priceUSDC": 350000
+    "priceUSDC": 35000
   },
   {
     "id": "p015",
@@ -162,6 +162,6 @@
     "journal": "Nature",
     "abstract": "We propose a distributed ledger architecture enabling third-party verification of carbon removal claims with 100x reduction in verification cost.",
     "keywords": ["verification", "MRV", "blockchain", "registry"],
-    "priceUSDC": 450000
+    "priceUSDC": 45000
   }
 ]
