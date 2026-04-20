@@ -128,8 +128,20 @@ export async function sendBatchUserOp(calls: BatchedCall[]): Promise<AASubmitRes
   const { status, userOpHash } = result;
   const happyStatus = status.status === "success" || status.status === "included";
   if (!happyStatus) {
-    const reason = status.reason ?? status.status;
-    throw new Error(`UserOp ${userOpHash.slice(0, 12)}… ${reason}`);
+    const details = await fetchUserOpDetails(userOpHash);
+    const reason =
+      details?.reason ??
+      (status as { reason?: string }).reason ??
+      status.status;
+    console.error("[aa] userOp reverted", {
+      userOpHash,
+      status: status.status,
+      sdkStatus: status,
+      details
+    });
+    throw new Error(
+      `UserOp ${userOpHash}: ${reason}${details?.revertReasonDecoded ? ` (${details.revertReasonDecoded})` : ""}`
+    );
   }
 
   const txHash = status.transactionHash;
@@ -142,6 +154,66 @@ export async function sendBatchUserOp(calls: BatchedCall[]): Promise<AASubmitRes
     txHash: txHash as Hex,
     aaAddress: ctx.aaAddress
   };
+}
+
+const KNOWN_ERRORS: Record<string, string> = {
+  "0xb5db60cb": "WeightMismatch — citation weights don't sum to 10000 bps",
+  "0xb2dbca4d": "QueryAlreadyAttested — queryId already attested",
+  "0x4b0423cf": "EmptyCitations — zero citations passed to attestAndSplit",
+  "0xbcd55b0f": "InvalidSplit — constructor splits don't total 10000",
+  "0xe450d38c": "ERC20InsufficientBalance — insufficient Test USD at sender",
+  "0x5274afe7": "SafeERC20FailedOperation — token transfer reverted",
+  "0x118cdaa7": "OwnableUnauthorizedAccount — caller is not owner"
+};
+
+async function fetchUserOpDetails(userOpHash: string): Promise<{
+  reason?: string;
+  revertData?: string;
+  revertReasonDecoded?: string;
+} | null> {
+  try {
+    const res = await fetch(BUNDLER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_getUserOperationReceipt",
+        params: [userOpHash],
+        id: 1
+      })
+    });
+    const j = (await res.json()) as {
+      result?: {
+        reason?: string;
+        success?: boolean;
+        receipt?: { status?: string };
+        revertData?: string;
+      } | null;
+    };
+    if (!j.result) return null;
+    const selector = j.result.revertData?.slice(0, 10);
+    let decoded = selector ? KNOWN_ERRORS[selector] : undefined;
+    // Error(string) standard revert — decode the reason
+    if (!decoded && selector === "0x08c379a0" && j.result.revertData) {
+      try {
+        const hex = j.result.revertData.slice(138);
+        const bytes = Buffer.from(hex, "hex");
+        const nul = bytes.indexOf(0);
+        const str = bytes.slice(0, nul === -1 ? bytes.length : nul).toString("utf8");
+        if (str) decoded = `Error("${str}")`;
+      } catch {
+        /* ignore */
+      }
+    }
+    return {
+      reason: j.result.reason,
+      revertData: j.result.revertData,
+      revertReasonDecoded: decoded
+    };
+  } catch (err) {
+    console.warn("[aa] could not fetch userOp details:", err);
+    return null;
+  }
 }
 
 export const AA_CONSTANTS = {
