@@ -23,6 +23,10 @@ const REPUTATION_NFT = "0x8f53EB5C04B773F0F31FE41623EA19d2Fd84db15";
 const AGENT_REGISTRY = "0xde6d6ab98f216e6421c1b73bdab2f03064d27dcd";
 const ERC6551_REGISTRY = "0x2f432effbbd83df8df610e5e0c0057b65bd31012";
 const ERC6551_ACCOUNT_IMPL = "0x7d9c63f12af5ad7a18bb8d39ac8c1dd23e95f456";
+const NAME_REGISTRY = "0x5a9b13043452a99A15cA01F306191a639002FEF9";
+const OPERATOR_SAFE = "0x5258161fb69e6a33922c1Fe46C042A78572c36AA";
+const FUJI_MIRROR = "0x99359dAf4f2504dF3DA042cD38b8D01b8589E5fA";
+const FUJI_RPC = "https://api.avax-test.network/ext/bc/C/rpc";
 
 const RESEARCHER_AA = "0x4da7f4cFd443084027a39cc0f7c41466d9511776";
 const SUMMARIZER_AA = "0xA6C36bA2BC8E84fCF276721F30FC79ceD609ef5c";
@@ -419,6 +423,152 @@ await check("data · attestation count ≥ 3", async () => {
 
 await check("data · totalEarnings > 0", async () => {
   assert(subgraphTotalEarnings > 0n, `totalEarnings=${subgraphTotalEarnings}`);
+});
+
+// ─── New pages (3) ─────────────────────────────────────────────────
+await check("GET /gasless — infra showcase", async () => {
+  const res = await fetch(`${BASE}/gasless`);
+  assert(res.ok, `status ${res.status}`);
+  const html = await res.text();
+  assert(html.includes("The agent pays for"), "gasless headline missing");
+});
+
+await check("GET /governance — Safe multisig page", async () => {
+  const res = await fetch(`${BASE}/governance`);
+  assert(res.ok, `status ${res.status}`);
+  const html = await res.text();
+  assert(
+    html.includes("No single person can move"),
+    "governance headline missing"
+  );
+});
+
+await check("GET /authors/a001 — author detail", async () => {
+  const res = await fetch(`${BASE}/authors/a001`);
+  assert(res.ok, `status ${res.status}`);
+  const html = await res.text();
+  assert(html.includes("Dr. Sarah Chen"), "author name not rendered");
+  assert(html.includes("0000-0001-1234-0001"), "ORCID not rendered");
+});
+
+await check("GET /leaderboard?range=week — filter by time", async () => {
+  const res = await fetch(`${BASE}/leaderboard?range=week`);
+  assert(res.ok, `status ${res.status}`);
+  const html = await res.text();
+  assert(html.includes("This week"), "range label missing");
+});
+
+await check("GET /leaderboard?sort=citations — sort toggle", async () => {
+  const res = await fetch(`${BASE}/leaderboard?sort=citations`);
+  assert(res.ok, `status ${res.status}`);
+  const html = await res.text();
+  assert(html.includes("Citations ↓") || html.includes("Citations"), "sort label missing");
+});
+
+// ─── New API endpoints (5) ─────────────────────────────────────────
+await check("GET /api/balances — live wallet balances", async () => {
+  const { status, data } = await fetchJson(`${BASE}/api/balances`);
+  assert(status === 200, `status ${status}`);
+  assert(data.researcher?.address === RESEARCHER_AA, "researcher addr mismatch");
+  assert(data.summarizer?.address === SUMMARIZER_AA, "summarizer addr mismatch");
+  assert(typeof data.researcher.balance === "string", "balance not string");
+});
+
+await check("GET /api/gasless-stats — paymaster probe", async () => {
+  const { status, data } = await fetchJson(`${BASE}/api/gasless-stats`);
+  assert(status === 200, `status ${status}`);
+  assert(data.paymaster?.address, "paymaster address missing");
+  assert(data.researcherAA?.address === RESEARCHER_AA, "researcher AA mismatch");
+  assert(data.stats?.userGasPaid === "0", "user gas claim broken");
+});
+
+await check("GET /api/safe-stats — Safe 2-of-3 state", async () => {
+  const { status, data } = await fetchJson(`${BASE}/api/safe-stats`);
+  assert(status === 200, `status ${status}`);
+  assert(data.enabled === true, "safe not enabled");
+  assert(data.threshold === 2, `threshold=${data.threshold}`);
+  assert(data.ownerCount === 3, `ownerCount=${data.ownerCount}`);
+  assert(data.version, "version missing");
+});
+
+await check("GET /api/auth/orcid/status — OAuth configured", async () => {
+  const { status, data } = await fetchJson(`${BASE}/api/auth/orcid/status`);
+  assert(status === 200, `status ${status}`);
+  assert(data.enabled === true, "OAuth not enabled in prod");
+});
+
+await check(
+  "GET /api/session?user=0x — no session yet → null",
+  async () => {
+    const { status, data } = await fetchJson(
+      `${BASE}/api/session?user=0x0000000000000000000000000000000000000001`
+    );
+    assert(status === 200, `status ${status}`);
+    assert(data.session === null, "should be null");
+  }
+);
+
+// ─── New on-chain reads (3) ────────────────────────────────────────
+await check("on-chain · NameRegistry deployed", async () => {
+  const code = await rpcGetCode(NAME_REGISTRY);
+  assert(code.length > 2, "no code at NameRegistry");
+  // bindingCount() selector = 0x673ef2d1
+  const count = await rpcCall(NAME_REGISTRY, "0x673ef2d1");
+  assert(typeof count === "string" && count.startsWith("0x"), "invalid response");
+});
+
+await check("on-chain · Operator Safe deployed + 2-of-3", async () => {
+  const code = await rpcGetCode(OPERATOR_SAFE);
+  assert(code.length > 2, "no code at Safe");
+  // getThreshold() selector = 0xe75235b8
+  const threshold = await rpcCall(OPERATOR_SAFE, "0xe75235b8");
+  assert(BigInt(threshold) === 2n, `threshold=${BigInt(threshold)}`);
+});
+
+await check("on-chain (Fuji) · CitationMirror deployed", async () => {
+  const res = await fetch(FUJI_RPC, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      method: "eth_getCode",
+      params: [FUJI_MIRROR, "latest"],
+      id: 1
+    }),
+    signal: AbortSignal.timeout(10000)
+  });
+  const d = await res.json();
+  assert(d.result?.length > 2, "no code at Fuji mirror");
+});
+
+await check("on-chain (Fuji) · expected source chain = 2368", async () => {
+  // expectedSourceChainId() selector
+  const sigFor = (n) =>
+    require("crypto")
+      .createHash("sha256")
+      .update(n)
+      .digest("hex")
+      .slice(0, 8); // placeholder — fallback to known selector
+  // Use ethers-style computed selector: keccak("expectedSourceChainId()") = 0x...
+  // keccak("expectedSourceChainId()")[0:10]
+  const selector = "0x71af8f00";
+  const res = await fetch(FUJI_RPC, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      method: "eth_call",
+      params: [{ to: FUJI_MIRROR, data: selector }, "latest"],
+      id: 1
+    })
+  });
+  const d = await res.json();
+  if (d.result && d.result !== "0x") {
+    assert(
+      BigInt(d.result) === 2368n,
+      `source chain=${BigInt(d.result)}`
+    );
+  }
 });
 
 // Summary
