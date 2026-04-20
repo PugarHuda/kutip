@@ -3,119 +3,119 @@
     "id": "a001",
     "name": "Dr. Sarah Chen",
     "affiliation": "Stanford University",
-    "wallet": "0x1111111111111111111111111111111111111111",
+    "wallet": "0x981025e3F9261A3637b9C5E09D1Ce33275452513",
     "orcid": "0000-0001-1234-0001"
   },
   {
     "id": "a002",
     "name": "Dr. Marcus Hoffmann",
     "affiliation": "ETH Zürich",
-    "wallet": "0x2222222222222222222222222222222222222222",
+    "wallet": "0x519Fa3068A4f7859Df5d2A74FE4bcF283f3B3392",
     "orcid": "0000-0001-1234-0002"
   },
   {
     "id": "a003",
     "name": "Dr. Ingibjörg Sigurdsson",
     "affiliation": "University of Iceland",
-    "wallet": "0x3333333333333333333333333333333333333333",
+    "wallet": "0xb32F0d036Aa8A9eE845AC395109201e2b3C27b3f",
     "orcid": "0000-0001-1234-0003"
   },
   {
     "id": "a004",
     "name": "Dr. Priya Sharma",
     "affiliation": "IIT Delhi",
-    "wallet": "0x4444444444444444444444444444444444444444",
+    "wallet": "0xd10892549a92cd45116d49524bC80b56A0f18450",
     "orcid": "0000-0001-1234-0004"
   },
   {
     "id": "a005",
     "name": "Dr. Arjun Mehta",
     "affiliation": "Oxford University",
-    "wallet": "0x5555555555555555555555555555555555555555",
+    "wallet": "0x82Eb5DFA5D080413Fd3BcEfFb59c635e9B8eA071",
     "orcid": "0000-0001-1234-0005"
   },
   {
     "id": "a006",
     "name": "Dr. Anna Kowalski",
     "affiliation": "MIT",
-    "wallet": "0x6666666666666666666666666666666666666666",
+    "wallet": "0xAC303343AfBc382e060036786Ecc5210C29144b8",
     "orcid": "0000-0001-1234-0006"
   },
   {
     "id": "a007",
     "name": "Dr. James Okonkwo",
     "affiliation": "Woods Hole Oceanographic",
-    "wallet": "0x7777777777777777777777777777777777777777",
+    "wallet": "0x5Cf9a7c10FB1698A2c922a43deFBBeF9B1E09ba3",
     "orcid": "0000-0001-1234-0007"
   },
   {
     "id": "a008",
     "name": "Dr. Lucia Fernandez",
     "affiliation": "CONICET Argentina",
-    "wallet": "0x8888888888888888888888888888888888888888",
+    "wallet": "0xe48a5BCe12b56437Dab893a27801640E32E08Fe5",
     "orcid": "0000-0001-1234-0008"
   },
   {
     "id": "a009",
     "name": "Dr. Hiroshi Tanaka",
     "affiliation": "University of Tokyo",
-    "wallet": "0x9999999999999999999999999999999999999999",
+    "wallet": "0xdc92e6d064c70cfa67a848f8EfEA0395A563DE44",
     "orcid": "0000-0001-1234-0009"
   },
   {
     "id": "a010",
     "name": "Dr. Elena Vasquez",
     "affiliation": "Harvard Kennedy School",
-    "wallet": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "wallet": "0x6F7bfc1aF121cC9b1d752cc0AFd1A2A352E445EB",
     "orcid": "0000-0001-1234-0010"
   },
   {
     "id": "a011",
     "name": "Dr. Kwame Osei",
     "affiliation": "Caltech",
-    "wallet": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "wallet": "0x969a602053F8df2879DE7E224d686B19e67aCFb4",
     "orcid": "0000-0001-1234-0011"
   },
   {
     "id": "a012",
     "name": "Dr. Siti Rahayu",
     "affiliation": "Universitas Indonesia",
-    "wallet": "0xcccccccccccccccccccccccccccccccccccccccc",
+    "wallet": "0x3FEbc11c1FC41C5484ebbF4a0b85285C5ba7756b",
     "orcid": "0000-0001-1234-0012"
   },
   {
     "id": "a013",
     "name": "Dr. Rafael Souza",
     "affiliation": "USP São Paulo",
-    "wallet": "0xdddddddddddddddddddddddddddddddddddddddd",
+    "wallet": "0x7872a0e94e7def6d099Ea7dECE47aE7e0BE9d3cc",
     "orcid": "0000-0001-1234-0013"
   },
   {
     "id": "a014",
     "name": "Dr. Budi Santoso",
     "affiliation": "ITB Bandung",
-    "wallet": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "wallet": "0xf8FF10a5A61D04083ADbbdA31Beef02d89c6E718",
     "orcid": "0000-0001-1234-0014"
   },
   {
     "id": "a015",
     "name": "Dr. Emma Thompson",
     "affiliation": "Imperial College London",
-    "wallet": "0xffffffffffffffffffffffffffffffffffffffff",
+    "wallet": "0xf99A6E0300f63D9EB0b07d107b7f22d44e72fE05",
     "orcid": "0000-0001-1234-0015"
   },
   {
     "id": "a016",
     "name": "Dr. Thiago Lima",
     "affiliation": "UFRJ Rio",
-    "wallet": "0x1010101010101010101010101010101010101010",
+    "wallet": "0x09b356231B3E29Bc942005dAdf55f675f54DB337",
     "orcid": "0000-0001-1234-0016"
   },
   {
     "id": "a017",
     "name": "Dr. Chang Wei",
     "affiliation": "Tsinghua University",
-    "wallet": "0x2020202020202020202020202020202020202020",
+    "wallet": "0xa55c05fEDABc6B33E75dDBFee395f247688e6B15",
     "orcid": "0000-0001-1234-0017"
   }
 ]

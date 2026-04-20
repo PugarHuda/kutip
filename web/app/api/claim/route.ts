@@ -4,8 +4,18 @@ import { verifyMessage, type Address, type Hex } from "viem";
 import { buildClaimMessage, listClaims, recordClaim } from "@/lib/claim-registry";
 import { listAuthors } from "@/lib/papers";
 import { lookupOrcid } from "@/lib/orcid";
+import {
+  ORCID_COOKIE_NAME,
+  isOrcidOauthEnabled,
+  verifyCookie
+} from "@/lib/orcid-oauth";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+function normalize(orcid: string): string {
+  return orcid.replace(/\s+/g, "").toUpperCase();
+}
 
 const ClaimSchema = z.object({
   orcid: z.string().min(5).max(30),
@@ -25,6 +35,32 @@ export async function POST(req: NextRequest) {
 
   const { orcid, wallet, signature } = parsed.data;
   const addr = wallet as Address;
+  const normalizedOrcid = normalize(orcid);
+
+  // OAuth gate: if ORCID OAuth is enabled, require a verified cookie
+  // whose orcid matches the claimed orcid. This proves the user logged
+  // into the actual ORCID account, not just knows the number.
+  if (isOrcidOauthEnabled()) {
+    const cookie = verifyCookie(req.cookies.get(ORCID_COOKIE_NAME)?.value);
+    if (!cookie) {
+      return NextResponse.json(
+        {
+          error: "ORCID ownership not verified",
+          hint: "Sign in with ORCID first — click 'Verify via ORCID' on /claim"
+        },
+        { status: 401 }
+      );
+    }
+    if (normalize(cookie.orcid) !== normalizedOrcid) {
+      return NextResponse.json(
+        {
+          error: "Claimed ORCID does not match the ORCID you signed in with",
+          hint: `You signed in as ${cookie.orcid} but tried to claim ${normalizedOrcid}`
+        },
+        { status: 403 }
+      );
+    }
+  }
 
   // Dual-track validation: real orcid.org OR local demo catalog.
   const [api, catalog] = await Promise.all([

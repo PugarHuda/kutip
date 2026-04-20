@@ -128,6 +128,56 @@ export async function fetchRecentAttestationsFromGoldsky(
   return data?.attestations ?? null;
 }
 
+/** Aggregates earnings + citations per author from authorDayStats within a day range. */
+export async function fetchLeaderboardWindowedFromGoldsky(
+  days: number
+): Promise<GoldskyAuthor[] | null> {
+  const cutoff = Math.floor(Date.now() / 1000 / 86400) - days;
+  const data = await query<{
+    authorDayStats: {
+      author: { id: string };
+      date: number;
+      earnings: string;
+      citations: string;
+    }[];
+  }>({
+    query: `
+      query Windowed($cutoff: Int!) {
+        authorDayStats(
+          where: { date_gte: $cutoff }
+          first: 1000
+          orderBy: date
+          orderDirection: desc
+        ) {
+          author { id }
+          date
+          earnings
+          citations
+        }
+      }
+    `,
+    variables: { cutoff }
+  });
+  if (!data) return null;
+
+  const agg = new Map<string, { earnings: bigint; citations: number; last: number }>();
+  for (const d of data.authorDayStats) {
+    const prev = agg.get(d.author.id) ?? { earnings: 0n, citations: 0, last: 0 };
+    agg.set(d.author.id, {
+      earnings: prev.earnings + BigInt(d.earnings),
+      citations: prev.citations + Number(d.citations),
+      last: Math.max(prev.last, d.date * 86400)
+    });
+  }
+  return Array.from(agg.entries()).map(([id, v]) => ({
+    id,
+    totalEarnings: v.earnings.toString(),
+    citationCount: v.citations,
+    firstSeenAt: "0",
+    lastSeenAt: String(v.last)
+  }));
+}
+
 export async function fetchAuthorHistoryFromGoldsky(
   authorId: string,
   days = 7

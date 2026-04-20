@@ -1,9 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Addr } from "@/components/ui";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
+
+interface OauthStatus {
+  enabled: boolean;
+  verifiedOrcid?: string | null;
+  exp?: number | null;
+}
 
 const EXAMPLE_ORCID = "0000-0002-1825-0097"; // Josiah Carberry — real public test ORCID
 
@@ -42,10 +49,34 @@ function eth(): EthereumProvider | null {
 
 const ORCID_PATTERN = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
 
-export default function ClaimPage() {
-  const [orcid, setOrcid] = useState(EXAMPLE_ORCID);
+export default function ClaimPageWrapper() {
+  return (
+    <Suspense fallback={<div className="px-6 py-14 text-center">Loading…</div>}>
+      <ClaimPage />
+    </Suspense>
+  );
+}
+
+function ClaimPage() {
+  const searchParams = useSearchParams();
+  const prefill = searchParams.get("orcid") ?? searchParams.get("verified");
+  const [orcid, setOrcid] = useState(prefill ?? EXAMPLE_ORCID);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [preview, setPreview] = useState<Preview>({ state: "hidden" });
+  const [oauth, setOauth] = useState<OauthStatus | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/api/auth/orcid/status", { cache: "no-store" });
+        if (!res.ok) return;
+        setOauth(await res.json());
+      } catch {
+        /* ignore */
+      }
+    }
+    load();
+  }, []);
 
   useEffect(() => {
     const normalized = orcid.replace(/\s+/g, "").toUpperCase();
@@ -168,7 +199,15 @@ export default function ClaimPage() {
     status.kind === "submitting" ||
     status.kind === "bound";
 
-  const canSign = connected && (preview.state === "real" || preview.state === "catalog");
+  const normalizedOrcid = orcid.replace(/\s+/g, "").toUpperCase();
+  const oauthRequired = oauth?.enabled === true;
+  const orcidVerified =
+    !oauthRequired ||
+    (oauth?.verifiedOrcid?.toUpperCase() === normalizedOrcid);
+  const canSign =
+    connected &&
+    (preview.state === "real" || preview.state === "catalog") &&
+    orcidVerified;
 
   return (
     <main className="min-h-[calc(100vh-60px)] px-6 py-12 lg:py-14">
@@ -221,7 +260,55 @@ export default function ClaimPage() {
           />
           <OrcidPreview preview={preview} />
 
-          <label className="t-caption mt-7 block">Step 3 — Sign the binding</label>
+          {oauthRequired && (
+            <>
+              <label className="t-caption mt-7 block">
+                Step 3 — Prove ownership via ORCID
+              </label>
+              {orcidVerified ? (
+                <div className="mt-2.5 p-3 rounded-lg border border-[color:var(--emerald-500)] bg-[color:var(--emerald-50)] text-[color:var(--emerald-700)] text-sm flex items-center gap-2">
+                  <CheckIcon size={14} /> Signed in as{" "}
+                  <strong>{oauth?.verifiedOrcid}</strong>
+                </div>
+              ) : (
+                <>
+                  <a
+                    href={`/api/auth/orcid/authorize?orcid=${encodeURIComponent(
+                      normalizedOrcid
+                    )}&returnTo=/claim`}
+                    className="btn btn--primary mt-2.5 inline-flex"
+                  >
+                    Verify via ORCID <ArrowRightIcon />
+                  </a>
+                  <div className="t-small ink-3 mt-2">
+                    Redirects to orcid.org to prove you own{" "}
+                    <span className="t-mono-sm">{normalizedOrcid}</span>.
+                  </div>
+                  {oauth?.verifiedOrcid &&
+                    oauth.verifiedOrcid.toUpperCase() !== normalizedOrcid && (
+                      <div className="t-small mt-2 text-rose-600">
+                        You signed in as {oauth.verifiedOrcid} — switch the
+                        field above to that ORCID, or sign in again.
+                      </div>
+                    )}
+                </>
+              )}
+            </>
+          )}
+
+          {!oauthRequired && (
+            <div className="mt-7 p-3 rounded-lg border border-dashed border-amber-400 bg-amber-50 text-[color:var(--amber-700,#92400e)] text-sm">
+              <strong>Demo mode:</strong> ORCID OAuth is not configured. This
+              flow proves wallet ownership via ECDSA but does not yet prove
+              ORCID ownership. Set <span className="t-mono-sm">ORCID_CLIENT_ID</span>{" "}
+              and <span className="t-mono-sm">ORCID_CLIENT_SECRET</span> to
+              enable full verification.
+            </div>
+          )}
+
+          <label className="t-caption mt-7 block">
+            Step {oauthRequired ? "4" : "3"} — Sign the binding
+          </label>
           <button
             type="button"
             onClick={signAndSubmit}

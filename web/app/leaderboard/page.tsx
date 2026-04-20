@@ -4,6 +4,7 @@ import { explorerAddress, formatUSDC } from "@/lib/kite";
 import {
   fetchAuthorHistoryFromGoldsky,
   fetchLeaderboardFromGoldsky,
+  fetchLeaderboardWindowedFromGoldsky,
   isSubgraphEnabled
 } from "@/lib/goldsky";
 import { Addr, StatTile } from "@/components/ui";
@@ -64,12 +65,23 @@ function RealSpark({ points }: { points: number[] }) {
   );
 }
 
+type Range = "all" | "week" | "month";
+type Sort = "earnings" | "citations";
+
 export default async function LeaderboardPage({
   searchParams
 }: {
-  searchParams?: { showAll?: string };
+  searchParams?: { showAll?: string; range?: string; sort?: string };
 }) {
   const showAll = searchParams?.showAll === "1";
+  const range: Range =
+    searchParams?.range === "week"
+      ? "week"
+      : searchParams?.range === "month"
+      ? "month"
+      : "all";
+  const sort: Sort = searchParams?.sort === "citations" ? "citations" : "earnings";
+  const days = range === "week" ? 7 : range === "month" ? 30 : null;
   const authors = listAuthors();
   const wallets = authors.map((a) => a.wallet as Address);
 
@@ -93,7 +105,9 @@ export default async function LeaderboardPage({
   let dataSource: "goldsky" | "rpc";
 
   if (useSubgraph) {
-    const leaderboard = await fetchLeaderboardFromGoldsky(50);
+    const leaderboard = days
+      ? await fetchLeaderboardWindowedFromGoldsky(days)
+      : await fetchLeaderboardFromGoldsky(50);
     if (leaderboard) {
       dataSource = "goldsky";
       // Per-author 7d sparkline — fire in parallel for top 20
@@ -146,9 +160,15 @@ export default async function LeaderboardPage({
     }));
   }
 
-  rows.sort(
-    (a, b) => Number(b.earnings - a.earnings) || b.citations - a.citations
-  );
+  if (sort === "citations") {
+    rows.sort(
+      (a, b) => b.citations - a.citations || Number(b.earnings - a.earnings)
+    );
+  } else {
+    rows.sort(
+      (a, b) => Number(b.earnings - a.earnings) || b.citations - a.citations
+    );
+  }
 
   const ledgerAddr = getLedgerAddress();
   const totalEarnings = rows.reduce((acc, r) => acc + r.earnings, 0n);
@@ -209,24 +229,65 @@ export default async function LeaderboardPage({
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 gap-3 flex-wrap">
           <div className="flex gap-1.5">
-            <button
-              type="button"
-              aria-pressed="true"
-              className="btn btn--ghost btn--sm surface-raised"
-            >
-              All time
-            </button>
-            <button type="button" className="btn btn--ghost btn--sm">
-              This week
-            </button>
-            <button type="button" className="btn btn--ghost btn--sm">
-              This month
-            </button>
+            {(
+              [
+                ["all", "All time"],
+                ["week", "This week"],
+                ["month", "This month"]
+              ] as const
+            ).map(([r, label]) => {
+              const active = range === r;
+              const qs = new URLSearchParams();
+              if (r !== "all") qs.set("range", r);
+              if (sort !== "earnings") qs.set("sort", sort);
+              if (showAll) qs.set("showAll", "1");
+              return (
+                <a
+                  key={r}
+                  href={`/leaderboard${qs.toString() ? "?" + qs.toString() : ""}`}
+                  aria-pressed={active}
+                  className={`btn btn--ghost btn--sm ${
+                    active ? "surface-raised" : ""
+                  }`}
+                  style={active ? { fontWeight: 600 } : undefined}
+                >
+                  {label}
+                </a>
+              );
+            })}
           </div>
           <div className="t-small ink-3">
-            Sort: <strong style={{ color: "var(--ink)" }}>USDC earned ↓</strong>
+            Sort:{" "}
+            {(
+              [
+                ["earnings", "USDC earned ↓"],
+                ["citations", "Citations ↓"]
+              ] as const
+            ).map(([s, label], i) => {
+              const active = sort === s;
+              const qs = new URLSearchParams();
+              if (range !== "all") qs.set("range", range);
+              if (s !== "earnings") qs.set("sort", s);
+              if (showAll) qs.set("showAll", "1");
+              const href = `/leaderboard${qs.toString() ? "?" + qs.toString() : ""}`;
+              return (
+                <span key={s}>
+                  {i > 0 && <span className="ink-4 mx-1">·</span>}
+                  {active ? (
+                    <strong style={{ color: "var(--ink)" }}>{label}</strong>
+                  ) : (
+                    <a
+                      href={href}
+                      className="hover:text-kite-500 transition-colors"
+                    >
+                      {label}
+                    </a>
+                  )}
+                </span>
+              );
+            })}
           </div>
         </div>
 
@@ -269,7 +330,12 @@ export default async function LeaderboardPage({
                 }}
               >
                 <span className="t-mono-sm ink-3">{String(i + 1).padStart(2, "0")}</span>
-                <span className="t-serif text-[17px]">{r.name}</span>
+                <a
+                  href={`/authors/${r.id}`}
+                  className="t-serif text-[17px] text-inherit hover:text-kite-700 transition-colors"
+                >
+                  {r.name}
+                </a>
                 <span className="t-small ink-2">{r.affiliation}</span>
                 <span className="t-mono text-right">{r.citations}</span>
                 <span
