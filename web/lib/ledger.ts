@@ -222,6 +222,12 @@ export async function submitAttestation(
   return submitViaEOA(wc, ledger, params);
 }
 
+const PAYMASTER_ADDRESS =
+  "0x9Adcbf85D5c724611a490Ba9eDc4d38d6F39e92d" as Address;
+const MAX_UINT256 =
+  0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
+const APPROVE_THRESHOLD = 10n * 10n ** 18n;
+
 async function submitViaAA(
   ledger: Address,
   params: AttestationParams
@@ -235,6 +241,38 @@ async function submitViaAA(
   const escrowDeposits = params.escrowDeposits ?? [];
 
   const calls: { target: Address; value: bigint; data: Hex }[] = [];
+
+  // Paymaster pulls gas-in-USDC from AA via transferFrom in postOp.
+  // Without approval the whole userOp PostOpReverts with
+  // ERC20InsufficientAllowance. Prepend a MAX_UINT approve when the
+  // current allowance is low. Idempotent — one approve lasts forever.
+  const usePaymaster = process.env.KUTIP_AA_PAYMASTER !== "0";
+  if (usePaymaster) {
+    try {
+      const currentAllowance = (await getPublicClient().readContract({
+        address: KITE_TESTNET_USDC,
+        abi: erc20TransferAbi,
+        functionName: "allowance",
+        args: [aaAddress, PAYMASTER_ADDRESS]
+      })) as bigint;
+      if (currentAllowance < APPROVE_THRESHOLD) {
+        const approveData = encodeFunctionData({
+          abi: erc20TransferAbi,
+          functionName: "approve",
+          args: [PAYMASTER_ADDRESS, MAX_UINT256]
+        });
+        calls.push({ target: KITE_TESTNET_USDC, value: 0n, data: approveData });
+      }
+    } catch (err) {
+      console.warn("[aa] paymaster allowance probe failed, forcing approve:", err);
+      const approveData = encodeFunctionData({
+        abi: erc20TransferAbi,
+        functionName: "approve",
+        args: [PAYMASTER_ADDRESS, MAX_UINT256]
+      });
+      calls.push({ target: KITE_TESTNET_USDC, value: 0n, data: approveData });
+    }
+  }
 
   if (summarizer && subAgentFee > 0n) {
     const subFeeData = encodeFunctionData({
