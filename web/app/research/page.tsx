@@ -1,9 +1,52 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import type { AgentEvent, AgentStep, ResearchResult } from "@/lib/types";
 import { ArrowRightIcon, CheckIcon, ChevronDownIcon, SearchIcon } from "@/components/icons";
 import { Addr, Cite, PayoutRow, Tx } from "@/components/ui";
+
+interface WalletBalance {
+  address: string;
+  balance: string | null;
+  label: string;
+}
+
+interface BalancesResponse {
+  eoa: WalletBalance | null;
+  researcher: WalletBalance | null;
+  summarizer: WalletBalance | null;
+  escrow: WalletBalance | null;
+}
+
+function formatBalance(raw: string | null | undefined): string {
+  if (!raw) return "—";
+  const v = BigInt(raw);
+  const whole = v / 10n ** 18n;
+  const frac = v % 10n ** 18n;
+  return `${whole}.${frac.toString().padStart(18, "0").slice(0, 2)}`;
+}
+
+function useBalances() {
+  const [data, setData] = useState<BalancesResponse | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/balances");
+        if (!res.ok) return;
+        const json = (await res.json()) as BalancesResponse;
+        if (!cancelled) setData(json);
+      } catch {}
+    }
+    load();
+    const t = setInterval(load, 30000); // refresh every 30s
+    return () => {
+      cancelled = true;
+      clearInterval(t);
+    };
+  }, []);
+  return data;
+}
 
 const SUGGESTIONS = [
   "Top carbon capture methods in 2024",
@@ -137,6 +180,15 @@ function ResearchSidebar({
   onSubmit: () => void;
   disabled: boolean;
 }) {
+  const balances = useBalances();
+  const researcherBal = balances?.researcher?.balance
+    ? BigInt(balances.researcher.balance)
+    : null;
+  const requiredRaw = BigInt(budget) * 10n ** 18n;
+  const subAgentFee = requiredRaw / 20n; // 5%
+  const requiredTotal = requiredRaw + subAgentFee;
+  const insufficient = researcherBal !== null && researcherBal < requiredTotal;
+
   return (
     <aside className="p-6 lg:p-7 lg:sticky lg:top-0 self-start">
       <div className="t-caption">Your question</div>
@@ -202,10 +254,11 @@ function ResearchSidebar({
       <button
         type="button"
         className="btn btn--primary btn--lg w-full mt-5 justify-center"
-        disabled={disabled}
+        disabled={disabled || (phase === "idle" && insufficient)}
         onClick={onSubmit}
       >
-        {phase === "idle" && (
+        {phase === "idle" && insufficient && <>Insufficient balance</>}
+        {phase === "idle" && !insufficient && (
           <>
             Pay {budget} USDC &amp; research <ArrowRightIcon />
           </>
@@ -216,22 +269,61 @@ function ResearchSidebar({
             <DotPulse />
           </>
         )}
-        {phase === "result" && (
+        {phase === "result" && !insufficient && (
           <>
             Ask a follow-up <ArrowRightIcon />
           </>
         )}
+        {phase === "result" && insufficient && <>Insufficient balance</>}
       </button>
 
       <div className="mt-5 p-3.5 surface-raised border border-token rounded-[10px]">
-        <div className="flex justify-between items-center">
-          <span className="t-caption">Wallet</span>
-          <span className="status-dot status-dot--done" style={{ width: 6, height: 6 }} />
+        <div className="flex justify-between items-center mb-2">
+          <span className="t-caption">Agent wallets</span>
+          {insufficient ? (
+            <span
+              className="status-dot status-dot--error"
+              style={{ width: 8, height: 8 }}
+              title="Insufficient balance"
+            />
+          ) : (
+            <span className="status-dot status-dot--done" style={{ width: 8, height: 8 }} />
+          )}
         </div>
-        <div className="flex justify-between items-baseline mt-1.5">
-          <Addr full="0x5C91B851D9Aa20172e6067d9236920A6CBabf40c">0x5c91…0bf40c</Addr>
-          <span className="t-mono font-semibold">EOA master</span>
-        </div>
+        {balances?.researcher && (
+          <div className="flex justify-between items-baseline">
+            <span className="t-small ink-3">Researcher AA</span>
+            <span
+              className={`t-mono-sm font-semibold ${
+                insufficient ? "text-rose-500" : ""
+              }`}
+            >
+              {formatBalance(balances.researcher.balance)} USDC
+            </span>
+          </div>
+        )}
+        {balances?.summarizer && (
+          <div className="flex justify-between items-baseline mt-1">
+            <span className="t-small ink-3">Summarizer AA</span>
+            <span className="t-mono-sm ink-2">
+              {formatBalance(balances.summarizer.balance)}
+            </span>
+          </div>
+        )}
+        {insufficient && (
+          <div className="mt-2.5 pt-2.5 border-t border-token">
+            <div className="t-small text-rose-500 font-medium">
+              Short by{" "}
+              {formatBalance(
+                (requiredTotal - (researcherBal ?? 0n)).toString()
+              )}{" "}
+              USDC
+            </div>
+            <div className="t-mono-sm ink-3 mt-1">
+              Top up Researcher AA via MetaMask
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="t-small ink-3 mt-4 pt-4 border-t border-token">

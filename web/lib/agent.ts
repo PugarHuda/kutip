@@ -12,16 +12,63 @@ import {
 } from "./semantic-scholar";
 import {
   getLedgerAddress,
+  getPublicClient,
   hasServiceAccount,
   submitAttestation,
   type AttestationParams,
   type EscrowDeposit
 } from "./ledger";
+import { erc20TransferAbi } from "./abi";
+import { getAAAddress, isAAEnabled } from "./agent-passport";
 import { lookupClaim } from "./claim-registry";
 import { getEscrowAddress } from "./escrow";
-import { parseUSDC } from "./kite";
+import { KITE_TESTNET_USDC, parseUSDC, formatUSDC } from "./kite";
 import { saveSummary } from "./summary-store";
 import type { AgentEvent, Citation, ResearchResult } from "./types";
+
+/** 5% sub-agent fee cap at 0.05 Test USD — mirrored in ledger.ts. */
+const SUB_AGENT_FEE_BPS = 500n;
+const SUB_AGENT_FEE_CAP = 50000000000000000n;
+
+async function preflightBalance(totalPaid: bigint): Promise<void> {
+  // Only check when we're going to actually spend — demo mode / no
+  // contract / no AA means the attestation skips safely.
+  const aa = isAAEnabled() ? getAAAddress() : null;
+  const payer = aa ?? (process.env.NEXT_PUBLIC_AGENT_OPERATOR_ADDRESS as Address | undefined);
+  if (!payer) return;
+
+  const subAgentFee =
+    (totalPaid * SUB_AGENT_FEE_BPS) / 10_000n > SUB_AGENT_FEE_CAP
+      ? SUB_AGENT_FEE_CAP
+      : (totalPaid * SUB_AGENT_FEE_BPS) / 10_000n;
+  const required = totalPaid + subAgentFee;
+
+  try {
+    const balance = (await getPublicClient().readContract({
+      address: KITE_TESTNET_USDC,
+      abi: erc20TransferAbi,
+      functionName: "balanceOf",
+      args: [payer]
+    })) as bigint;
+
+    if (balance < required) {
+      const shortfall = required - balance;
+      throw new Error(
+        `Insufficient Test USD on ${aa ? "Researcher AA" : "operator"} ` +
+        `(${payer.slice(0, 8)}…${payer.slice(-4)}): ` +
+        `have ${formatUSDC(balance)}, need ${formatUSDC(required)} ` +
+        `(short ${formatUSDC(shortfall)}). ` +
+        `Top up via MetaMask — Test USD at 0x0fF5…7e63.`
+      );
+    }
+  } catch (err) {
+    // Network / RPC issue — don't block, let attestation surface its own error
+    if (err instanceof Error && err.message.startsWith("Insufficient Test USD")) {
+      throw err;
+    }
+    console.warn("[preflight] balance check failed, proceeding:", err);
+  }
+}
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = process.env.OPENROUTER_MODEL ?? "openai/gpt-oss-120b:free";
@@ -100,6 +147,11 @@ export async function runResearchAgent(opts: {
 
   const citations = buildCitations(purchased, citationWeights);
   const totalPaidRaw = parseUSDC(budgetUSDC);
+
+  // Pre-flight: if payer is broke, fail fast with an actionable message
+  // instead of burning LLM quota + surfacing the cryptic 'execution reverted'.
+  await preflightBalance(totalPaidRaw);
+
   const { citations: flatForContract, escrowDeposits } =
     flattenCitationsForContract(purchased, citationWeights, totalPaidRaw);
   const queryId = keccak256(toHex(`${query}:${Date.now()}`));
