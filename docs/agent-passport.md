@@ -39,7 +39,9 @@ Kite's thesis is that AI agents should be **first-class economic actors** with t
 | EIP-4337 bundler | ✅ Reachable | `https://bundler-service.staging.gokite.ai/rpc/` (chain 2368, EntryPoint `0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108`) |
 | Batched UserOps | ✅ Live | Attestation bundles USDC transfer + `attestAndSplit` in a single UserOperation |
 | Kite Passport signup | ⏳ Awaiting invite | Testnet is invitation-only; request submitted to Kite Discord `#testnet-support` |
-| Standing Intent → Delegation Token → Session Signature chain | ⏳ Awaiting invite | Adapter stubbed in `lib/agent-passport.ts`, drop-in once signup completes |
+| Standing Intent (Passport-compatible) | ✅ Live | `lib/session.ts` — EIP-712 typed signature from user's wallet, stored server-side, verified via `recoverTypedDataAddress`. Schema mirrors Passport's `SpendingIntent` 1:1 |
+| Session Signature → per-tx enforcement | ✅ Live | `preflightSession()` in `lib/agent.ts` rejects queries over per-query or daily caps before any LLM cost is incurred |
+| Revocation | ✅ Live | `DELETE /api/session` — only the delegator's wallet can revoke their own session |
 | MCP integration | ⏳ Future | Not required for hackathon judging |
 
 ## How the integration is structured
@@ -104,22 +106,41 @@ Request channel: **Kite Discord → `#testnet-support`** with:
 - Use case: autonomous research agent with cryptographic citation receipts
 - Expected volume: ~50 paid queries across demo + stress test
 
-## Upgrade path when invite arrives
+## Session delegation flow (live)
 
-Zero code change required in the agent/contract layer. Only additions in `lib/agent-passport.ts`:
+1. **User connects MetaMask** (wagmi injected connector on `kiteTestnet`).
+2. **User signs EIP-712 `SpendingIntent`** in the `/research` sidebar. MetaMask
+   renders the typed fields (`maxPerQueryUSDC`, `dailyCapUSDC`, `validUntil`,
+   `purpose`) so they know exactly what they authorize. No gas — pure signature.
+3. **Server verifies** the signature with `recoverTypedDataAddress` and stores
+   the delegation keyed by a deterministic session id.
+4. **Every research query** is pre-flighted: if the requested spend violates
+   per-query or daily caps, the agent rejects before the LLM is even called.
+   Actionable error surfaces to the UI ("Daily cap would be exceeded: 0.5 USDC
+   left today, query needs 1.0").
+5. **On successful attestation**, `recordSpend()` increments the session's
+   daily counter. UI sidebar live-updates via `/api/session`.
+6. **Attestation receipt** on `/research` result card shows the session id +
+   delegator's address — *the agent can prove on-chain that it acted under a
+   user's delegation*, not on its own initiative.
+7. **Revoke**: user clicks "Revoke" in sidebar, signature-less DELETE call,
+   daily enforcement prevents any further spend.
+
+## Upgrade path when Kite Passport invite arrives
+
+`lib/session.ts` is intentionally isomorphic to Passport's Standing Intent
+schema. Swap the in-memory `store` for Passport REST calls in two places:
 
 ```typescript
-// Added under a single new function, no existing call-site change
-export async function createSpendingSession(opts: {
-  taskSummary: string;
-  maxAmountPerTx: bigint;
-  maxTotalAmount: bigint;
-  ttlSeconds: number;
-}) {
-  // Calls kpass agent:session create equivalent — either via the CLI
-  // wrapper or direct REST once published.
-  // Returns the session id and signed Standing Intent.
-}
+// Before (current):
+store.set(id, delegation);
+
+// After (Passport):
+await kpass.sessions.create({
+  standingIntent: intent,
+  signature,
+  ttl: Number(intent.validUntil) - now
+});
 ```
 
 The `submitAttestation` path picks up the session automatically via a new

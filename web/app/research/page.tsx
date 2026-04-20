@@ -1,9 +1,23 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { AgentEvent, AgentStep, ResearchResult } from "@/lib/types";
 import { ArrowRightIcon, CheckIcon, ChevronDownIcon, SearchIcon } from "@/components/icons";
 import { Addr, Cite, PayoutRow, Tx } from "@/components/ui";
+import { SessionManager } from "@/components/session-manager";
+
+interface SessionDto {
+  id: string;
+  user: string;
+  agent: string;
+  maxPerQueryUSDC: string;
+  dailyCapUSDC: string;
+  validUntil: string;
+  spentToday: string;
+  createdAt: number;
+  revokedAt: number | null;
+  purpose: string;
+}
 
 interface WalletBalance {
   address: string;
@@ -75,6 +89,8 @@ export default function ResearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [expandLog, setExpandLog] = useState(false);
+  const [session, setSession] = useState<SessionDto | null>(null);
+  const onSessionChange = useCallback((s: SessionDto | null) => setSession(s), []);
 
   const phase: Phase = result ? "result" : running ? "running" : "idle";
 
@@ -90,7 +106,11 @@ export default function ResearchPage() {
       const res = await fetch("/api/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q, budgetUSDC: budget })
+        body: JSON.stringify({
+          query: q,
+          budgetUSDC: budget,
+          sessionId: session?.id
+        })
       });
       if (!res.body) throw new Error("No response body");
 
@@ -147,6 +167,7 @@ export default function ResearchPage() {
         onSubmit={runQuery}
         disabled={running || query.trim().length < 5}
         steps={steps}
+        onSessionChange={onSessionChange}
       />
       <div className="px-6 lg:px-8 py-8 lg:py-10 lg:border-l border-token">
         {phase === "idle" && !error && <IdleView setQuery={setQuery} />}
@@ -174,7 +195,8 @@ function ResearchSidebar({
   setBudget,
   onSubmit,
   disabled,
-  steps
+  steps,
+  onSessionChange
 }: {
   phase: Phase;
   query: string;
@@ -184,6 +206,7 @@ function ResearchSidebar({
   onSubmit: () => void;
   disabled: boolean;
   steps: AgentStep[];
+  onSessionChange: (s: SessionDto | null) => void;
 }) {
   const balances = useBalances();
   const researcherBal = balances?.researcher?.balance
@@ -458,6 +481,8 @@ function ResearchSidebar({
           </div>
         )}
       </div>
+
+      <SessionManager onSessionChange={onSessionChange} />
 
       <div className="t-small ink-3 mt-4 pt-4 border-t border-token">
         Your USDC splits to authors only if citations land. Attestation is fail-closed.
@@ -758,6 +783,19 @@ function ResultView({
               {(result.totalPaidUSDC * 0.4 / 1e18).toFixed(4)} USDC
             </span>
           </div>
+          {result.sessionId && (
+            <div className="flex justify-between items-center px-5 py-3 border-t border-token">
+              <div>
+                <div className="t-small ink-2">Authorized under session</div>
+                <div className="t-mono-sm ink-3 mt-0.5 break-all">
+                  {result.sessionId} · delegator {result.sessionDelegator ?? "—"}
+                </div>
+              </div>
+              <span className="chip chip--success" style={{ padding: "2px 10px", fontSize: 10 }}>
+                Passport ✓
+              </span>
+            </div>
+          )}
           {result.subAgentAddress && result.subAgentFeeUSDC && (
             <div className="flex justify-between items-center px-5 py-3.5 border-t border-token">
               <div>

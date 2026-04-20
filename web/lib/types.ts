@@ -15,6 +15,8 @@ export interface ResearchResult {
   attestationPayer?: string;
   subAgentAddress?: string;
   subAgentFeeUSDC?: string;
+  sessionId?: string;
+  sessionDelegator?: string;
   paperDetails: {
     id: string;
     title: string;
