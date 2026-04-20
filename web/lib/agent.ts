@@ -24,6 +24,7 @@ import { lookupClaim } from "./claim-registry";
 import { getEscrowAddress } from "./escrow";
 import { KITE_TESTNET_USDC, parseUSDC, formatUSDC } from "./kite";
 import { saveSummary } from "./summary-store";
+import { isMirrorEnabled, mirrorToFuji } from "./cross-chain";
 import type { AgentEvent, Citation, ResearchResult } from "./types";
 
 /** 5% sub-agent fee cap at 0.05 Test USD — mirrored in ledger.ts. */
@@ -181,6 +182,29 @@ export async function runResearchAgent(opts: {
     emit
   });
 
+  // Cross-chain mirror to Avalanche Fuji — non-blocking. Kite attestation
+  // is the source of truth; Fuji is a discoverability mirror for agents
+  // on the broader LayerZero ecosystem. Relayer swap for LZ OApp is a
+  // one-function change once Kite exposes its LZ endpoint.
+  let mirrorTx: string | undefined;
+  let mirrorChain: number | undefined;
+  let mirrorExplorer: string | undefined;
+  if (attestation?.txHash && isMirrorEnabled()) {
+    try {
+      const mr = await mirrorToFuji({
+        queryId,
+        payerOnSource: attestation.payer,
+        totalPaid: totalPaidRaw,
+        citationCount: flatForContract.length
+      });
+      mirrorTx = mr.txHash;
+      mirrorChain = mr.chainId;
+      mirrorExplorer = mr.explorer;
+    } catch (err) {
+      console.warn("[mirror] replicate to Fuji failed:", err);
+    }
+  }
+
   const paperDetails = purchased.map((p) => {
     const weight = citationWeights.get(p.id) ?? 0;
     const authors = p.authors.map((aid) => {
@@ -212,6 +236,9 @@ export async function runResearchAgent(opts: {
     subAgentFeeUSDC: attestation?.subAgentFeeUSDC,
     sessionId: sessionInfo?.sessionId,
     sessionDelegator: sessionInfo?.userLabel,
+    mirrorTx,
+    mirrorChain,
+    mirrorExplorer,
     paperDetails
   };
 

@@ -18,6 +18,9 @@ export interface ResearchResult {
   sessionId?: string;
   sessionDelegator?: string;
   sessionNewSpentToday?: string;
+  mirrorTx?: string;
+  mirrorChain?: number;
+  mirrorExplorer?: string;
   paperDetails: {
     id: string;
     title: string;

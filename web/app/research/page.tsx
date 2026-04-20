@@ -1005,6 +1005,35 @@ function ResultView({
               </span>
             </div>
           )}
+          {result.mirrorTx && result.mirrorExplorer && (
+            <div className="flex justify-between items-center px-5 py-3 border-t border-token">
+              <div className="min-w-0">
+                <div className="t-small ink-2">
+                  Mirrored on Avalanche Fuji
+                </div>
+                <a
+                  href={result.mirrorExplorer}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="t-mono-sm text-kite-700 hover:text-kite-500 mt-0.5 break-all block"
+                >
+                  {result.mirrorTx}
+                </a>
+              </div>
+              <span
+                className="chip"
+                style={{
+                  padding: "2px 10px",
+                  fontSize: 10,
+                  background: "#e84142",
+                  color: "#fff",
+                  border: "1px solid #e84142"
+                }}
+              >
+                LayerZero-pattern
+              </span>
+            </div>
+          )}
           {result.subAgentAddress && result.subAgentFeeUSDC && (
             <div className="flex justify-between items-center px-5 py-3.5 border-t border-token">
               <div>
