@@ -548,55 +548,146 @@ function IdleView({ setQuery }: { setQuery: (q: string) => void }) {
 }
 
 function RunningView({ steps }: { steps: AgentStep[] }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 200);
+    return () => clearInterval(t);
+  }, []);
+
+  const [timings, setTimings] = useState<
+    Record<number, { startedAt: number; endedAt?: number }>
+  >({});
+  useEffect(() => {
+    setTimings((prev) => {
+      const next = { ...prev };
+      for (const s of steps) {
+        const existing = next[s.step];
+        if (s.status === "running" && !existing) {
+          next[s.step] = { startedAt: Date.now() };
+        } else if (s.status === "done" && existing && !existing.endedAt) {
+          next[s.step] = { ...existing, endedAt: Date.now() };
+        }
+      }
+      return next;
+    });
+  }, [steps]);
+
   const currentIdx = steps.findIndex((s) => s.status === "running");
-  const effectiveCurrent = currentIdx >= 0 ? currentIdx : Math.max(0, steps.length - 1);
+  const doneCount = steps.filter((s) => s.status === "done").length;
+  const progressPct = Math.round((doneCount / 5) * 100);
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-5">
+      <div className="flex justify-between items-center mb-4">
         <div>
-          <div className="t-caption">Agent log</div>
+          <div className="t-caption flex items-center gap-2">
+            <span
+              className="inline-block rounded-full bg-kite-500 animate-pulse-dot"
+              style={{ width: 8, height: 8 }}
+            />
+            Agent log · live
+          </div>
           <h2 className="t-h2 mt-1 mb-0">Researching…</h2>
         </div>
         <span className="chip chip--pending">
-          {Math.min(steps.length, 5)} / 5 steps
+          {doneCount} / 5 steps
         </span>
+      </div>
+
+      <div
+        className="h-1 rounded-full overflow-hidden mb-4"
+        style={{ background: "color-mix(in srgb, var(--kite-500) 15%, transparent)" }}
+      >
+        <div
+          className="h-full bg-kite-500 transition-all duration-500 ease-out"
+          style={{ width: `${progressPct}%` }}
+        />
       </div>
 
       <div className="card p-0 overflow-hidden">
         {Array.from({ length: 5 }).map((_, i) => {
-          const s = steps[i];
+          const stepNum = i + 1;
+          const s = steps.find((st) => st.step === stepNum);
           const optimisticRunning = steps.length === 0 && i === 0;
           const state: AgentStep["status"] =
             s?.status ?? (optimisticRunning ? "running" : "pending");
           const isRunning = state === "running";
-          const label = s?.label ?? STEP_OUTLINE[i]?.[0] ?? `Step ${i + 1}`;
+          const isDone = state === "done";
+          const isPending = state === "pending";
+          const isNextPending = isPending && currentIdx === i - 1;
+          const label = s?.label ?? STEP_OUTLINE[i]?.[0] ?? `Step ${stepNum}`;
           const detail = s?.detail ?? STEP_OUTLINE[i]?.[1] ?? "";
+
+          const t = timings[stepNum];
+          let timeText = "";
+          if (isRunning && t) {
+            const elapsed = (now - t.startedAt) / 1000;
+            timeText = `${elapsed.toFixed(1)}s`;
+          } else if (isDone && t && t.endedAt) {
+            const dur = (t.endedAt - t.startedAt) / 1000;
+            timeText = `${dur.toFixed(1)}s`;
+          } else if (isNextPending) {
+            timeText = "next";
+          } else if (isPending) {
+            timeText = "queued";
+          }
+
           return (
             <div
               key={i}
-              className="grid items-center gap-3.5 py-4 px-5 border-b border-token last:border-b-0 transition-opacity"
+              className="relative grid items-center gap-3.5 py-4 px-5 border-b border-token last:border-b-0 transition-all duration-300"
               style={{
-                gridTemplateColumns: "44px 1fr 70px",
-                borderLeft: isRunning ? "2px solid var(--kite-500)" : "2px solid transparent",
+                gridTemplateColumns: "44px 1fr 80px",
+                borderLeft: isRunning
+                  ? "3px solid var(--kite-500)"
+                  : isDone
+                  ? "3px solid var(--emerald-500, #10b981)"
+                  : "3px solid transparent",
                 background: isRunning
-                  ? "color-mix(in srgb, var(--kite-500) 5%, transparent)"
+                  ? "color-mix(in srgb, var(--kite-500) 8%, transparent)"
                   : "transparent",
-                opacity: state === "pending" ? 0.5 : 1
+                opacity: isPending && !isNextPending ? 0.4 : 1
               }}
             >
+              {isRunning && (
+                <div
+                  className="absolute top-0 left-0 h-[2px] animate-shimmer"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent, var(--kite-500), transparent)",
+                    width: "40%"
+                  }}
+                />
+              )}
               <div className="flex justify-center">
-                <StepIcon state={state} n={i + 1} />
+                <StepIcon state={state} n={stepNum} />
               </div>
               <div>
-                <div className="t-h3 text-[16px] font-semibold">{label}</div>
+                <div
+                  className="t-h3 text-[16px] font-semibold"
+                  style={
+                    isRunning
+                      ? { color: "var(--kite-700, var(--kite-500))" }
+                      : undefined
+                  }
+                >
+                  {label}
+                </div>
                 <div className="t-small ink-2 mt-0.5">{detail}</div>
               </div>
               <div
-                className="t-mono-sm text-right"
-                style={{ color: state === "pending" ? "var(--ink-4)" : "var(--ink-3)" }}
+                className="t-mono-sm text-right font-semibold"
+                style={{
+                  color: isRunning
+                    ? "var(--kite-500)"
+                    : isDone
+                    ? "var(--emerald-600, #059669)"
+                    : isNextPending
+                    ? "var(--ink-2)"
+                    : "var(--ink-4)"
+                }}
               >
-                {state === "done" ? "done" : isRunning ? "…" : "—"}
+                {timeText}
               </div>
             </div>
           );

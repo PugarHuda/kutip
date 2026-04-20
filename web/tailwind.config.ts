@@ -55,13 +55,18 @@ const config: Config = {
         "pulse-dot": {
           "0%, 100%": { transform: "scale(1)", opacity: "1" },
           "50%": { transform: "scale(1.25)", opacity: "0.65" }
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(350%)" }
         }
       },
       animation: {
         breathe: "breathe 1.6s ease-in-out infinite",
         "pulse-ring": "pulse-ring 1.8s ease-out infinite",
         "fade-up": "fade-up 400ms ease-out both",
-        "pulse-dot": "pulse-dot 1.6s ease-in-out infinite"
+        "pulse-dot": "pulse-dot 1.6s ease-in-out infinite",
+        shimmer: "shimmer 1.8s ease-in-out infinite"
       }
     }
   },
