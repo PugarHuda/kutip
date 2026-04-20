@@ -146,6 +146,7 @@ export default function ResearchPage() {
         setBudget={setBudget}
         onSubmit={runQuery}
         disabled={running || !query.trim()}
+        steps={steps}
       />
       <div className="px-6 lg:px-8 py-8 lg:py-10 lg:border-l border-token">
         {phase === "idle" && !error && <IdleView setQuery={setQuery} />}
@@ -163,6 +164,8 @@ export default function ResearchPage() {
   );
 }
 
+const BUDGET_PRESETS = [0.1, 0.5, 1, 2] as const;
+
 function ResearchSidebar({
   phase,
   query,
@@ -170,7 +173,8 @@ function ResearchSidebar({
   budget,
   setBudget,
   onSubmit,
-  disabled
+  disabled,
+  steps
 }: {
   phase: Phase;
   query: string;
@@ -179,6 +183,7 @@ function ResearchSidebar({
   setBudget: (b: number) => void;
   onSubmit: () => void;
   disabled: boolean;
+  steps: AgentStep[];
 }) {
   const balances = useBalances();
   const researcherBal = balances?.researcher?.balance
@@ -188,6 +193,33 @@ function ResearchSidebar({
   const subAgentFee = requiredRaw / 20n; // 5%
   const requiredTotal = requiredRaw + subAgentFee;
   const insufficient = researcherBal !== null && researcherBal < requiredTotal;
+
+  const isPreset = (BUDGET_PRESETS as readonly number[]).includes(budget);
+  const [customMode, setCustomMode] = useState(!isPreset);
+  const [customInput, setCustomInput] = useState(isPreset ? "" : String(budget));
+
+  function applyCustom(value: string) {
+    setCustomInput(value);
+    const n = parseFloat(value);
+    if (!Number.isNaN(n) && n >= 0.1 && n <= 20) {
+      setBudget(Math.round(n * 100) / 100);
+    }
+  }
+
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (phase !== "running") {
+      setElapsed(0);
+      return;
+    }
+    const start = Date.now();
+    const t = setInterval(() => setElapsed(Math.floor((Date.now() - start) / 1000)), 250);
+    return () => clearInterval(t);
+  }, [phase]);
+
+  const runningStep = steps.find((s) => s.status === "running");
+  const doneCount = steps.filter((s) => s.status === "done").length;
+  const progressPct = Math.min(100, Math.round((doneCount / 5) * 100));
 
   return (
     <aside className="p-6 lg:p-7 lg:sticky lg:top-0 self-start">
@@ -225,36 +257,90 @@ function ResearchSidebar({
 
       <div className="t-caption mt-6">Budget</div>
       <div className="flex gap-1.5 mt-2">
-        {[0.1, 0.5, 1, 2].map((v) => (
-          <button
-            key={v}
-            type="button"
-            onClick={() => setBudget(v)}
-            className="flex-1 h-10 rounded-lg font-mono text-[13px] font-semibold transition-colors"
-            style={
-              budget === v
-                ? {
-                    border: "1px solid var(--kite-500)",
-                    background: "var(--kite-500)",
-                    color: "#fff"
-                  }
-                : {
-                    border: "1px solid var(--border)",
-                    background: "var(--surface)",
-                    color: "var(--ink)"
-                  }
-            }
-          >
-            {v}
-          </button>
-        ))}
+        {BUDGET_PRESETS.map((v) => {
+          const selected = !customMode && budget === v;
+          return (
+            <button
+              key={v}
+              type="button"
+              onClick={() => {
+                setBudget(v);
+                setCustomMode(false);
+                setCustomInput("");
+              }}
+              className="flex-1 h-10 rounded-lg font-mono text-[13px] font-semibold transition-colors"
+              style={
+                selected
+                  ? {
+                      border: "1px solid var(--kite-500)",
+                      background: "var(--kite-500)",
+                      color: "#fff"
+                    }
+                  : {
+                      border: "1px solid var(--border)",
+                      background: "var(--surface)",
+                      color: "var(--ink)"
+                    }
+              }
+            >
+              {v}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => {
+            setCustomMode(true);
+            if (!customInput) setCustomInput(String(budget));
+          }}
+          className="flex-1 h-10 rounded-lg text-[12px] font-semibold transition-colors"
+          style={
+            customMode
+              ? {
+                  border: "1px solid var(--kite-500)",
+                  background: "var(--kite-500)",
+                  color: "#fff"
+                }
+              : {
+                  border: "1px solid var(--border)",
+                  background: "var(--surface)",
+                  color: "var(--ink)"
+                }
+          }
+        >
+          Custom
+        </button>
       </div>
-      <div className="t-small ink-3 mt-2">USDC · paid by agent smart account</div>
+      {customMode && (
+        <div className="mt-2 flex items-center gap-2">
+          <div className="relative flex-1">
+            <input
+              type="number"
+              inputMode="decimal"
+              step="0.01"
+              min="0.1"
+              max="20"
+              value={customInput}
+              onChange={(e) => applyCustom(e.target.value)}
+              placeholder="0.10"
+              className="card w-full h-10 px-3 pr-14 font-mono text-[13px] font-semibold bg-transparent focus:outline-none focus:border-kite-500 transition-colors"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 t-mono-sm ink-3 pointer-events-none">
+              USDC
+            </span>
+          </div>
+        </div>
+      )}
+      <div className="t-small ink-3 mt-2">
+        {customMode
+          ? "Between 0.10 and 20 USDC · paid by agent smart account"
+          : "USDC · paid by agent smart account"}
+      </div>
 
       <button
         type="button"
         className="btn btn--primary btn--lg w-full mt-5 justify-center"
-        disabled={disabled || (phase === "idle" && insufficient)}
+        disabled={disabled || ((phase === "idle" || phase === "result") && insufficient)}
         onClick={onSubmit}
       >
         {phase === "idle" && insufficient && <>Insufficient balance</>}
@@ -276,6 +362,42 @@ function ResearchSidebar({
         )}
         {phase === "result" && insufficient && <>Insufficient balance</>}
       </button>
+
+      {phase === "running" && (
+        <div className="mt-3 p-3.5 rounded-[10px] border border-kite-500 animate-fade-up"
+          style={{
+            background: "color-mix(in srgb, var(--kite-500) 6%, transparent)"
+          }}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="status-dot status-dot--running animate-pulse-dot" style={{ width: 8, height: 8 }} />
+              <span className="t-caption text-kite-700">
+                Processing · step {Math.min(doneCount + 1, 5)} of 5
+              </span>
+            </div>
+            <span className="t-mono-sm ink-3">{elapsed}s</span>
+          </div>
+          <div className="t-small font-semibold">
+            {runningStep?.label ?? (doneCount === 5 ? "Finalizing" : "Starting…")}
+          </div>
+          {runningStep?.detail && (
+            <div className="t-small ink-3 mt-0.5">{runningStep.detail}</div>
+          )}
+          <div
+            className="mt-2.5 h-1 rounded-full overflow-hidden"
+            style={{ background: "color-mix(in srgb, var(--kite-500) 15%, transparent)" }}
+          >
+            <div
+              className="h-full bg-kite-500 transition-all duration-500 ease-out"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <div className="t-mono-sm ink-3 mt-1.5">
+            Paying {budget} USDC · attestation fail-closed
+          </div>
+        </div>
+      )}
 
       <div className="mt-5 p-3.5 surface-raised border border-token rounded-[10px]">
         <div className="flex justify-between items-center mb-2">
