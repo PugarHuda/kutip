@@ -32,7 +32,7 @@ function useBalances() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch("/api/balances");
+        const res = await fetch("/api/balances", { cache: "no-store" });
         if (!res.ok) return;
         const json = (await res.json()) as BalancesResponse;
         if (!cancelled) setData(json);
