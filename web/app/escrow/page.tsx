@@ -130,10 +130,25 @@ export default async function EscrowPage() {
           </h1>
           <p className="t-body ink-2 max-w-[640px] m-0">
             When Kutip cites a paper whose author hasn&apos;t bound their ORCID
-            yet, their share goes here. Principal sits safely, simulated APY of
-            5% accrues, and both release to the researcher the moment they
-            verify their ORCID on <Link href="/claim" className="tx">/claim</Link>.
+            yet, their share goes here. Principal sits safely, 5% APY accrues,
+            and both release to the researcher the moment they verify their
+            ORCID on <Link href="/claim" className="tx">/claim</Link>.
           </p>
+          {process.env.NEXT_PUBLIC_YIELD_VAULT && (
+            <div className="mt-4 t-small ink-3">
+              Yield target:{" "}
+              <a
+                href={`https://testnet.kitescan.ai/address/${process.env.NEXT_PUBLIC_YIELD_VAULT}`}
+                target="_blank"
+                rel="noreferrer"
+                className="t-mono-sm text-kite-700 hover:text-kite-500"
+              >
+                SimpleYieldVault ({process.env.NEXT_PUBLIC_YIELD_VAULT.slice(0, 10)}…{process.env.NEXT_PUBLIC_YIELD_VAULT.slice(-4)})
+              </a>{" "}
+              — ERC-4626-shaped. Swap-ready for Aave/Compound when Kite
+              DeFi ships.
+            </div>
+          )}
         </div>
       </header>
 
