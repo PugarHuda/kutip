@@ -71,10 +71,22 @@ function ToastCard({ t }: { t: Toast }) {
 
   const accent =
     t.kind === "success"
-      ? { border: "#10b981", dot: "#10b981", tint: "#ecfdf5" }
+      ? {
+          border: "#10b981",
+          dot: "#10b981",
+          tint: "color-mix(in srgb, #10b981 14%, var(--surface))"
+        }
       : t.kind === "error"
-      ? { border: "#e11d48", dot: "#e11d48", tint: "#fff1f2" }
-      : { border: "var(--kite-500)", dot: "var(--kite-500)", tint: "var(--kite-50)" };
+      ? {
+          border: "#e11d48",
+          dot: "#e11d48",
+          tint: "color-mix(in srgb, #e11d48 14%, var(--surface))"
+        }
+      : {
+          border: "var(--kite-500)",
+          dot: "var(--kite-500)",
+          tint: "color-mix(in srgb, var(--kite-500) 14%, var(--surface))"
+        };
 
   return (
     <div

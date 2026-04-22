@@ -6,6 +6,8 @@ import { useState, type ReactNode } from "react";
 import { BrandMark } from "@/components/icons";
 import { ConnectWallet } from "@/components/connect-wallet";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { AgentStateFooter } from "@/components/agent-state-footer";
+import { ActivityTicker } from "@/components/activity-ticker";
 
 interface NavItem {
   href: string;
@@ -188,6 +190,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             />
           ))}
         </nav>
+
+        <AgentStateFooter />
+        <ActivityTicker />
 
         <div className="px-4 py-3 border-t border-token flex items-center justify-between">
           <Link

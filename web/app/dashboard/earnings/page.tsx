@@ -68,10 +68,23 @@ export default async function DashboardEarningsPage() {
   const authorsPaid = rows.filter((r) => r.earnings > 0n).length;
 
   const medals = ["🥇", "🥈", "🥉"];
+  // Use color-mix with surface so podium tints invert correctly in dark mode.
   const podiumAccents = [
-    { border: "#d4af37", tint: "#fffbe6", earn: "#92681a" },
-    { border: "#a8a8a8", tint: "#f7f7f7", earn: "#5f5f5f" },
-    { border: "#c7832e", tint: "#fdf3e8", earn: "#7a4c15" }
+    {
+      border: "#d4af37",
+      tint: "color-mix(in srgb, #d4af37 14%, var(--surface))",
+      earn: "#a8821f"
+    },
+    {
+      border: "#a8a8a8",
+      tint: "color-mix(in srgb, #a8a8a8 14%, var(--surface))",
+      earn: "#7a7a7a"
+    },
+    {
+      border: "#c7832e",
+      tint: "color-mix(in srgb, #c7832e 14%, var(--surface))",
+      earn: "#9a6321"
+    }
   ];
 
   return (
