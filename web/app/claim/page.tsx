@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Addr } from "@/components/ui";
+import { Addr, Breadcrumb } from "@/components/ui";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 
 interface OauthStatus {
@@ -212,12 +212,14 @@ function ClaimPage() {
   return (
     <main className="min-h-[calc(100vh-60px)] px-6 py-12 lg:py-14">
       <div className="max-w-[640px] mx-auto">
-        <Link
-          href="/leaderboard"
-          className="t-small ink-3 hover:ink-2 mb-6 inline-block"
-        >
-          ← All authors
-        </Link>
+        <div className="mb-6">
+          <Breadcrumb
+            items={[
+              { label: "Registry", href: "/registry" },
+              { label: "Claim earnings" }
+            ]}
+          />
+        </div>
 
         <div className="t-caption">Claim your earnings</div>
         <h1 className="t-display-xl mt-1.5 mb-2">Bind your ORCID.</h1>

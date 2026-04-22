@@ -63,6 +63,10 @@ const config: Config = {
         "spin-slow": {
           from: { transform: "rotate(0deg)" },
           to: { transform: "rotate(360deg)" }
+        },
+        "skeleton-shimmer": {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" }
         }
       },
       animation: {
@@ -71,7 +75,8 @@ const config: Config = {
         "fade-up": "fade-up 400ms ease-out both",
         "pulse-dot": "pulse-dot 1.6s ease-in-out infinite",
         shimmer: "shimmer 1.8s ease-in-out infinite",
-        "spin-slow": "spin-slow 2.4s linear infinite"
+        "spin-slow": "spin-slow 2.4s linear infinite",
+        "skeleton-shimmer": "skeleton-shimmer 1.8s linear infinite"
       }
     }
   },

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Address } from "viem";
-import { StatTile } from "@/components/ui";
+import { Breadcrumb, StatTile } from "@/components/ui";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 import { getAuthor, listAuthors, listPapers } from "@/lib/papers";
 import { getAuthorStats } from "@/lib/ledger";
@@ -54,12 +54,15 @@ export default async function AuthorDetailPage({
   return (
     <main className="min-h-[calc(100vh-60px)] px-8 py-10">
       <div className="max-w-[960px] mx-auto">
-        <Link
-          href="/leaderboard"
-          className="t-small ink-3 hover:text-kite-500 mb-5 inline-block"
-        >
-          ← All authors
-        </Link>
+        <div className="mb-5">
+          <Breadcrumb
+            items={[
+              { label: "Registry", href: "/registry" },
+              { label: "Authors", href: "/leaderboard" },
+              { label: author.name }
+            ]}
+          />
+        </div>
 
         <div className="flex items-start justify-between flex-wrap gap-4 mb-7">
           <div>

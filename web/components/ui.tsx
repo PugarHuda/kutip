@@ -91,6 +91,97 @@ export function Cite({ n }: { n: number }) {
   return <span className="cite">{n}</span>;
 }
 
+export function Skeleton({
+  className = "",
+  style
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <span
+      className={`block rounded-[6px] animate-skeleton-shimmer ${className}`}
+      style={{
+        background:
+          "linear-gradient(90deg, color-mix(in srgb, var(--ink) 5%, transparent), color-mix(in srgb, var(--ink) 12%, transparent), color-mix(in srgb, var(--ink) 5%, transparent))",
+        backgroundSize: "200% 100%",
+        ...style
+      }}
+    />
+  );
+}
+
+export function Breadcrumb({
+  items
+}: {
+  items: { label: string; href?: string }[];
+}) {
+  return (
+    <nav
+      aria-label="breadcrumb"
+      className="t-small ink-3 flex items-center gap-1.5 flex-wrap"
+    >
+      {items.map((item, i) => {
+        const last = i === items.length - 1;
+        return (
+          <span key={i} className="flex items-center gap-1.5">
+            {item.href && !last ? (
+              <a
+                href={item.href}
+                className="hover:text-kite-500 transition-colors"
+              >
+                {item.label}
+              </a>
+            ) : (
+              <span
+                className={last ? "text-[color:var(--ink)] font-medium" : ""}
+              >
+                {item.label}
+              </span>
+            )}
+            {!last && <span className="ink-4">›</span>}
+          </span>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function EmptyState({
+  icon,
+  title,
+  body,
+  cta
+}: {
+  icon?: React.ReactNode;
+  title: string;
+  body: string;
+  cta?: { label: string; href: string };
+}) {
+  return (
+    <div className="card p-10 flex flex-col items-center text-center animate-fade-up">
+      {icon && (
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+          style={{
+            background: "color-mix(in srgb, var(--kite-500) 10%, transparent)",
+            color: "var(--kite-500)"
+          }}
+        >
+          {icon}
+        </div>
+      )}
+      <h3 className="t-h2 m-0">{title}</h3>
+      <p className="t-body ink-2 max-w-[480px] mt-2 mb-0">{body}</p>
+      {cta && (
+        <a href={cta.href} className="btn btn--primary mt-5">
+          {cta.label}
+        </a>
+      )}
+    </div>
+  );
+}
+
 export interface PayoutRowProps {
   name: string;
   affiliation: string;

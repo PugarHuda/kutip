@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CheckIcon } from "@/components/icons";
+import { Breadcrumb } from "@/components/ui";
 import { explorerAddress } from "@/lib/kite";
 
 interface SafeStats {
@@ -70,6 +71,14 @@ export default function GovernancePage() {
   return (
     <main className="min-h-[calc(100vh-60px)] px-8 py-10">
       <div className="max-w-[960px] mx-auto">
+        <div className="mb-5">
+          <Breadcrumb
+            items={[
+              { label: "Infrastructure" },
+              { label: "Governance" }
+            ]}
+          />
+        </div>
         <div className="t-caption">Governance</div>
         <h1 className="t-display-xl mt-1.5 mb-3">
           No single person can move Kutip&apos;s money.

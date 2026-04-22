@@ -8,7 +8,7 @@ import {
 import { explorerAddress, explorerTx, formatUSDC } from "@/lib/kite";
 import { listAuthors } from "@/lib/papers";
 import { getAccessMetrics, loadSummary } from "@/lib/summary-store";
-import { Addr, PayoutRow } from "@/components/ui";
+import { Addr, Breadcrumb, PayoutRow } from "@/components/ui";
 import { CheckIcon, CopyIcon, ExternalLinkIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -37,12 +37,14 @@ export default async function VerifyPage({ params }: { params: { queryId: string
   return (
     <main className="min-h-[calc(100vh-60px)] px-6 lg:px-14 py-12 lg:py-14">
       <div className="max-w-[820px] mx-auto">
-        <Link
-          href="/leaderboard"
-          className="text-sm t-small ink-3 hover:ink-2 mb-6 inline-block"
-        >
-          ← All attestations
-        </Link>
+        <div className="mb-6">
+          <Breadcrumb
+            items={[
+              { label: "Verify", href: "/verify" },
+              { label: `Query ${queryId.slice(0, 10)}…${queryId.slice(-4)}` }
+            ]}
+          />
+        </div>
 
         <div
           className="card pattern-grid p-7 lg:p-8"

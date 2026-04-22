@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRightIcon } from "@/components/icons";
+import { Breadcrumb, Skeleton } from "@/components/ui";
 import { explorerAddress } from "@/lib/kite";
 
 interface GaslessStats {
@@ -65,6 +66,14 @@ export default function GaslessPage() {
   return (
     <main className="min-h-[calc(100vh-60px)] px-8 py-10">
       <div className="max-w-[1040px] mx-auto">
+        <div className="mb-5">
+          <Breadcrumb
+            items={[
+              { label: "Infrastructure" },
+              { label: "Gasless" }
+            ]}
+          />
+        </div>
         <div className="t-caption">Infrastructure</div>
         <h1 className="t-display-xl mt-1.5 mb-3">
           The agent pays for <span className="text-kite-500">its own gas.</span>
@@ -118,6 +127,25 @@ export default function GaslessPage() {
 
         <h2 className="t-h2 mt-12 mb-4">Live agent state</h2>
         <div className="flex flex-col gap-4">
+          {!data && (
+            <>
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="card p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <Skeleton className="w-28" style={{ height: 10 }} />
+                      <Skeleton className="w-56 mt-2" style={{ height: 14 }} />
+                      <Skeleton className="w-80 mt-2" style={{ height: 12 }} />
+                    </div>
+                    <div className="text-right flex-none">
+                      <Skeleton className="w-24 ml-auto" style={{ height: 20 }} />
+                      <Skeleton className="w-20 ml-auto mt-2" style={{ height: 14 }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
           {data?.researcherAA && (
             <WalletCard
               title="Researcher AA"

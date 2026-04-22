@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { AgentEvent, AgentStep, ResearchResult } from "@/lib/types";
 import { ArrowRightIcon, CheckIcon, ChevronDownIcon, SearchIcon } from "@/components/icons";
-import { Cite, PayoutRow } from "@/components/ui";
+import { Cite, PayoutRow, Skeleton } from "@/components/ui";
 import {
   SessionManager,
   updateLocalSpent,
@@ -449,6 +449,18 @@ function ResearchSidebar({
             <span className="status-dot status-dot--done" style={{ width: 8, height: 8 }} />
           )}
         </div>
+        {!balances && (
+          <>
+            <div className="flex justify-between items-baseline">
+              <span className="t-small ink-3">Researcher AA</span>
+              <Skeleton className="w-20" style={{ height: 14 }} />
+            </div>
+            <div className="flex justify-between items-baseline mt-1.5">
+              <span className="t-small ink-3">Summarizer AA</span>
+              <Skeleton className="w-16" style={{ height: 14 }} />
+            </div>
+          </>
+        )}
         {balances?.researcher && (
           <div className="flex justify-between items-baseline">
             <span className="t-small ink-3">Researcher AA</span>
@@ -847,6 +859,28 @@ function StepIcon({ state, n }: { state: AgentStep["status"]; n: number }) {
   );
 }
 
+function CountUp({ value }: { value: string }) {
+  const target = parseFloat(value);
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!Number.isFinite(target)) {
+      setN(0);
+      return;
+    }
+    const start = Date.now();
+    const duration = 900;
+    const handle = setInterval(() => {
+      const t = Math.min(1, (Date.now() - start) / duration);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      setN(target * eased);
+      if (t >= 1) clearInterval(handle);
+    }, 30);
+    return () => clearInterval(handle);
+  }, [target]);
+  return <>{n.toFixed(2)}</>;
+}
+
 function ResultView({
   result,
   steps,
@@ -932,31 +966,65 @@ function ResultView({
         className="card pattern-grid animate-fade-up p-0 overflow-hidden relative"
         style={{ animationDelay: "120ms" }}
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-token surface">
+        <div
+          className="flex items-center justify-between px-6 py-6 border-b border-token gap-4 flex-wrap"
+          style={{
+            background:
+              "linear-gradient(180deg, color-mix(in srgb, var(--emerald-500) 8%, transparent), transparent)"
+          }}
+        >
           <div>
             <div className="t-caption text-emerald-700">Attribution receipt</div>
-            <div className="t-h2 mt-1">
-              {authorCount} author{authorCount === 1 ? "" : "s"} paid ·{" "}
-              <span className="t-mono" style={{ fontSize: 28 }}>
-                {totalPaid} USDC
-              </span>
+            <div
+              className="t-mono font-bold mt-2 tracking-tight"
+              style={{
+                fontSize: 44,
+                lineHeight: "48px",
+                color: "var(--emerald-600)"
+              }}
+            >
+              <CountUp value={totalPaid} /> USDC
+            </div>
+            <div className="t-small ink-2 mt-1.5">
+              paid to {authorCount} author{authorCount === 1 ? "" : "s"} ·{" "}
+              {result.paperDetails.length} paper
+              {result.paperDetails.length === 1 ? "" : "s"} cited
             </div>
           </div>
-          {txShort && result.attestationTx && (
-            <a
-              href={KITESCAN_TX + result.attestationTx}
-              target="_blank"
-              rel="noreferrer"
-              className="chip chip--success chip--lg animate-pulse-ring rounded-full"
-            >
-              <CheckIcon size={12} /> Tx {txShort}
-            </a>
-          )}
-          {!txShort && (
-            <span className="chip chip--pending chip--lg rounded-full">
-              Demo mode · no on-chain tx
-            </span>
-          )}
+          <div className="flex flex-col items-end gap-1.5">
+            {txShort && result.attestationTx && (
+              <a
+                href={KITESCAN_TX + result.attestationTx}
+                target="_blank"
+                rel="noreferrer"
+                className="chip chip--success chip--lg animate-pulse-ring rounded-full"
+              >
+                <CheckIcon size={12} /> Tx {txShort}
+              </a>
+            )}
+            {result.mirrorExplorer && (
+              <a
+                href={result.mirrorExplorer}
+                target="_blank"
+                rel="noreferrer"
+                className="chip rounded-full"
+                style={{
+                  background: "color-mix(in srgb, #ec4899 12%, transparent)",
+                  color: "#be185d",
+                  border: "1px solid color-mix(in srgb, #ec4899 30%, transparent)",
+                  padding: "4px 12px",
+                  fontSize: 11
+                }}
+              >
+                Mirrored on Avalanche Fuji ↗
+              </a>
+            )}
+            {!txShort && (
+              <span className="chip chip--pending chip--lg rounded-full">
+                Demo mode · no on-chain tx
+              </span>
+            )}
+          </div>
         </div>
         <div className="surface">
           {result.paperDetails.flatMap((p, pIdx) =>

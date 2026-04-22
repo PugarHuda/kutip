@@ -170,10 +170,169 @@ export default async function HomePage() {
         </div>
       </div>
 
+      <section className="max-w-[1280px] mx-auto mt-20">
+        <div className="flex items-baseline justify-between mb-5">
+          <h2 className="t-h2 m-0">Built on six primitives, not one.</h2>
+          <span className="t-small ink-3 hidden sm:inline">
+            Tap any tile to inspect it live
+          </span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <FeatureTile
+            href="/gasless"
+            icon={<GasIcon />}
+            title="Gasless"
+            subtitle="Paymaster covers KITE, agent pays in USDC"
+          />
+          <FeatureTile
+            href="/research"
+            icon={<SignatureIcon />}
+            title="Passport session"
+            subtitle="Sign once, agent spends within caps"
+            accent="indigo"
+          />
+          <FeatureTile
+            href="/claim"
+            icon={<OrcidIcon />}
+            title="ORCID OAuth"
+            subtitle="Real ownership proof, on-chain binding"
+            accent="emerald"
+          />
+          <FeatureTile
+            href="/verify"
+            icon={<ChainIcon />}
+            title="Cross-chain"
+            subtitle="Mirror receipts to Avalanche Fuji"
+            accent="rose"
+          />
+          <FeatureTile
+            href="/governance"
+            icon={<SafeIcon />}
+            title="Safe 2-of-3"
+            subtitle="No single person moves the funds"
+            accent="amber"
+          />
+          <FeatureTile
+            href="https://github.com/PugarHuda/kutip/tree/main/mcp"
+            external
+            icon={<PlugIcon />}
+            title="MCP server"
+            subtitle="Accessible from Claude Desktop"
+            accent="cyan"
+          />
+        </div>
+      </section>
+
       <footer className="max-w-[1280px] mx-auto mt-20 pt-5 border-t border-token">
         <span className="t-small ink-3">Built on Kite testnet · Hackathon 2026</span>
       </footer>
     </main>
+  );
+}
+
+function FeatureTile({
+  href,
+  icon,
+  title,
+  subtitle,
+  accent = "kite",
+  external
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  accent?: "kite" | "indigo" | "emerald" | "rose" | "amber" | "cyan";
+  external?: boolean;
+}) {
+  const accentColor: Record<string, string> = {
+    kite: "#5566ff",
+    indigo: "#6366f1",
+    emerald: "#10b981",
+    rose: "#ec4899",
+    amber: "#f59e0b",
+    cyan: "#06b6d4"
+  };
+  const color = accentColor[accent];
+
+  const content = (
+    <>
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
+        style={{
+          background: `color-mix(in srgb, ${color} 14%, transparent)`,
+          color
+        }}
+      >
+        {icon}
+      </div>
+      <div className="t-h3 text-[15px] font-semibold">{title}</div>
+      <div className="t-small ink-3 mt-1 leading-snug">{subtitle}</div>
+    </>
+  );
+
+  const base =
+    "card p-4 hover:surface-raised transition-colors no-underline text-inherit block";
+
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" className={base}>
+        {content}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={base}>
+      {content}
+    </Link>
+  );
+}
+
+function GasIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 21h9V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v17Z" />
+      <path d="M12 9h2.5a2.5 2.5 0 0 1 2.5 2.5V17a2 2 0 0 0 4 0v-6l-4-4" />
+    </svg>
+  );
+}
+function SignatureIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 19c-3 0-3-2-6-2s-3 2-6 2-3-2-6-2" />
+      <path d="M4 15c3-11 10-9 11 0" />
+    </svg>
+  );
+}
+function OrcidIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9 9v8M9 7v.01M12 10h3a4 4 0 0 1 0 8h-3V10Z" />
+    </svg>
+  );
+}
+function ChainIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" />
+    </svg>
+  );
+}
+function SafeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 9v-2M12 17v-2" />
+    </svg>
+  );
+}
+function PlugIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22v-5M9 9V2M15 9V2M5 9h14l-1 6a5 5 0 0 1-5 4h-2a5 5 0 0 1-5-4L5 9Z" />
+    </svg>
   );
 }
 
