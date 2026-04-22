@@ -67,53 +67,60 @@ const NAV: NavItem[] = [
     match: (p) => p.startsWith("/dashboard/earnings")
   },
   {
-    href: "/claim",
+    href: "/dashboard/claim",
     label: "Claim as Author",
     group: "author",
     icon: <Icon d="M20 6 9 17l-5-5" />,
-    match: (p) => p.startsWith("/claim")
+    match: (p) => p.startsWith("/dashboard/claim") || p === "/claim"
   },
   {
-    href: "/verify",
+    href: "/dashboard/verify",
     label: "Verify attestation",
     group: "author",
     icon: <Icon d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />,
-    match: (p) => p.startsWith("/verify") && !p.startsWith("/dashboard")
+    match: (p) => p.startsWith("/dashboard/verify") || p.startsWith("/verify")
   },
   {
-    href: "/gasless",
+    href: "/dashboard/leaderboard",
+    label: "Leaderboard",
+    group: "author",
+    icon: <Icon d="M3 3v18h18M9 17V9M15 17V5M21 17v-7" />,
+    match: (p) => p.startsWith("/dashboard/leaderboard") || p.startsWith("/leaderboard")
+  },
+  {
+    href: "/dashboard/gasless",
     label: "Gasless",
     group: "infra",
     icon: <Icon d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />,
-    match: (p) => p.startsWith("/gasless")
+    match: (p) => p.startsWith("/dashboard/gasless") || p.startsWith("/gasless")
   },
   {
-    href: "/governance",
+    href: "/dashboard/governance",
     label: "Governance",
     group: "infra",
     icon: <Icon d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
-    match: (p) => p.startsWith("/governance")
+    match: (p) => p.startsWith("/dashboard/governance") || p.startsWith("/governance")
   },
   {
-    href: "/agents",
+    href: "/dashboard/agents",
     label: "Agent Registry",
     group: "infra",
     icon: <Icon d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M23 21v-2a4 4 0 0 0-3-3.87M13 3.13a4 4 0 0 1 0 7.75M9 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0z" />,
-    match: (p) => p.startsWith("/agents")
+    match: (p) => p.startsWith("/dashboard/agents") || p.startsWith("/agents")
   },
   {
-    href: "/bounties",
+    href: "/dashboard/bounties",
     label: "Bounties",
     group: "infra",
     icon: <Icon d="M12 2 15 8l6 .75-4.5 4.1 1.2 6.15L12 16l-5.7 3 1.2-6.15L3 8.75 9 8z" />,
-    match: (p) => p.startsWith("/bounties")
+    match: (p) => p.startsWith("/dashboard/bounties") || p.startsWith("/bounties")
   },
   {
-    href: "/escrow",
+    href: "/dashboard/escrow",
     label: "Escrow Yield",
     group: "infra",
     icon: <Icon d="M21 12a9 9 0 1 1-9-9M21 3v6h-6" />,
-    match: (p) => p.startsWith("/escrow")
+    match: (p) => p.startsWith("/dashboard/escrow") || p.startsWith("/escrow")
   }
 ];
 
