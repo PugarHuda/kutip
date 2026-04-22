@@ -105,6 +105,29 @@ export async function fetchLeaderboardFromGoldsky(
   return data?.authors ?? null;
 }
 
+export async function fetchAttestationByQueryId(
+  queryId: string
+): Promise<GoldskyAttestation | null> {
+  const data = await query<{ attestation: GoldskyAttestation | null }>({
+    query: `
+      query ByQueryId($id: ID!) {
+        attestation(id: $id) {
+          id
+          payer
+          totalPaid
+          authorsShare
+          citationCount
+          block
+          timestamp
+          tx
+        }
+      }
+    `,
+    variables: { id: queryId.toLowerCase() }
+  });
+  return data?.attestation ?? null;
+}
+
 export async function fetchRecentAttestationsFromGoldsky(
   limit = 20
 ): Promise<GoldskyAttestation[] | null> {

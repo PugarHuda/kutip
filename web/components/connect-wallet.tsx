@@ -20,7 +20,7 @@ export function ConnectWallet() {
   const [open, setOpen] = useState(false);
 
   if (!mounted) {
-    return <div className="addr hidden sm:inline-flex opacity-0" aria-hidden />;
+    return <div className="addr inline-flex opacity-0" aria-hidden />;
   }
 
   if (!isConnected || !address) {
@@ -28,11 +28,16 @@ export function ConnectWallet() {
     return (
       <button
         type="button"
-        className="addr hidden sm:inline-flex"
+        className="addr inline-flex"
         disabled={isPending || !injected}
         onClick={() => injected && connect({ connector: injected })}
       >
-        {isPending ? "Connecting…" : "Connect wallet"}
+        <span className="hidden sm:inline">
+          {isPending ? "Connecting…" : "Connect wallet"}
+        </span>
+        <span className="sm:hidden">
+          {isPending ? "…" : "Connect"}
+        </span>
       </button>
     );
   }
@@ -43,17 +48,18 @@ export function ConnectWallet() {
     return (
       <button
         type="button"
-        className="addr hidden sm:inline-flex"
+        className="addr inline-flex"
         style={{ background: "color-mix(in srgb, var(--kite-500) 10%, transparent)" }}
         onClick={() => switchChain({ chainId: kiteTestnet.id })}
       >
-        Switch to Kite testnet
+        <span className="hidden sm:inline">Switch to Kite testnet</span>
+        <span className="sm:hidden">Switch</span>
       </button>
     );
   }
 
   return (
-    <div className="relative hidden sm:inline-block">
+    <div className="relative inline-block">
       <button
         type="button"
         className="addr"
@@ -65,7 +71,7 @@ export function ConnectWallet() {
       </button>
       {open && (
         <div
-          className="absolute right-0 top-full mt-1.5 card p-2 min-w-[220px] shadow-lg z-50"
+          className="absolute right-0 top-full mt-1.5 card p-2 min-w-[220px] max-w-[calc(100vw-24px)] shadow-lg z-50"
           onMouseLeave={() => setOpen(false)}
         >
           <div className="px-2.5 py-2 border-b border-token">

@@ -1,0 +1,16 @@
+{
+  "name": "kutip-mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing Kutip's research agent as a tool for Claude Desktop / any MCP client.",
+  "type": "module",
+  "bin": {
+    "kutip-mcp": "index.mjs"
+  },
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0"
+  },
+  "license": "MIT"
+}
