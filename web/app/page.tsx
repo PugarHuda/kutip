@@ -59,33 +59,21 @@ export default async function HomePage() {
           </p>
 
           <div className="flex gap-3 mt-8">
-            <Link href="/research" className="btn btn--primary btn--lg">
-              Start a research query <ArrowRightIcon />
+            <Link href="/dashboard" className="btn btn--primary btn--lg">
+              Enter Dashboard <ArrowRightIcon />
             </Link>
-            <Link href="/registry" className="btn btn--ghost btn--lg">
-              See who&apos;s getting paid
+            <Link href="/verify" className="btn btn--ghost btn--lg">
+              See live attestations
             </Link>
           </div>
 
-          <div className="flex gap-12 mt-12 pt-6 border-t border-token">
-            <div>
-              <div className="t-caption">Authors tracked</div>
-              <div className="t-mono text-2xl font-semibold text-kite-700 mt-1 tracking-tight">
-                {authorsPaid} / {authors.length}
-              </div>
-            </div>
-            <div>
-              <div className="t-caption">Total paid out</div>
-              <div className="t-mono text-2xl font-semibold text-kite-700 mt-1 tracking-tight">
-                {formatUSDC(totalPaid)} USDC
-              </div>
-            </div>
-            <div>
-              <div className="t-caption">Citations attested</div>
-              <div className="t-mono text-2xl font-semibold text-kite-700 mt-1 tracking-tight">
-                {totalCitations}
-              </div>
-            </div>
+          <div className="flex gap-3 mt-6 items-center t-small ink-3">
+            <span className="status-dot status-dot--done animate-pulse-dot" style={{ width: 6, height: 6 }} />
+            <span>
+              <strong className="text-kite-700">{totalCitations}</strong> citations ·{" "}
+              <strong className="text-kite-700">{formatUSDC(totalPaid)}</strong> USDC paid · live on
+              Kite testnet
+            </span>
           </div>
         </div>
 

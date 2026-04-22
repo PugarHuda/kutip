@@ -14,9 +14,9 @@ const LINKS: {
 }[] = [
   { href: "/", label: "Home", match: (p) => p === "/" },
   {
-    href: "/research",
-    label: "Research",
-    match: (p) => p.startsWith("/research")
+    href: "/dashboard",
+    label: "Dashboard",
+    match: (p) => p.startsWith("/dashboard") || p.startsWith("/research")
   },
   {
     href: "/registry",
@@ -25,6 +25,7 @@ const LINKS: {
       p.startsWith("/registry") ||
       p.startsWith("/agents") ||
       p.startsWith("/leaderboard") ||
+      p.startsWith("/authors") ||
       p.startsWith("/claim")
   },
   {
