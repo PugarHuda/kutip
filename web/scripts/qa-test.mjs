@@ -119,24 +119,35 @@ await check("GET /research", async () => {
   assert(res.ok, `status ${res.status}`);
 });
 
-await check("GET /registry — hub page", async () => {
-  const res = await fetch(`${BASE}/registry`);
-  assert(res.ok, `status ${res.status}`);
-  const html = await res.text();
+await check("GET /registry → redirects to /dashboard/overview", async () => {
+  const res = await fetch(`${BASE}/registry`, { redirect: "manual" });
   assert(
-    html.includes("Who is on the other side"),
-    "registry headline missing"
+    res.status === 307 || res.status === 308,
+    `expected redirect, got ${res.status}`
+  );
+  const loc = res.headers.get("location") ?? "";
+  assert(
+    loc.includes("/dashboard"),
+    `location should go to dashboard, got ${loc}`
   );
 });
 
-await check("GET /market — hub page", async () => {
-  const res = await fetch(`${BASE}/market`);
-  assert(res.ok, `status ${res.status}`);
-  const html = await res.text();
+await check("GET /market → redirects to /dashboard/overview", async () => {
+  const res = await fetch(`${BASE}/market`, { redirect: "manual" });
   assert(
-    html.includes("Where capital meets citations"),
-    "market headline missing"
+    res.status === 307 || res.status === 308,
+    `expected redirect, got ${res.status}`
   );
+});
+
+await check("GET /dashboard/overview — aggregate stats", async () => {
+  const res = await fetch(`${BASE}/dashboard/overview`);
+  assert(res.ok, `status ${res.status}`);
+});
+
+await check("GET /dashboard — research workbench default", async () => {
+  const res = await fetch(`${BASE}/dashboard`);
+  assert(res.ok, `status ${res.status}`);
 });
 
 await check("GET /agents — shows ERC-8004 + ERC-6551", async () => {
