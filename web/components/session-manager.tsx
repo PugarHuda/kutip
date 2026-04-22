@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAccount, useSignTypedData } from "wagmi";
 import { kiteTestnet } from "@/lib/kite";
+import { useToast } from "./toast";
 
 const RESEARCHER_AA = (process.env.NEXT_PUBLIC_AGENT_AA_ADDRESS ??
   "0x4da7f4cFd443084027a39cc0f7c41466d9511776") as `0x${string}`;
@@ -101,6 +102,7 @@ export function SessionManager({
 }) {
   const { address, isConnected } = useAccount();
   const { signTypedDataAsync, isPending: isSigning } = useSignTypedData();
+  const toast = useToast();
 
   const [envelope, setEnvelope] = useState<SessionEnvelope | null>(null);
   const [maxPerQuery, setMaxPerQuery] = useState("2");
@@ -208,6 +210,11 @@ export function SessionManager({
 
       writeLocal(address, env);
       setEnvelope(env);
+      toast.push({
+        kind: "success",
+        message: "Agent Passport delegated",
+        detail: `Max ${formatUSDC(maxRaw.toString())} / query · daily cap ${formatUSDC(dailyRaw.toString())} · ${hoursN}h`
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "unknown error");
     } finally {
@@ -219,6 +226,11 @@ export function SessionManager({
     if (!address) return;
     writeLocal(address, null);
     setEnvelope(null);
+    toast.push({
+      kind: "info",
+      message: "Passport session revoked",
+      detail: "The agent can no longer spend on your behalf."
+    });
   }
 
   if (!isConnected) {

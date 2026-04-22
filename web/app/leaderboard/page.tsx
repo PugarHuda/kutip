@@ -312,24 +312,67 @@ export default async function LeaderboardPage({
             )}
           </div>
           {visibleRows.map((r, i) => {
-            const top = i === 0 && r.earnings > 0n;
+            const rank = i + 1;
+            const hasEarnings = r.earnings > 0n;
+            const podium = hasEarnings && rank <= 3 ? rank : 0; // 1|2|3|0
             const trend: "up" | "down" | "flat" =
               r.citations > 0 ? "up" : r.earnings > 0n ? "flat" : "flat";
             const walletShort = `${r.wallet.slice(0, 6)}…${r.wallet.slice(-4)}`;
             const useRealSpark = r.sparkPoints.length > 1;
+
+            const podiumStyles: Record<
+              number,
+              {
+                bg: string;
+                border: string;
+                rankColor: string;
+                earningsColor: string;
+                medal?: string;
+              }
+            > = {
+              1: {
+                bg: "linear-gradient(90deg, color-mix(in srgb, #fcd34d 20%, transparent), transparent 70%)",
+                border: "3px solid #f59e0b",
+                rankColor: "#b45309",
+                earningsColor: "#b45309",
+                medal: "🥇"
+              },
+              2: {
+                bg: "linear-gradient(90deg, color-mix(in srgb, #9ca3af 18%, transparent), transparent 70%)",
+                border: "3px solid #9ca3af",
+                rankColor: "#4b5563",
+                earningsColor: "#4b5563",
+                medal: "🥈"
+              },
+              3: {
+                bg: "linear-gradient(90deg, color-mix(in srgb, #d97706 14%, transparent), transparent 70%)",
+                border: "3px solid #d97706",
+                rankColor: "#92400e",
+                earningsColor: "#92400e",
+                medal: "🥉"
+              }
+            };
+            const pod = podium > 0 ? podiumStyles[podium] : null;
+
             return (
               <div
                 key={r.id}
                 className="grid gap-4 px-5 py-3.5 items-center transition-colors hover:surface-raised min-w-[760px]"
                 style={{
                   gridTemplateColumns: "54px 1.6fr 1.5fr 100px 130px 160px 80px",
-                  background: top ? "var(--emerald-50)" : "transparent",
-                  borderLeft: top ? "2px solid var(--emerald-500)" : "2px solid transparent",
+                  background: pod?.bg ?? "transparent",
+                  borderLeft: pod?.border ?? "3px solid transparent",
                   borderBottom:
                     i < visibleRows.length - 1 ? "1px solid var(--border)" : "none"
                 }}
               >
-                <span className="t-mono-sm ink-3">{String(i + 1).padStart(2, "0")}</span>
+                <span
+                  className="t-mono-sm font-semibold flex items-center gap-1"
+                  style={{ color: pod?.rankColor ?? "var(--ink-3)" }}
+                >
+                  {pod?.medal && <span aria-hidden>{pod.medal}</span>}
+                  {String(rank).padStart(2, "0")}
+                </span>
                 <a
                   href={`/authors/${r.id}`}
                   className="t-serif text-[17px] text-inherit hover:text-kite-700 transition-colors"
@@ -340,7 +383,9 @@ export default async function LeaderboardPage({
                 <span className="t-mono text-right">{r.citations}</span>
                 <span
                   className="t-mono text-right text-[15px] font-semibold"
-                  style={{ color: top ? "var(--emerald-700)" : "var(--ink)" }}
+                  style={{
+                    color: pod?.earningsColor ?? "var(--ink)"
+                  }}
                 >
                   {formatUSDC(r.earnings)}
                 </span>

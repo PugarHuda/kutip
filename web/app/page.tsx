@@ -223,8 +223,82 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <footer className="max-w-[1280px] mx-auto mt-20 pt-5 border-t border-token">
-        <span className="t-small ink-3">Built on Kite testnet · Hackathon 2026</span>
+      <footer className="max-w-[1280px] mx-auto mt-20 pt-7 border-t border-token">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          <div>
+            <div className="t-caption mb-2">Kutip</div>
+            <div className="t-small ink-2 mb-1">
+              The research agent that pays its sources.
+            </div>
+            <div className="t-mono-sm ink-3">v0.1 · Hackathon 2026</div>
+          </div>
+          <div>
+            <div className="t-caption mb-2">Live stats</div>
+            <div className="t-small ink-2">
+              <span className="font-semibold text-kite-700">
+                {totalCitations}
+              </span>{" "}
+              citations · {authorsPaid} authors paid
+            </div>
+            <div className="t-mono-sm ink-3 mt-1">
+              {formatUSDC(totalPaid)} USDC distributed
+            </div>
+          </div>
+          <div>
+            <div className="t-caption mb-2">Chains</div>
+            <div className="t-small">
+              <a
+                href="https://testnet.kitescan.ai"
+                target="_blank"
+                rel="noreferrer"
+                className="ink-2 hover:text-kite-500 transition-colors"
+              >
+                Kite testnet · 2368
+              </a>
+            </div>
+            <div className="t-small mt-1">
+              <a
+                href="https://testnet.snowtrace.io"
+                target="_blank"
+                rel="noreferrer"
+                className="ink-2 hover:text-kite-500 transition-colors"
+              >
+                Avalanche Fuji · 43113
+              </a>
+            </div>
+          </div>
+          <div>
+            <div className="t-caption mb-2">Source</div>
+            <div className="t-small">
+              <a
+                href="https://github.com/PugarHuda/kutip"
+                target="_blank"
+                rel="noreferrer"
+                className="ink-2 hover:text-kite-500 transition-colors"
+              >
+                github.com/PugarHuda/kutip
+              </a>
+            </div>
+            <div className="t-small mt-1">
+              <a
+                href="https://github.com/PugarHuda/kutip/tree/main/mcp"
+                target="_blank"
+                rel="noreferrer"
+                className="ink-2 hover:text-kite-500 transition-colors"
+              >
+                MCP server for Claude Desktop →
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="mt-7 pt-5 border-t border-token flex justify-between items-center flex-wrap gap-2">
+          <span className="t-small ink-3">
+            Built on Kite testnet · Hackathon 2026 · Novel track
+          </span>
+          <span className="t-mono-sm ink-3">
+            Pugar Huda Mantoro · @PugarHuda
+          </span>
+        </div>
       </footer>
     </main>
   );

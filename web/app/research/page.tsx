@@ -524,14 +524,26 @@ function DotPulse() {
 
 function IdleView({ setQuery }: { setQuery: (q: string) => void }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[640px] text-center">
-      <div className="w-14 h-14 rounded-2xl bg-kite-100 text-kite-500 flex items-center justify-center mb-5">
-        <SearchIcon size={24} />
+    <div className="flex flex-col items-center min-h-[640px] py-10 lg:py-14 text-center">
+      <div
+        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 animate-breathe"
+        style={{
+          background:
+            "conic-gradient(from 180deg, color-mix(in srgb, var(--kite-500) 20%, transparent), color-mix(in srgb, #10b981 20%, transparent), color-mix(in srgb, var(--kite-500) 20%, transparent))",
+          color: "var(--kite-700)"
+        }}
+      >
+        <SearchIcon size={26} />
       </div>
-      <h2 className="t-h2 max-w-[420px] m-0">Ask a question. Pay the authors you learn from.</h2>
-      <p className="t-body ink-2 max-w-[440px] mt-2.5">
-        Type your question on the left and set a USDC budget. We&apos;ll show the agent&apos;s work,
-        live, and hand you a cryptographic receipt at the end.
+      <h2 className="t-h2 max-w-[480px] m-0">
+        Ask a question.
+        <br />
+        Pay the humans you learn from.
+      </h2>
+      <p className="t-body ink-2 max-w-[460px] mt-3">
+        Type your question on the left and set a USDC budget. The agent&apos;s
+        work streams live, receipts land on Kite chain, and cited authors get
+        paid — all in one transaction.
       </p>
       <button
         type="button"
@@ -541,19 +553,53 @@ function IdleView({ setQuery }: { setQuery: (q: string) => void }) {
         Try the sample query <ArrowRightIcon />
       </button>
 
-      <div className="mt-12 w-full max-w-[560px]">
+      <div className="mt-12 w-full max-w-[680px]">
         <div className="t-caption mb-3">How a query runs</div>
-        <div className="grid grid-cols-5 gap-2">
-          {STEP_OUTLINE.map(([label], i) => (
-            <div
-              key={label}
-              className="p-3 rounded-lg text-left surface-raised border border-token"
-            >
-              <div className="t-mono-sm ink-3">{String(i + 1).padStart(2, "0")}</div>
-              <div className="t-small font-semibold mt-1">{label}</div>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          {STEP_OUTLINE.map(([label, detail], i) => {
+            const themeColor = [
+              "#6366f1",
+              "#10b981",
+              "#f59e0b",
+              "#ec4899",
+              "#06b6d4"
+            ][i];
+            return (
+              <div
+                key={label}
+                className="p-3 rounded-lg text-left surface-raised border border-token transition-all hover:-translate-y-0.5"
+                style={{
+                  borderTop: `2px solid color-mix(in srgb, ${themeColor} 60%, transparent)`
+                }}
+              >
+                <div
+                  className="t-mono-sm font-semibold"
+                  style={{ color: themeColor }}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <div className="t-small font-semibold mt-1">{label}</div>
+                <div className="t-mono-sm ink-3 mt-1 leading-tight">
+                  {detail}
+                </div>
+              </div>
+            );
+          })}
         </div>
+      </div>
+
+      <div className="mt-10 max-w-[480px] card p-4 text-left">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="status-dot status-dot--done animate-pulse-dot" style={{ width: 7, height: 7 }} />
+          <span className="t-caption">What you get back</span>
+        </div>
+        <ul className="t-small ink-2 space-y-1 pl-0 list-none">
+          <li>→ Summary with inline citation pills</li>
+          <li>→ Receipt with each author&apos;s share + wallet</li>
+          <li>→ KiteScan tx hash (authoritative)</li>
+          <li>→ Avalanche Fuji mirror (portable proof)</li>
+          <li>→ All in ~15 seconds, zero gas from your pocket</li>
+        </ul>
       </div>
     </div>
   );

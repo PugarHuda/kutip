@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Addr, Breadcrumb } from "@/components/ui";
+import { useToast } from "@/components/toast";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 
 interface OauthStatus {
@@ -64,6 +65,7 @@ function ClaimPage() {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [preview, setPreview] = useState<Preview>({ state: "hidden" });
   const [oauth, setOauth] = useState<OauthStatus | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     async function load() {
@@ -185,6 +187,14 @@ function ClaimPage() {
       }
 
       setStatus({ kind: "bound", address: wallet, name: data.bound!.name });
+      const bindTx = (data.bound as { bindTx?: string } | undefined)?.bindTx;
+      toast.push({
+        kind: "success",
+        message: `Bound ORCID → ${data.bound!.name}`,
+        detail: `Wallet ${wallet.slice(0, 6)}…${wallet.slice(-4)} · future citations will pay here.`,
+        href: bindTx ? `https://testnet.kitescan.ai/tx/${bindTx}` : undefined,
+        hrefLabel: bindTx ? "View binding tx" : undefined
+      });
     } catch (err) {
       setStatus({
         kind: "error",
