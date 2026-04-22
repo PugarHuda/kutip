@@ -6,7 +6,7 @@ import { formatUSDC, explorerAddress } from "@/lib/kite";
 import { facilitatorHandshake, PIEVERSE_URL } from "@/lib/pieverse";
 import type { Address } from "viem";
 import { MoneyFlow } from "@/components/money-flow";
-import { ArrowRightIcon, CheckIcon } from "@/components/icons";
+import { ArrowRightIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

@@ -3,8 +3,7 @@ import type { Address, Hex } from "viem";
 import { escrowAbi, getEscrowAddress } from "@/lib/escrow";
 import { getPublicClient } from "@/lib/ledger";
 import { explorerAddress, explorerTx, formatUSDC } from "@/lib/kite";
-import { listAuthors } from "@/lib/papers";
-import { Addr, StatTile } from "@/components/ui";
+import { StatTile } from "@/components/ui";
 import { CheckIcon, ExternalLinkIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -116,9 +115,6 @@ export default async function EscrowPage() {
   const totalYield = rows.reduce((s, r) => s + (r.accrued ?? 0n), 0n);
   const unclaimed = rows.filter((r) => r.claimer === "0x0000000000000000000000000000000000000000");
   const claimed = rows.filter((r) => r.claimer !== "0x0000000000000000000000000000000000000000");
-
-  // Tie orcidHash → author name via data/authors.json (hash each offline)
-  const authors = listAuthors();
 
   return (
     <main className="min-h-[calc(100vh-60px)]">

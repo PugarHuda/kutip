@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { CheckIcon } from "@/components/icons";
 import { explorerAddress } from "@/lib/kite";
 
@@ -33,12 +32,6 @@ function formatUSDC(raw: string | undefined): string {
   const frac = (v % 10n ** 18n).toString().padStart(18, "0").slice(0, 2);
   return `${whole}.${frac}`;
 }
-
-const OWNER_LABELS: Record<string, string> = {
-  operator: "Operator EOA",
-  ecosystem: "Ecosystem backup",
-  guardian: "Researcher guardian"
-};
 
 export default function GovernancePage() {
   const [stats, setStats] = useState<SafeStats | null>(null);

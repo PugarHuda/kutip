@@ -26,7 +26,7 @@ import {
   type Hex
 } from "viem";
 import { getPublicClient } from "./ledger";
-import { getAAContext, isAAEnabled, sendBatchUserOp } from "./agent-passport";
+import { isAAEnabled, sendBatchUserOp } from "./agent-passport";
 
 export interface AuthorClaim {
   orcid: string;

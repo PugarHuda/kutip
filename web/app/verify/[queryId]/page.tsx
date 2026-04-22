@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Address, Hex } from "viem";
+import type { Hex } from "viem";
 import {
   getCitationsForQuery,
   getLedgerAddress,

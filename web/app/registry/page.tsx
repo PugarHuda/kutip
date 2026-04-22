@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Address } from "viem";
 import { agentReputationAbi, getReputationAddress } from "@/lib/reputation";
-import { getAuthorStats, getLedgerAddress } from "@/lib/ledger";
+import { getAuthorStats } from "@/lib/ledger";
 import { listAuthors } from "@/lib/papers";
 import {
   fetchLeaderboardFromGoldsky,

@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { AgentEvent, AgentStep, ResearchResult } from "@/lib/types";
 import { ArrowRightIcon, CheckIcon, ChevronDownIcon, SearchIcon } from "@/components/icons";
-import { Addr, Cite, PayoutRow, Tx } from "@/components/ui";
+import { Cite, PayoutRow } from "@/components/ui";
 import {
   SessionManager,
   updateLocalSpent,

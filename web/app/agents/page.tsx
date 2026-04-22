@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Address } from "viem";
 import { agentReputationAbi, getReputationAddress } from "@/lib/reputation";
 import {

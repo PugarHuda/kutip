@@ -5,7 +5,7 @@ import {
   getPublicClient
 } from "@/lib/ledger";
 import { attributionLedgerAbi } from "@/lib/abi";
-import { explorerAddress, explorerTx, formatUSDC } from "@/lib/kite";
+import { explorerAddress, formatUSDC } from "@/lib/kite";
 import { listAuthors } from "@/lib/papers";
 import { CheckIcon, ExternalLinkIcon, SearchIcon } from "@/components/icons";
 
@@ -135,7 +135,7 @@ export default async function VerifyIndexPage() {
 
         {recent.length > 0 && (
           <div className="card p-0 overflow-hidden">
-            {recent.map((q, i) => {
+            {recent.map((q) => {
               const short = `${q.queryId.slice(0, 10)}…${q.queryId.slice(-6)}`;
               const payerName =
                 walletToName.get(q.payer.toLowerCase()) ??
