@@ -2,47 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BrandMark, CheckIcon } from "./icons";
+import { ArrowRightIcon, BrandMark, CheckIcon } from "./icons";
 import { ThemeToggle } from "./theme-toggle";
 import { ConnectWallet } from "./connect-wallet";
-
-const LINKS: {
-  href: string;
-  label: string;
-  mobileLabel?: string;
-  match: (p: string) => boolean;
-}[] = [
-  { href: "/", label: "Home", match: (p) => p === "/" },
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    match: (p) => p.startsWith("/dashboard") || p.startsWith("/research")
-  },
-  {
-    href: "/registry",
-    label: "Registry",
-    match: (p) =>
-      p.startsWith("/registry") ||
-      p.startsWith("/agents") ||
-      p.startsWith("/leaderboard") ||
-      p.startsWith("/authors") ||
-      p.startsWith("/claim")
-  },
-  {
-    href: "/market",
-    label: "Market",
-    match: (p) =>
-      p.startsWith("/market") ||
-      p.startsWith("/escrow") ||
-      p.startsWith("/bounties")
-  },
-  {
-    href: "/gasless",
-    label: "Infra",
-    match: (p) => p.startsWith("/gasless") || p.startsWith("/governance")
-  },
-  { href: "/verify", label: "Verify", match: (p) => p.startsWith("/verify") }
-];
 
 export function TopNav() {
   const pathname = usePathname();
@@ -60,28 +22,21 @@ export function TopNav() {
         </span>
       </Link>
 
-      <div className="flex gap-1 items-center flex-wrap">
-        {LINKS.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="topnav__link"
-            data-active={link.match(pathname)}
-          >
-            <span className="hidden sm:inline">{link.label}</span>
-            <span className="sm:hidden">{link.mobileLabel ?? link.label}</span>
-          </Link>
-        ))}
-      </div>
-
       <div className="flex gap-2 items-center">
         <ThemeToggle />
-        <span className="chip chip--success">
-          <CheckIcon size={10} />{" "}
-          <span className="hidden sm:inline">Kite testnet</span>
-          <span className="sm:hidden">Kite</span>
+        <span className="chip chip--success hidden sm:inline-flex">
+          <CheckIcon size={10} />
+          <span>Kite testnet</span>
         </span>
         <ConnectWallet />
+        <Link
+          href="/dashboard"
+          className="btn btn--primary btn--sm ml-1"
+        >
+          <span className="hidden sm:inline">Enter Dashboard</span>
+          <span className="sm:hidden">Dashboard</span>
+          <ArrowRightIcon size={14} />
+        </Link>
       </div>
     </nav>
   );
