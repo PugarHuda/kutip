@@ -46,6 +46,10 @@ const LINKS: {
 
 export function TopNav() {
   const pathname = usePathname();
+
+  // Dashboard has its own sidebar + topbar — skip the marketing topnav there.
+  if (pathname?.startsWith("/dashboard")) return null;
+
   return (
     <nav className="topnav">
       <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
