@@ -537,14 +537,14 @@ In production, the configured OpenRouter model would synthesize a coherent 3-par
   return { summary, citationWeights: weights };
 }
 
-function evenWeights(papers: Paper[], map: Map<string, number>) {
+export function evenWeights(papers: Paper[], map: Map<string, number>) {
   const per = Math.floor(10_000 / papers.length);
   papers.forEach((p, i) => {
     map.set(p.id, i === papers.length - 1 ? 10_000 - per * (papers.length - 1) : per);
   });
 }
 
-function normalize(map: Map<string, number>, papers: Paper[]): Map<string, number> {
+export function normalize(map: Map<string, number>, papers: Paper[]): Map<string, number> {
   const filtered = new Map<string, number>();
   for (const p of papers) {
     const w = map.get(p.id);
@@ -570,7 +570,7 @@ function normalize(map: Map<string, number>, papers: Paper[]): Map<string, numbe
   return rebalanced;
 }
 
-function buildCitations(papers: Paper[], weights: Map<string, number>): Citation[] {
+export function buildCitations(papers: Paper[], weights: Map<string, number>): Citation[] {
   return papers
     .filter((p) => (weights.get(p.id) ?? 0) > 0)
     .map((p) => {
@@ -592,7 +592,7 @@ function buildCitations(papers: Paper[], weights: Map<string, number>): Citation
  * `submitAttestation` can emit a `registerDeposit` call in the same
  * atomic UserOp.
  */
-function flattenCitationsForContract(
+export function flattenCitationsForContract(
   papers: Paper[],
   weights: Map<string, number>,
   totalPaid: bigint
