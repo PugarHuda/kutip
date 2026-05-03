@@ -147,8 +147,16 @@ export async function configureSpendingRules(
   signFn: SignFunction
 ): Promise<{ success: boolean; txHash?: Hex; error?: string }> {
   try {
+    // Fetch existing then strip usage fields (setSpendingRules only takes
+    // the rule shape, not the runtime tracking data).
     const existing = await viewSpendingRules(kitepassAddress);
-    const merged = [...existing, ...rulesToAdd];
+    const existingPlain: SpendingRule[] = existing.map((r) => ({
+      timeWindow: r.timeWindow,
+      budget: r.budget,
+      initialWindowStartTime: r.initialWindowStartTime,
+      targetProviders: r.targetProviders
+    }));
+    const merged = [...existingPlain, ...rulesToAdd];
 
     const callData = new Interface([
       "function setSpendingRules(tuple(uint256 timeWindow, uint160 budget, uint96 initialWindowStartTime, bytes32[] targetProviders)[] rules)"
@@ -172,13 +180,20 @@ export async function configureSpendingRules(
   }
 }
 
+export interface SpendingRuleWithUsage extends SpendingRule {
+  amountUsed: bigint;
+  currentTimeWindowStartTime: bigint;
+}
+
 /**
- * Read current spending rules from a KitePass proxy. Returns empty array
- * if the proxy doesn't exist yet, or has never been configured.
+ * Read current spending rules + usage data from a KitePass proxy.
+ * Returns empty array if the proxy doesn't exist yet or has never been
+ * configured. The contract returns a tuple of (rule, usage) per entry —
+ * we flatten into one struct for downstream consumers.
  */
 export async function viewSpendingRules(
   kitepassAddress: Address
-): Promise<SpendingRule[]> {
+): Promise<SpendingRuleWithUsage[]> {
   const provider = new ethers.JsonRpcProvider(KITE_RPC, {
     chainId: 2368,
     name: "kite-testnet"
@@ -186,21 +201,28 @@ export async function viewSpendingRules(
   const contract = new ethers.Contract(
     kitepassAddress,
     [
-      "function getSpendingRules() view returns (tuple(uint256 timeWindow, uint160 budget, uint96 initialWindowStartTime, bytes32[] targetProviders)[])"
+      "function getSpendingRules() view returns (tuple(tuple(uint256 timeWindow, uint160 budget, uint96 initialWindowStartTime, bytes32[] targetProviders) rule, tuple(uint128 amountUsed, uint128 currentTimeWindowStartTime) usage)[])"
     ],
     provider
   );
 
   try {
-    const raw = (await contract.getSpendingRules()) as Array<
-      [bigint, bigint, bigint, string[]]
-    >;
-    return raw.map((r) => ({
-      timeWindow: BigInt(r[0]),
-      budget: BigInt(r[1]),
-      initialWindowStartTime: BigInt(r[2]),
-      targetProviders: r[3] as Hex[]
-    }));
+    const raw = (await contract.getSpendingRules()) as Array<{
+      rule: [bigint, bigint, bigint, string[]];
+      usage: [bigint, bigint];
+    }>;
+    return raw.map((entry) => {
+      const r = entry.rule;
+      const u = entry.usage;
+      return {
+        timeWindow: BigInt(r[0]),
+        budget: BigInt(r[1]),
+        initialWindowStartTime: BigInt(r[2]),
+        targetProviders: r[3] as Hex[],
+        amountUsed: BigInt(u[0]),
+        currentTimeWindowStartTime: BigInt(u[1])
+      };
+    });
   } catch {
     return [];
   }
