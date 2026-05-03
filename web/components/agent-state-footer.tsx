@@ -125,6 +125,8 @@ export function AgentStateFooter() {
         </span>
       </div>
 
+      <KitePassPanel />
+
       {sessionActive && session ? (
         <div className="pt-1 border-t border-token">
           <div className="flex items-center gap-1.5 t-mono-sm">
@@ -132,19 +134,133 @@ export function AgentStateFooter() {
               className="status-dot status-dot--done"
               style={{ width: 6, height: 6 }}
             />
-            <span className="text-kite-700 font-medium">Passport active</span>
+            <span className="text-kite-700 font-medium">Local session</span>
           </div>
           <div className="t-mono-sm ink-3 mt-0.5">
             {formatUSDC(session.spentToday)} /{" "}
             {formatUSDC(session.intent.dailyCapUSDC)} today
           </div>
         </div>
-      ) : (
-        <div className="pt-1 border-t border-token">
-          <div className="t-mono-sm ink-3">No Passport session</div>
-          <div className="t-mono-sm ink-3 opacity-60 mt-0.5">
-            Sign from /research sidebar
+      ) : null}
+    </div>
+  );
+}
+
+interface KitePassRule {
+  timeWindow: string;
+  budget: string;
+  amountUsed: string;
+  humanLabel: string;
+}
+
+interface KitePassInfo {
+  configured: boolean;
+  address?: string;
+  explorer?: string;
+  ruleCount?: number;
+  rules?: KitePassRule[];
+  error?: string;
+}
+
+function KitePassPanel() {
+  const [info, setInfo] = useState<KitePassInfo | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/kitepass/info", { cache: "no-store" });
+        if (!res.ok && res.status !== 502) return;
+        const j = (await res.json()) as KitePassInfo;
+        if (!cancelled) setInfo(j);
+      } catch {
+        /* ignore */
+      }
+    }
+    load();
+    const t = setInterval(load, 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(t);
+    };
+  }, []);
+
+  if (!info?.configured || !info.address) {
+    return (
+      <div className="pt-1 border-t border-token">
+        <div className="t-mono-sm ink-3">KitePass not configured</div>
+      </div>
+    );
+  }
+
+  if (info.error || !info.rules) {
+    return (
+      <div className="pt-1 border-t border-token">
+        <div className="flex items-center gap-1.5 t-mono-sm">
+          <span
+            className="status-dot status-dot--pending"
+            style={{ width: 6, height: 6 }}
+          />
+          <span className="ink-2 font-medium">KitePass · check failed</span>
+        </div>
+      </div>
+    );
+  }
+
+  const daily = info.rules.find((r) => r.humanLabel === "daily");
+  const perTx = info.rules.find((r) => r.humanLabel === "per-tx");
+  const dailyBudget = daily ? BigInt(daily.budget) : 0n;
+  const dailyUsed = daily ? BigInt(daily.amountUsed) : 0n;
+  const pct =
+    dailyBudget > 0n
+      ? Number((dailyUsed * 10000n) / dailyBudget) / 100
+      : 0;
+
+  return (
+    <div className="pt-1 border-t border-token">
+      <div className="flex items-center justify-between gap-1.5">
+        <div className="flex items-center gap-1.5 t-mono-sm">
+          <span
+            className="status-dot status-dot--done"
+            style={{ width: 6, height: 6 }}
+          />
+          <span className="text-kite-700 font-medium">KitePass on-chain</span>
+        </div>
+        <a
+          href={info.explorer}
+          target="_blank"
+          rel="noreferrer"
+          className="t-mono-sm ink-3 hover:text-kite-500"
+        >
+          ↗
+        </a>
+      </div>
+      {daily && (
+        <>
+          <div className="flex items-baseline justify-between mt-1.5">
+            <span className="t-mono-sm ink-3">Daily</span>
+            <span className="t-mono-sm font-semibold">
+              {formatUSDC(daily.amountUsed)} /{" "}
+              {formatUSDC(daily.budget)}
+            </span>
           </div>
+          <div
+            className="h-1 mt-1 rounded-full overflow-hidden"
+            style={{
+              background: "color-mix(in srgb, var(--kite-500) 12%, transparent)"
+            }}
+          >
+            <div
+              className="h-full bg-kite-500 transition-all duration-500"
+              style={{ width: `${Math.min(100, pct)}%` }}
+            />
+          </div>
+        </>
+      )}
+      {perTx && (
+        <div className="flex items-baseline justify-between mt-1.5">
+          <span className="t-mono-sm ink-3">Per-tx cap</span>
+          <span className="t-mono-sm">{formatUSDC(perTx.budget)}</span>
         </div>
       )}
     </div>

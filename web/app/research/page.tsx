@@ -1119,6 +1119,7 @@ function ResultView({
               </span>
             </div>
           )}
+          <KitePassBadge />
           {result.mirrorTx && result.mirrorExplorer && (
             <div className="flex justify-between items-center px-5 py-3 border-t border-token">
               <div className="min-w-0">
@@ -1256,5 +1257,81 @@ function RenderWithCitations({ text }: { text: string }) {
         )
       )}
     </>
+  );
+}
+
+interface KitePassInfo {
+  configured: boolean;
+  address?: string;
+  explorer?: string;
+  rules?: { humanLabel: string; budget: string; amountUsed: string }[];
+}
+
+function formatUSDC18(raw: string): string {
+  const v = BigInt(raw);
+  const whole = v / 10n ** 18n;
+  const frac = (v % 10n ** 18n).toString().padStart(18, "0").slice(0, 2);
+  return `${whole}.${frac}`;
+}
+
+function KitePassBadge() {
+  const [info, setInfo] = useState<KitePassInfo | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/kitepass/info", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j: KitePassInfo) => {
+        if (!cancelled) setInfo(j);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!info?.configured || !info.address) return null;
+  const daily = info.rules?.find((r) => r.humanLabel === "daily");
+  const perTx = info.rules?.find((r) => r.humanLabel === "per-tx");
+
+  return (
+    <div className="flex justify-between items-center px-5 py-3 border-t border-token">
+      <div className="min-w-0">
+        <div className="t-small ink-2">
+          Spending bounded by Kite Passport vault
+        </div>
+        <a
+          href={info.explorer}
+          target="_blank"
+          rel="noreferrer"
+          className="t-mono-sm text-kite-700 hover:text-kite-500 mt-0.5 break-all block"
+        >
+          {info.address}
+        </a>
+        {(daily || perTx) && (
+          <div className="t-mono-sm ink-3 mt-0.5">
+            {daily && (
+              <>
+                {formatUSDC18(daily.amountUsed)}/{formatUSDC18(daily.budget)} daily
+              </>
+            )}
+            {daily && perTx && " · "}
+            {perTx && <>cap {formatUSDC18(perTx.budget)}/tx</>}
+          </div>
+        )}
+      </div>
+      <span
+        className="chip"
+        style={{
+          padding: "2px 10px",
+          fontSize: 10,
+          background: "color-mix(in srgb, var(--kite-500) 15%, var(--surface))",
+          color: "var(--kite-700)",
+          border: "1px solid color-mix(in srgb, var(--kite-500) 30%, var(--border))"
+        }}
+      >
+        Kite Passport ✓
+      </span>
+    </div>
   );
 }
