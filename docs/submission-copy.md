@@ -1,32 +1,34 @@
 # Kutip — Submission Copy
 
-> **Status:** finalized after the 2026-04-20 feature sprint — reflects Passport session + on-chain claims + cross-chain mirror + 2-of-3 Safe.
-> **Deadline:** Extended ≥2 weeks past 2026-04-27 by Encode (pending Kite Passport public launch). Exact date TBC.
+> **Status:** finalized after the 2026-05-03 KitePass swap — Kite Passport now LIVE & INTEGRATED on chain.
+> **Deadline:** Sunday **2026-05-17** (Encode email 2026-04-28 · Rebecca).
 > **Live:** https://kutip-zeta.vercel.app · **Repo:** https://github.com/PugarHuda/kutip
+> **KitePass vault:** [`0xe2c4e97738884fd6db2fbb62c1cd672ef1debc4c`](https://testnet.kitescan.ai/address/0xe2c4e97738884fd6db2fbb62c1cd672ef1debc4c) · 10 USDC daily · 2 USDC per-tx
 
 ---
 
-## 200-word pitch (updated · hackathon track)
+## 200-word pitch (updated · hackathon track · post-KitePass)
 
-> Kutip is the first live implementation of Kite's Proof-of-AI thesis:
-> an autonomous research agent that pays the humans it learns from —
-> cryptographically, in one transaction, at the moment it answers.
+> Kutip is the first agent shipping real Kite Passport delegation
+> end-to-end: an autonomous research agent that pays the humans it
+> learns from — cryptographically, in one transaction, at the moment
+> it answers.
 >
-> A Researcher smart account (EIP-4337, address `0x4da7f4cF…`) runs
-> every query under a cryptographic budget delegated by the user via a
-> one-time EIP-712 signature — our Kite-Agent-Passport-compatible
-> session layer. It pays a Summarizer sub-agent 5%, settles the rest
-> through an on-chain AttributionLedger (50% operator / 40% cited
-> authors / 10% Kite ecosystem), and replicates the receipt to Avalanche
-> Fuji within seconds. All in one UserOperation, gas sponsored by Kite's
-> paymaster in Test USD — user pays zero gas in any currency.
+> A Researcher smart account (EIP-4337, `0x4da7f4cF…`) operates within
+> a Kite Passport vault (`0xe2c4e9…ebc4c`) deployed live on Kite
+> testnet — 10 USDC daily, 2 USDC per-tx, on-chain enforcement, auditable
+> by anyone. Every query pays a Summarizer sub-agent 5%, settles the
+> rest through AttributionLedger (50% operator / 40% cited authors /
+> 10% Kite ecosystem), then replicates the receipt to Avalanche Fuji
+> within seconds. Gas sponsored by Kite's paymaster in Test USD — user
+> pays zero gas in any currency.
 >
 > Authors prove ownership via real ORCID OAuth (we redirect them to
 > orcid.org — they log in, we never guess), then bind their wallet
 > on-chain in a NameRegistry contract so future payouts route permanently.
 > Ecosystem governance runs through a 2-of-3 Safe multisig.
 >
-> Eleven contracts across two chains, a full Goldsky subgraph, 50
+> Twelve contracts across two chains, a full Goldsky subgraph, 53
 > automated QA checks. This is what the agentic economy was supposed to
 > look like.
 
@@ -34,16 +36,16 @@
 
 ## 100-word tech summary (for form "what did you build" field)
 
-Kutip ships an end-to-end agentic payment stack on Kite testnet: a
-Researcher smart-account pays a Summarizer sub-agent 5% atomically,
-settles USDC through an AttributionLedger that splits 50/40/10, and
-replicates every receipt to Avalanche Fuji via `CitationMirror`. User
-signs one EIP-712 SpendingIntent — agent runs within cap until revoked
-(Passport-compatible). Authors prove ORCID ownership via real OAuth2 →
-binding persisted on-chain in `NameRegistry`. Governance via 2-of-3
-Safe multisig. Goldsky subgraph powers leaderboards + author detail
-pages. Fully gasless UX — Kite paymaster covers every transaction in
-Test USD.
+Kutip ships an end-to-end agentic payment stack on Kite testnet:
+Researcher smart-account spends bounded by a live Kite Passport vault
+(0xe2c4e9…, 10 USDC/day, 2 USDC/tx, on-chain enforcement). Each query
+pays a Summarizer sub-agent 5%, settles USDC through AttributionLedger
+(50/40/10 split), replicates receipt to Avalanche Fuji via
+CitationMirror. Authors prove ORCID via real OAuth2 → binding on-chain
+in NameRegistry. Governance via 2-of-3 Safe multisig. Goldsky subgraph
+powers leaderboards + author profiles. Fully gasless — Kite paymaster
+covers every transaction in Test USD. Twelve contracts, two chains, 53
+automated QA checks.
 
 ---
 
@@ -93,17 +95,22 @@ Filtering catalog"). Live progress bar. 5 steps settle.
 > sub-agent fee, ledger transfer, and attestAndSplit in ONE UserOp
 > sponsored by the paymaster."
 
-### Shot 5 · 0:55–1:15 · The climax (receipt + mirror)
+### Shot 5 · 0:55–1:15 · The climax (receipt + KitePass + mirror)
 **Visual:** Result receipt animates in. Scroll: summary with cite pills,
 authors paid table, "Authorized under session" row with Passport ✓,
-"Mirrored on Avalanche Fuji" row with LayerZero-pattern chip. Click
-Kite tx → KiteScan. Then click Fuji tx → SnowTrace.
+**"Spending bounded by Kite Passport vault" row with `Kite Passport ✓`
+chip — click vault address, KiteScan opens showing the vault's spending
+rules with `amountUsed` ticking up live**. Then "Mirrored on Avalanche
+Fuji" with LayerZero-pattern chip. Click Kite tx → KiteScan. Click
+Fuji tx → SnowTrace.
 
 **Voice:**
-> "The receipt. Every author, their cut, their wallet, the hash.
-> Authorized under our Passport delegation. And — within seconds —
-> mirrored to Avalanche Fuji. Cross-chain citation proof without
-> requiring the user to do anything."
+> "The receipt. Every author, their cut, their wallet, the hash. The
+> agent's spending was on-chain-bounded by our Kite Passport vault —
+> deployed live, ten USDC per day, two per transaction. Click — see
+> the rules and usage right on KiteScan. And within seconds, this
+> attestation mirrors to Avalanche Fuji. Cross-chain citation proof,
+> zero user gas."
 
 ### Shot 6 · 1:15–1:30 · ORCID ownership + governance
 **Visual:** Cut to `/claim`. Type an ORCID, click "Verify via ORCID" —
@@ -131,6 +138,7 @@ Then flash to `/governance` — "2 / 3 signers required" big number.
 flowchart TB
     User[User Wallet<br/>signs EIP-712 SpendingIntent]
     Passport[Session Delegation<br/>max/query · daily cap · expiry]
+    KitePass[Kite Passport vault<br/>0xe2c4e9…ebc4c<br/>10 USDC/day · 2 USDC/tx]
     Researcher[Researcher AA<br/>0x4da7f4cF…]
     Summarizer[Summarizer AA<br/>0xA6C36bA2…]
     Ledger[AttributionLedger<br/>0x99359DaF…]
@@ -140,6 +148,7 @@ flowchart TB
     Safe[Operator Safe 2-of-3<br/>0x5258161f…]
 
     User --signs once--> Passport
+    KitePass -.bounds spending.-> Researcher
     Passport -.gates.-> Researcher
     Researcher --5% atomic--> Summarizer
     Researcher --totalPaid--> Ledger
