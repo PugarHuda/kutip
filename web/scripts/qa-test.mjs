@@ -502,6 +502,18 @@ await check("GET /api/safe-stats — Safe 2-of-3 state", async () => {
   assert(data.version, "version missing");
 });
 
+await check("GET /api/kitepass/info — live KitePass vault rules", async () => {
+  const { status, data } = await fetchJson(`${BASE}/api/kitepass/info`);
+  assert(status === 200, `status ${status}`);
+  assert(data.configured === true, "kitepass not configured");
+  assert(data.address?.startsWith("0x"), "address missing");
+  assert(Array.isArray(data.rules), "rules not array");
+  assert(data.ruleCount >= 1, `ruleCount=${data.ruleCount}`);
+  const daily = data.rules.find((r) => r.humanLabel === "daily");
+  assert(daily, "no daily rule");
+  assert(BigInt(daily.budget) > 0n, "daily budget=0");
+});
+
 await check("GET /api/auth/orcid/status — OAuth configured", async () => {
   const { status, data } = await fetchJson(`${BASE}/api/auth/orcid/status`);
   assert(status === 200, `status ${status}`);
