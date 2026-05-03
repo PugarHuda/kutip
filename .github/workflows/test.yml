@@ -1,0 +1,78 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  foundry:
+    name: Foundry contracts
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Install OpenZeppelin
+        run: forge install OpenZeppelin/openzeppelin-contracts foundry-rs/forge-std --no-commit
+
+      - name: Build
+        run: forge build --sizes
+
+      - name: Test (with fuzz at 256 runs)
+        run: forge test -vvv
+
+      - name: Coverage report
+        run: forge coverage --report summary || true
+
+  vitest:
+    name: Vitest unit + integration
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check
+        run: pnpm typecheck
+
+      - name: Unit tests + coverage
+        run: pnpm test:unit -- --coverage
+        env:
+          NODE_ENV: test
+
+      - name: Integration tests
+        run: pnpm test:integration
+        env:
+          NODE_ENV: test
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: web/coverage/
