@@ -168,6 +168,30 @@ Or use https://mermaid.live → paste → export PNG.
 
 ---
 
+## Capture status (2026-05-04 · auto-captured via Playwright)
+
+| # | Shot | Status | Notes |
+|---|---|---|---|
+| 1 | Landing hero | ✓ captured | wordmark + headline + money flow + infrastructure |
+| 2 | Dashboard idle | ✓ captured | sidebar, AgentStateFooter, KitePass panel, query input |
+| 3 | Dashboard running | **NEEDS USER** | run a query mid-flow + capture step ticker |
+| 4 | Receipt + KitePass | **NEEDS USER** | run fresh query → scroll receipt → capture KitePass chip |
+| 4a | Attestation verify | ✓ captured (substitute) | full attestation proof with payouts table |
+| 5 | KiteScan vault rules | ✓ captured | both spending rules visible (10 USDC daily / 2 USDC tx) |
+| 6 | SnowTrace mirror | ✓ captured (Events tab) | 4 AttestationMirrored events with topic[2]=2368 |
+| 7 | Claim verified | partial (idle state) | wallet not connected; user runs OAuth → recapture for `verified` state |
+| 7a | Claim page idle | ✓ captured | shows ORCID lookup + 4-step flow before OAuth |
+| 8 | Leaderboard podium | ✓ captured | 6/6 authors, 68 citations, 2.44 USDC, gold/silver/bronze |
+| 9 | Governance Safe | ✓ captured | 2/3 signers + 3 owner cards |
+| 10 | Architecture diagram | ✓ rendered | clean mermaid PNG, color-coded contracts |
+
+**Three shots still need user action**:
+- **Shot 3 (dashboard running)**: connect wallet → run sample query → capture during step 3-4
+- **Shot 4 (receipt + KitePass)**: same query as Shot 3 → scroll to bottom → capture receipt with KitePass chip
+- **Shot 7 (claim verified)**: complete ORCID OAuth flow → capture green "Signed in as ORCID..." badge state
+
+---
+
 ## Common mistakes to avoid
 
 - ❌ **Cropping too tight** — leave 40px breathing room on all sides. Submission form thumbnails sometimes auto-pad.
