@@ -129,6 +129,10 @@ const NAV: NavItem[] = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const onInfraPage = NAV.some(
+    (n) => n.group === "infra" && n.match(pathname)
+  );
+  const [infraOpen, setInfraOpen] = useState(onInfraPage);
 
   return (
     <div className="flex min-h-screen">
@@ -180,15 +184,21 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             />
           ))}
 
-          <SectionLabel>Infrastructure</SectionLabel>
-          {NAV.filter((n) => n.group === "infra").map((item) => (
-            <NavLink
-              key={item.href}
-              item={item}
-              active={item.match(pathname)}
-              onClick={() => setMobileOpen(false)}
-            />
-          ))}
+          <CollapsibleSectionLabel
+            label="Infrastructure"
+            open={infraOpen}
+            onToggle={() => setInfraOpen((v) => !v)}
+            count={NAV.filter((n) => n.group === "infra").length}
+          />
+          {infraOpen &&
+            NAV.filter((n) => n.group === "infra").map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                active={item.match(pathname)}
+                onClick={() => setMobileOpen(false)}
+              />
+            ))}
         </nav>
 
         <AgentStateFooter />
@@ -258,6 +268,48 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
     <div className="px-3 pt-3 pb-1 t-caption ink-3">{children}</div>
+  );
+}
+
+function CollapsibleSectionLabel({
+  label,
+  open,
+  onToggle,
+  count
+}: {
+  label: string;
+  open: boolean;
+  onToggle: () => void;
+  count: number;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="w-full flex items-center justify-between px-3 pt-3 pb-1 t-caption ink-3 hover:text-kite-500 transition-colors"
+      aria-expanded={open}
+    >
+      <span className="flex items-center gap-1.5">
+        {label}
+        <span className="t-mono-sm opacity-60">({count})</span>
+      </span>
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{
+          transform: open ? "rotate(90deg)" : "rotate(0deg)",
+          transition: "transform 150ms"
+        }}
+      >
+        <path d="m9 18 6-6-6-6" />
+      </svg>
+    </button>
   );
 }
 
