@@ -258,6 +258,32 @@ Kutip/
 
 ---
 
+## Testing
+
+**Foundry — 50/50 passing** (`cd contracts && forge test`):
+- Includes 4× 256-run fuzz suites (1024 random scenarios)
+- Property-based: fund conservation invariant, yield linearity
+- Boundary cases: weight 9999/10001, dust payment, dust principal, double-claim revert
+
+**Vitest — 7 test files, ~150 cases** (`cd web && pnpm test`):
+- 6 unit suites + 1 integration (`/api/claim` full flow with nock)
+- London-school isolation, real `ethers.Wallet` for crypto primitives
+- `fast-check` property-based tests on financial invariants (weight sum=10000)
+- Coverage gate: 80% lines / **100% branches** on `lib/agent.ts`
+
+**CI** — `.github/workflows/test.yml` runs both jobs on every PR.
+
+Convention: `describe(method) → describe(positive|negative|edge) → it`. See [`docs/testing.md`](docs/testing.md) for full guide, mocking strategy, and adding-tests workflow.
+
+```bash
+# Reproduce local test run
+cd contracts && forge test            # 50 contract tests
+cd ../web && pnpm test                # ~150 TypeScript tests
+pnpm test:coverage                    # HTML report at web/coverage/
+```
+
+---
+
 ## Links
 
 - Live demo: <https://kutip-zeta.vercel.app>
