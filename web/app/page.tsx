@@ -6,6 +6,7 @@ import { formatUSDC, explorerAddress } from "@/lib/kite";
 import { facilitatorHandshake, PIEVERSE_URL } from "@/lib/pieverse";
 import type { Address } from "viem";
 import { AutoDemo } from "@/components/auto-demo";
+import { MoneyFlow } from "@/components/money-flow";
 import { ArrowRightIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -90,6 +91,14 @@ export default async function HomePage() {
               </span>
             </div>
             <AutoDemo />
+          </div>
+
+          <div className="card mt-4 p-5">
+            <div className="flex justify-between items-center mb-2">
+              <span className="t-caption">How the money moves</span>
+              <span className="t-mono-sm ink-3">one cycle · every 12s</span>
+            </div>
+            <MoneyFlow />
           </div>
 
           {(aaAddress || ledgerAddress) && (

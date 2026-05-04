@@ -37,21 +37,32 @@
   --rose-500: #f43f5e;
   --rose-700: #be123c;
 
-  --bg: var(--kite-50);
-  --surface: #ffffff;
-  --surface-raised: var(--kite-100);
-  --border: var(--kite-200);
-  --border-strong: rgba(26, 31, 94, 0.14);
-  --ink: var(--kite-900);
-  --ink-2: rgba(26, 31, 94, 0.72);
-  --ink-3: rgba(26, 31, 94, 0.50);
-  --ink-4: rgba(26, 31, 94, 0.32);
+  /* Paper palette — warm cream surfaces, ink-on-paper text. */
+  --paper-cream: #faf6ed;
+  --paper-card: #fffcf2;
+  --paper-raised: #f3ecd8;
+  --paper-border: #e3d9bd;
+  --paper-ink: #2c2620;
 
-  --shadow-elev: 0 8px 24px -12px rgba(26, 31, 94, 0.18);
-  --shadow-soft: 0 1px 0 rgba(26, 31, 94, 0.04);
+  --bg: var(--paper-cream);
+  --surface: var(--paper-card);
+  --surface-raised: var(--paper-raised);
+  --border: var(--paper-border);
+  --border-strong: rgba(60, 45, 20, 0.20);
+  --ink: var(--paper-ink);
+  --ink-2: rgba(44, 38, 32, 0.74);
+  --ink-3: rgba(44, 38, 32, 0.52);
+  --ink-4: rgba(44, 38, 32, 0.32);
+
+  --shadow-elev: 0 12px 24px -14px rgba(60, 45, 20, 0.20),
+    0 2px 4px -2px rgba(60, 45, 20, 0.08);
+  --shadow-soft: 0 1px 0 rgba(60, 45, 20, 0.05);
   --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--kite-500);
 
-  --pattern-color: rgba(85, 102, 255, 0.08);
+  --pattern-color: rgba(60, 45, 20, 0.06);
+
+  /* Subtle paper grain — SVG fractal noise rendered once, dimmed via opacity. */
+  --paper-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.15  0 0 0 0 0.12  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
 [data-theme="dark"] {
@@ -99,6 +110,28 @@ body {
 
 body {
   font-feature-settings: "rlig" 1, "calt" 1;
+  position: relative;
+}
+
+/* Paper grain — sits above bg, below content, ignores pointer events.
+   Disabled in dark mode (the dark surfaces handle their own texture). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: var(--paper-grain);
+  background-size: 180px 180px;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+[data-theme="dark"] body::before {
+  display: none;
+}
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 @layer utilities {
@@ -109,25 +142,25 @@ body {
   }
 
   .t-display-2xl {
-    font-family: var(--font-inter-tight), var(--font-inter), sans-serif;
+    font-family: var(--font-newsreader), Georgia, serif;
     font-weight: 600;
-    font-size: 72px;
+    font-size: 76px;
     line-height: 80px;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.022em;
   }
   .t-display-xl {
-    font-family: var(--font-inter-tight), var(--font-inter), sans-serif;
+    font-family: var(--font-newsreader), Georgia, serif;
     font-weight: 600;
-    font-size: 56px;
-    line-height: 62px;
-    letter-spacing: -0.025em;
+    font-size: 60px;
+    line-height: 64px;
+    letter-spacing: -0.018em;
   }
   .t-h1 {
-    font-family: var(--font-inter-tight), var(--font-inter), sans-serif;
+    font-family: var(--font-newsreader), Georgia, serif;
     font-weight: 600;
-    font-size: 40px;
-    line-height: 46px;
-    letter-spacing: -0.02em;
+    font-size: 42px;
+    line-height: 48px;
+    letter-spacing: -0.014em;
   }
   .t-h2 {
     font-family: var(--font-inter-tight), var(--font-inter), sans-serif;
@@ -206,6 +239,7 @@ body {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
+    box-shadow: var(--shadow-soft);
   }
   .card-elev {
     background: var(--surface);
