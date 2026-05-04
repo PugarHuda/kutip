@@ -5,7 +5,7 @@ import { listAuthors } from "@/lib/papers";
 import { formatUSDC, explorerAddress } from "@/lib/kite";
 import { facilitatorHandshake, PIEVERSE_URL } from "@/lib/pieverse";
 import type { Address } from "viem";
-import { MoneyFlow } from "@/components/money-flow";
+import { AutoDemo } from "@/components/auto-demo";
 import { ArrowRightIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -78,18 +78,18 @@ export default async function HomePage() {
         </div>
 
         <div className="lg:col-span-5">
-          <div className="card-elev p-6 pb-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="t-caption">How the money moves</span>
+          <div className="card-elev p-3">
+            <div className="flex justify-between items-center mb-2 px-2 pt-1">
+              <span className="t-caption">A query, end-to-end</span>
               <span className="chip chip--success">
                 <span
                   className="status-dot status-dot--done animate-pulse-dot"
                   style={{ width: 6, height: 6 }}
                 />
-                live
+                auto-demo · 16s loop
               </span>
             </div>
-            <MoneyFlow />
+            <AutoDemo />
           </div>
 
           {(aaAddress || ledgerAddress) && (
