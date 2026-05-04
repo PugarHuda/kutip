@@ -8,6 +8,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   buildCookiePayload,
+  isDemoVerifyAllowed,
   isOrcidOauthEnabled,
   orcidAuthorizeUrl,
   redirectUrl,
@@ -287,5 +288,67 @@ describe("redirectUrl", () => {
 describe("ORCID_COOKIE_NAME", () => {
   it("is the expected stable identifier", () => {
     expect(ORCID_COOKIE_NAME).toBe("kutip_orcid_verified");
+  });
+});
+
+describe("isDemoVerifyAllowed", () => {
+  describe("positive", () => {
+    it("returns true when KUTIP_ALLOW_DEMO_VERIFY='1'", () => {
+      const orig = process.env.KUTIP_ALLOW_DEMO_VERIFY;
+      process.env.KUTIP_ALLOW_DEMO_VERIFY = "1";
+      expect(isDemoVerifyAllowed()).toBe(true);
+      process.env.KUTIP_ALLOW_DEMO_VERIFY = orig;
+    });
+  });
+
+  describe("negative", () => {
+    it("returns false when env var is unset", () => {
+      const orig = process.env.KUTIP_ALLOW_DEMO_VERIFY;
+      delete process.env.KUTIP_ALLOW_DEMO_VERIFY;
+      expect(isDemoVerifyAllowed()).toBe(false);
+      process.env.KUTIP_ALLOW_DEMO_VERIFY = orig;
+    });
+
+    it("returns false on truthy-but-not-'1' values", () => {
+      const orig = process.env.KUTIP_ALLOW_DEMO_VERIFY;
+      for (const v of ["true", "yes", "on", "0", ""]) {
+        process.env.KUTIP_ALLOW_DEMO_VERIFY = v;
+        expect(isDemoVerifyAllowed()).toBe(false);
+      }
+      process.env.KUTIP_ALLOW_DEMO_VERIFY = orig;
+    });
+  });
+});
+
+describe("verifyCookie · demo flag round-trip", () => {
+  describe("positive", () => {
+    it("preserves demo:true through sign + verify", () => {
+      const payload = {
+        orcid: "0009-0002-8864-0901",
+        exp: NOW + 60,
+        demo: true
+      };
+      const signed = signCookie(payload);
+      const verified = verifyCookie(signed);
+      expect(verified?.demo).toBe(true);
+      expect(verified?.orcid).toBe(payload.orcid);
+    });
+
+    it("treats missing demo flag as undefined (not a forgery signal)", () => {
+      const signed = signCookie({ orcid: "x", exp: NOW + 60 });
+      const verified = verifyCookie(signed);
+      expect(verified?.demo).toBeUndefined();
+    });
+  });
+
+  describe("negative", () => {
+    it("rejects payload tampered to flip demo flag without re-signing", () => {
+      const original = signCookie({ orcid: "x", exp: NOW + 60, demo: true });
+      const [, sig] = original.split(".");
+      const fakeBody = Buffer.from(
+        JSON.stringify({ orcid: "x", exp: NOW + 60, demo: false })
+      ).toString("base64url");
+      expect(verifyCookie(`${fakeBody}.${sig}`)).toBeNull();
+    });
   });
 });

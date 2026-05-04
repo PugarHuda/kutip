@@ -9,7 +9,9 @@ import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 
 interface OauthStatus {
   enabled: boolean;
+  demoVerifyAvailable?: boolean;
   verifiedOrcid?: string | null;
+  verifiedViaDemo?: boolean;
   exp?: number | null;
 }
 
@@ -279,22 +281,49 @@ function ClaimPage() {
               </label>
               {orcidVerified ? (
                 <div className="mt-2.5 p-3 rounded-lg border border-[color:var(--emerald-500)] bg-[color:var(--emerald-50)] text-[color:var(--emerald-700)] text-sm flex items-center gap-2">
-                  <CheckIcon size={14} /> Signed in as{" "}
-                  <strong>{oauth?.verifiedOrcid}</strong>
+                  <CheckIcon size={14} />
+                  <span>
+                    {oauth?.verifiedViaDemo ? "Demo-verified as " : "Signed in as "}
+                    <strong>{oauth?.verifiedOrcid}</strong>
+                  </span>
                 </div>
               ) : (
                 <>
-                  <a
-                    href={`/api/auth/orcid/authorize?orcid=${encodeURIComponent(
-                      normalizedOrcid
-                    )}&returnTo=/claim`}
-                    className="btn btn--primary mt-2.5 inline-flex"
-                  >
-                    Verify via ORCID <ArrowRightIcon />
-                  </a>
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    <a
+                      href={`/api/auth/orcid/authorize?orcid=${encodeURIComponent(
+                        normalizedOrcid
+                      )}&returnTo=/claim`}
+                      className="btn btn--primary inline-flex"
+                    >
+                      Verify via ORCID <ArrowRightIcon />
+                    </a>
+                    {oauth?.demoVerifyAvailable && (
+                      <a
+                        href={`/api/auth/orcid/demo-verify?orcid=${encodeURIComponent(
+                          normalizedOrcid
+                        )}&returnTo=/claim`}
+                        className="btn btn--ghost inline-flex"
+                        title="Skip ORCID OAuth — for hackathon judges who don't have an ORCID account"
+                      >
+                        Skip OAuth (demo) <ArrowRightIcon />
+                      </a>
+                    )}
+                  </div>
                   <div className="t-small ink-3 mt-2">
-                    Redirects to orcid.org to prove you own{" "}
-                    <span className="t-mono-sm">{normalizedOrcid}</span>.
+                    {oauth?.demoVerifyAvailable ? (
+                      <>
+                        Real path redirects to orcid.org to prove you own{" "}
+                        <span className="t-mono-sm">{normalizedOrcid}</span>.
+                        Demo path skips OAuth — wallet binding is still real
+                        on-chain.
+                      </>
+                    ) : (
+                      <>
+                        Redirects to orcid.org to prove you own{" "}
+                        <span className="t-mono-sm">{normalizedOrcid}</span>.
+                      </>
+                    )}
                   </div>
                   {oauth?.verifiedOrcid &&
                     oauth.verifiedOrcid.toUpperCase() !== normalizedOrcid && (
@@ -304,6 +333,13 @@ function ClaimPage() {
                       </div>
                     )}
                 </>
+              )}
+              {orcidVerified && oauth?.verifiedViaDemo && (
+                <div className="mt-3 p-3 rounded-lg border border-dashed border-amber-400 bg-amber-50 text-[color:var(--amber-700,#92400e)] text-xs">
+                  <strong>Demo mode:</strong> identity is mocked (skipped real
+                  ORCID OAuth), but the wallet binding below still writes to the
+                  real on-chain registry — anyone can verify it.
+                </div>
               )}
             </>
           )}

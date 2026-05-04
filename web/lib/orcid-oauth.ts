@@ -47,6 +47,15 @@ export function isOrcidOauthEnabled(): boolean {
   return Boolean(process.env.ORCID_CLIENT_ID && process.env.ORCID_CLIENT_SECRET);
 }
 
+/**
+ * Demo-verify path: lets judges skip the real ORCID OAuth dance and bind a
+ * mock ORCID directly. Wallet signature + on-chain claim still happen for
+ * real — only identity proof is mocked.
+ */
+export function isDemoVerifyAllowed(): boolean {
+  return process.env.KUTIP_ALLOW_DEMO_VERIFY === "1";
+}
+
 export interface OrcidTokenResponse {
   access_token: string;
   token_type: string;
@@ -95,6 +104,7 @@ function secret(): string {
 export interface OrcidCookiePayload {
   orcid: string;
   exp: number;
+  demo?: boolean;
 }
 
 export function signCookie(payload: OrcidCookiePayload): string {
