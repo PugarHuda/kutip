@@ -246,10 +246,12 @@ describe("orcidAuthorizeUrl", () => {
   describe("edge cases", () => {
     it("URL-encodes state values containing reserved characters", () => {
       // state shouldn't normally contain these (we use hex), but encoding is
-      // the contract — test that it survives the round-trip.
+      // the contract. URLSearchParams uses application/x-www-form-urlencoded
+      // (space → "+", "&" → "%26"), so round-trip via URLSearchParams.
       const raw = "state with spaces & ampersands";
       const url = orcidAuthorizeUrl(raw);
-      expect(url).toContain(encodeURIComponent(raw));
+      const parsed = new URL(url).searchParams.get("state");
+      expect(parsed).toBe(raw);
     });
   });
 });

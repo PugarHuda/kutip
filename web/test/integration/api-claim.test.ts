@@ -48,7 +48,7 @@ afterEach(() => {
 function mockOrcidApi(orcid: string, response: unknown, status = 200) {
   nock("https://pub.orcid.org")
     .get(`/v3.0/${orcid}`)
-    .reply(status, response);
+    .reply(status, response as nock.Body);
 }
 
 async function buildRequest(opts: {

@@ -109,7 +109,10 @@ export function verifyCookie(value: string | undefined): OrcidCookiePayload | nu
   if (parts.length !== 2) return null;
   const [body, sig] = parts;
   const expected = crypto.createHmac("sha256", secret()).update(body).digest("base64url");
-  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+  const sigBuf = Buffer.from(sig);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length) return null;
+  if (!crypto.timingSafeEqual(sigBuf, expBuf)) return null;
   try {
     const payload = JSON.parse(Buffer.from(body, "base64url").toString()) as OrcidCookiePayload;
     if (payload.exp < Math.floor(Date.now() / 1000)) return null;

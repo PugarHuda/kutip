@@ -3,7 +3,7 @@
  * Locks env vars to deterministic values so tests don't depend on .env.
  */
 
-process.env.NODE_ENV = "test";
+(process.env as Record<string, string>).NODE_ENV = "test";
 process.env.KITE_RPC_URL = "http://anvil.local";
 process.env.KITE_TESTNET_USDC = "0x0fF5393387ad2f9f691FD6Fd28e07E3969e27e63";
 process.env.NEXT_PUBLIC_AGENT_OPERATOR_ADDRESS =

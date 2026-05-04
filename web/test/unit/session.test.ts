@@ -21,11 +21,20 @@ import type { Address, Hex } from "viem";
 const NOW_SEC = () => BigInt(Math.floor(Date.now() / 1000));
 const usdc = (n: number) => BigInt(Math.round(n * 100)) * 10n ** 16n;
 
+const MUTABLE_TYPES = JSON.parse(JSON.stringify(SESSION_TYPES)) as Record<
+  string,
+  ethers.TypedDataField[]
+>;
+
 async function freshIntent(opts?: {
   dailyCap?: bigint;
   perQueryCap?: bigint;
   ttlSec?: bigint;
-}): Promise<{ wallet: ethers.Wallet; intent: SpendingIntent; signature: Hex }> {
+}): Promise<{
+  wallet: ethers.HDNodeWallet;
+  intent: SpendingIntent;
+  signature: Hex;
+}> {
   const wallet = ethers.Wallet.createRandom();
   const intent: SpendingIntent = {
     user: wallet.address as Address,
@@ -39,7 +48,7 @@ async function freshIntent(opts?: {
 
   const signature = (await wallet.signTypedData(
     SESSION_DOMAIN,
-    SESSION_TYPES,
+    MUTABLE_TYPES,
     intent as unknown as Record<string, unknown>
   )) as Hex;
 
@@ -91,7 +100,7 @@ describe("verifyIntent", () => {
       };
       const signature = (await wallet.signTypedData(
         SESSION_DOMAIN,
-        SESSION_TYPES,
+        MUTABLE_TYPES,
         intent as unknown as Record<string, unknown>
       )) as Hex;
       await expect(verifyIntent(intent, signature)).rejects.toThrow(/expired/i);
@@ -118,7 +127,7 @@ describe("verifyIntent", () => {
       };
       const signature = (await wallet.signTypedData(
         SESSION_DOMAIN,
-        SESSION_TYPES,
+        MUTABLE_TYPES,
         intent as unknown as Record<string, unknown>
       )) as Hex;
       await expect(verifyIntent(intent, signature)).resolves.toMatchObject({
@@ -188,7 +197,7 @@ describe("checkSpendStateless", () => {
       };
       const signature = (await wallet.signTypedData(
         SESSION_DOMAIN,
-        SESSION_TYPES,
+        MUTABLE_TYPES,
         intent as unknown as Record<string, unknown>
       )) as Hex;
       const env: SessionEnvelope = { intent, signature, spentToday: 0n };

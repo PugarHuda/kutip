@@ -52,11 +52,8 @@ describe("normalizeOrcid", () => {
 
   describe("edge cases", () => {
     it("handles tab and newline whitespace", () => {
-      expect(normalizeOrcid("0000\t0002\n1825-0097")).toBe(
-        "00000002182501825-0097".slice(0, 0) + "000000021825-0097".slice(0, 0) + "0000000218250097"
-      );
-      // Note: the implementation strips all whitespace including dashes context
-      // Actually no — \s+ matches whitespace, not -. Let me verify behaviour.
+      // \s+ strips tab + newline (whitespace), preserves dash. Then upper-cases.
+      expect(normalizeOrcid("0000\t0002\n1825-0097")).toBe("000000021825-0097");
     });
 
     it("preserves dashes (not whitespace)", () => {
