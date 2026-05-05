@@ -235,39 +235,48 @@ body > * {
 }
 
 @layer components {
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: var(--shadow-soft);
-  }
-  .card-elev {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: var(--shadow-elev);
-  }
-
-  /* Torn-paper edge — irregular polygon clips top + bottom edges into a
-     ripped look. Uses filter:drop-shadow (not box-shadow) so the soft
-     warm shadow follows the jagged silhouette. Borders disabled because
-     clip-path slices them mid-stroke; the surface vs page contrast plus
-     drop-shadow is enough to define the edge. */
+  /* Torn-paper edge — applied to all cards by default.
+     - Polygon depth 0-7%, points spaced unevenly for organic tear.
+     - filter:drop-shadow follows the jagged silhouette (box-shadow can't).
+     - Border dropped because clip-path slices it mid-stroke; surface/bg
+       contrast + drop-shadow are enough to define the edge. */
+  .card,
   .card--torn {
     background: var(--surface);
     border: none;
     border-radius: 0;
     box-shadow: none;
-    filter: drop-shadow(0 6px 14px rgba(60, 45, 20, 0.18))
+    filter: drop-shadow(0 4px 10px rgba(60, 45, 20, 0.14))
       drop-shadow(0 1px 0 rgba(60, 45, 20, 0.06));
     clip-path: polygon(
-      0% 2.4%, 4% 0.4%, 9% 2%, 14% 0.2%, 19% 2.4%, 24% 0.6%, 29% 2.2%,
-      34% 0.4%, 39% 2.6%, 44% 0.8%, 49% 2.2%, 54% 0.4%, 59% 2.6%, 64% 0.8%,
-      69% 2.2%, 74% 0.4%, 79% 2.6%, 84% 1%, 89% 2.2%, 94% 0.4%, 100% 2%,
-      100% 98%, 95% 99.6%, 90% 97.8%, 85% 99.4%, 80% 97.6%, 75% 99.6%,
-      70% 97.8%, 65% 99.4%, 60% 97.6%, 55% 99.6%, 50% 97.8%, 45% 99.4%,
-      40% 97.6%, 35% 99.6%, 30% 97.8%, 25% 99.4%, 20% 97.6%, 15% 99.6%,
-      10% 97.8%, 5% 99.4%, 0% 98%
+      /* TOP — irregular tear, depth 0-7% */
+      0% 4%, 2% 1%, 5% 5%, 8% 2%, 12% 6%, 15% 0%, 18% 4%, 22% 1%, 25% 5%,
+      28% 0%, 32% 3%, 35% 7%, 39% 2%, 42% 5%, 46% 0%, 50% 4%, 54% 1%, 58% 6%,
+      62% 2%, 66% 4%, 70% 0%, 74% 5%, 78% 1%, 82% 4%, 86% 0%, 90% 6%, 94% 2%,
+      97% 4%, 100% 1%,
+      /* BOTTOM — mirrored irregular tear */
+      100% 99%, 97% 96%, 94% 99%, 90% 95%, 86% 100%, 82% 97%, 78% 99%,
+      74% 96%, 70% 100%, 66% 97%, 62% 99%, 58% 96%, 54% 100%, 50% 97%,
+      46% 99%, 42% 96%, 39% 99%, 35% 95%, 32% 99%, 28% 96%, 25% 100%,
+      22% 97%, 18% 99%, 15% 96%, 12% 100%, 8% 97%, 5% 99%, 2% 96%, 0% 99%
+    );
+  }
+  .card-elev {
+    background: var(--surface);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    filter: drop-shadow(0 8px 18px rgba(60, 45, 20, 0.22))
+      drop-shadow(0 2px 4px rgba(60, 45, 20, 0.10));
+    clip-path: polygon(
+      0% 4%, 2% 1%, 5% 5%, 8% 2%, 12% 6%, 15% 0%, 18% 4%, 22% 1%, 25% 5%,
+      28% 0%, 32% 3%, 35% 7%, 39% 2%, 42% 5%, 46% 0%, 50% 4%, 54% 1%, 58% 6%,
+      62% 2%, 66% 4%, 70% 0%, 74% 5%, 78% 1%, 82% 4%, 86% 0%, 90% 6%, 94% 2%,
+      97% 4%, 100% 1%,
+      100% 99%, 97% 96%, 94% 99%, 90% 95%, 86% 100%, 82% 97%, 78% 99%,
+      74% 96%, 70% 100%, 66% 97%, 62% 99%, 58% 96%, 54% 100%, 50% 97%,
+      46% 99%, 42% 96%, 39% 99%, 35% 95%, 32% 99%, 28% 96%, 25% 100%,
+      22% 97%, 18% 99%, 15% 96%, 12% 100%, 8% 97%, 5% 99%, 2% 96%, 0% 99%
     );
   }
 
