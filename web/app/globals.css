@@ -242,12 +242,25 @@ body > * {
        contrast + drop-shadow are enough to define the edge. */
   .card,
   .card--torn {
-    background: var(--surface);
+    background-color: var(--surface);
+    /* Subtle "belly" — top catches light, bottom slightly shaded. Sells the
+       3D paper feel before any shadow even lands. */
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0) 6%,
+      rgba(60, 45, 20, 0.03) 92%,
+      rgba(60, 45, 20, 0.08) 100%
+    );
     border: none;
     border-radius: 0;
     box-shadow: none;
-    filter: drop-shadow(0 4px 10px rgba(60, 45, 20, 0.14))
-      drop-shadow(0 1px 0 rgba(60, 45, 20, 0.06));
+    /* 3 stacked drop-shadows: contact (sharp), mid (main lift), ambient
+       (ground anchor). Reads as a sheet of paper raised off the desk. */
+    filter:
+      drop-shadow(0 1px 1px rgba(60, 45, 20, 0.10))
+      drop-shadow(0 6px 14px rgba(60, 45, 20, 0.16))
+      drop-shadow(0 18px 30px rgba(60, 45, 20, 0.10));
     clip-path: polygon(
       /* TOP — irregular tear, depth 0-7% */
       0% 4%, 2% 1%, 5% 5%, 8% 2%, 12% 6%, 15% 0%, 18% 4%, 22% 1%, 25% 5%,
@@ -262,12 +275,22 @@ body > * {
     );
   }
   .card-elev {
-    background: var(--surface);
+    background-color: var(--surface);
+    background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.65) 0%,
+      rgba(255, 255, 255, 0) 6%,
+      rgba(60, 45, 20, 0.04) 92%,
+      rgba(60, 45, 20, 0.10) 100%
+    );
     border: none;
     border-radius: 0;
     box-shadow: none;
-    filter: drop-shadow(0 8px 18px rgba(60, 45, 20, 0.22))
-      drop-shadow(0 2px 4px rgba(60, 45, 20, 0.10));
+    /* Same 3-layer recipe as .card but stronger — for hero-grade lift. */
+    filter:
+      drop-shadow(0 1px 1px rgba(60, 45, 20, 0.12))
+      drop-shadow(0 8px 18px rgba(60, 45, 20, 0.22))
+      drop-shadow(0 24px 40px rgba(60, 45, 20, 0.14));
     clip-path: polygon(
       0% 4%, 2% 1%, 5% 5%, 8% 2%, 12% 6%, 15% 0%, 18% 4%, 22% 1%, 25% 5%,
       28% 0%, 32% 3%, 35% 7%, 39% 2%, 42% 5%, 46% 0%, 50% 4%, 54% 1%, 58% 6%,
