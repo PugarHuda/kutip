@@ -93,14 +93,6 @@ export default async function HomePage() {
             <AutoDemo />
           </div>
 
-          <div className="card mt-4 p-6 pt-9 pb-9">
-            <div className="flex justify-between items-center mb-2">
-              <span className="t-caption">How the money moves</span>
-              <span className="t-mono-sm ink-3">one cycle · every 12s</span>
-            </div>
-            <MoneyFlow />
-          </div>
-
           {(aaAddress || ledgerAddress) && (
             <div className="mt-4 card p-4 text-sm flex flex-col gap-3">
               {aaAddress && (
@@ -166,6 +158,24 @@ export default async function HomePage() {
           )}
         </div>
       </div>
+
+      <section className="max-w-[1280px] mx-auto mt-20 px-2">
+        <div className="text-center mb-8">
+          <span className="t-caption">How the money moves</span>
+          <h2 className="t-h1 mt-2 mb-2">
+            One query, three authors paid — atomic.
+          </h2>
+          <p className="t-body ink-2 max-w-[600px] mx-auto m-0">
+            The researcher pays 2 USDC up front. The agent reads, cites,
+            and settles in one transaction. Cited authors land their
+            share before the response renders — every 12 seconds, on
+            Kite testnet, live.
+          </p>
+        </div>
+        <div className="card-elev p-8 pt-10 pb-10 mx-auto" style={{ maxWidth: 760 }}>
+          <MoneyFlow />
+        </div>
+      </section>
 
       <section className="max-w-[1280px] mx-auto mt-20">
         <div className="flex items-baseline justify-between mb-5">
