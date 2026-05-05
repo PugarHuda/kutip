@@ -1,167 +1,631 @@
 [
   {
     "id": "p001",
-    "doi": "10.1038/s41586-2024-carbon-01",
-    "title": "Direct air capture at scale: progress, challenges, and pathways",
-    "authors": ["a001", "a002"],
-    "year": 2024,
-    "journal": "Nature",
-    "abstract": "We review technological, economic, and policy trajectories for gigaton-scale direct air capture. Three pathways — solid-sorbent modular, liquid-solvent utility, and mineralization hybrids — are benchmarked against net-zero targets.",
-    "keywords": ["carbon capture", "direct air capture", "net zero", "climate"],
-    "priceUSDC": 40000
+    "doi": "10.1016/j.jclepro.2019.03.086",
+    "title": "Techno-economic assessment of CO2 direct air capture plants",
+    "authors": [
+      "a001",
+      "a002",
+      "a003",
+      "a109"
+    ],
+    "year": 2019,
+    "journal": "Journal of Cleaner Production",
+    "abstract": "CO2 direct air capture (DAC) has been increasingly discussed as a climate change mitigation option. Despite technical advances in the past decade, there are still misconceptions about DAC's current and long-term costs as well as energy, water and area demands. This could undermine DAC's anticipated role in a neutral or negative greenhouse gas emission energy system, and influence policy makers. In this study, a literature review and techno-economic analyses of state-of-the…",
+    "keywords": [
+      "direct",
+      "air",
+      "capture"
+    ],
+    "priceUSDC": 30000
   },
   {
     "id": "p002",
-    "doi": "10.1126/sciadv.adm2024",
-    "title": "Mineral carbonation kinetics in basaltic reservoirs: a field-scale study",
-    "authors": ["a003"],
-    "year": 2024,
-    "journal": "Science Advances",
-    "abstract": "Field data from Icelandic basalt injection site shows 95% CO2 mineralization within 24 months, faster than laboratory predictions by factor of 1.8x.",
-    "keywords": ["mineralization", "basalt", "CO2 storage"],
-    "priceUSDC": 35000
+    "doi": "10.1039/d1ee03523a",
+    "title": "Direct air capture: process technology, techno-economic and socio-political challenges",
+    "authors": [
+      "a004",
+      "a005",
+      "a006",
+      "a007",
+      "a109"
+    ],
+    "year": 2022,
+    "journal": "Energy & Environmental Science",
+    "abstract": "This comprehensive review appraises the state-of-the-art in direct air capture materials, processes, economics, sustainability, and policy, to inform, challenge and inspire a broad audience of researchers, practitioners, and policymakers.",
+    "keywords": [
+      "direct",
+      "air",
+      "capture"
+    ],
+    "priceUSDC": 30977
   },
   {
     "id": "p003",
-    "doi": "10.1016/j.joule.2024.biochar",
-    "title": "Biochar as a scalable negative emissions pathway: lifecycle analysis across 12 feedstocks",
-    "authors": ["a004", "a005"],
-    "year": 2024,
-    "journal": "Joule",
-    "abstract": "Multi-feedstock LCA identifies agricultural residue biochar as lowest-cost (<$80/tCO2e) pathway with co-benefits for soil carbon.",
-    "keywords": ["biochar", "negative emissions", "LCA"],
-    "priceUSDC": 30000
+    "doi": "10.1002/anie.201506952",
+    "title": "Direct Air Capture of CO<sub>2</sub> by Physisorbent Materials",
+    "authors": [
+      "a008",
+      "a009",
+      "a010",
+      "a011"
+    ],
+    "year": 2015,
+    "journal": "Angewandte Chemie International Edition",
+    "abstract": "Sequestration of CO2, either from gas mixtures or directly from air (direct air capture, DAC), could mitigate carbon emissions. Here five materials are investigated for their ability to adsorb CO2 directly from air and other gas mixtures. The sorbents studied are benchmark materials that encompass four types of porous material, one chemisorbent, TEPA-SBA-15 (amine-modified mesoporous silica) and four physisorbents: Zeolite 13X (inorganic); HKUST-1 and Mg-MOF-74/Mg-dobdc (m…",
+    "keywords": [
+      "direct",
+      "air",
+      "capture"
+    ],
+    "priceUSDC": 31954
   },
   {
     "id": "p004",
-    "doi": "10.1038/s41560-2024-solar-perov",
-    "title": "Tandem perovskite-silicon solar cells cross 34% efficiency threshold",
-    "authors": ["a006", "a002"],
-    "year": 2024,
-    "journal": "Nature Energy",
-    "abstract": "A vapor-deposition stabilization strategy lifts tandem efficiency to 34.2% with operational stability >1000 hours at 85°C.",
-    "keywords": ["perovskite", "solar", "tandem"],
-    "priceUSDC": 45000
+    "doi": "10.1038/s41467-019-10842-5",
+    "title": "An inter-model assessment of the role of direct air capture in deep mitigation pathways",
+    "authors": [
+      "a012",
+      "a013",
+      "a014",
+      "a015"
+    ],
+    "year": 2019,
+    "journal": "Nature Communications",
+    "abstract": "Abstract The feasibility of large-scale biological CO 2 removal to achieve stringent climate targets remains unclear. Direct Air Carbon Capture and Storage (DACCS) offers an alternative negative emissions technology (NET) option. Here we conduct the first inter-model comparison on the role of DACCS in 1.5 and 2 °C scenarios, under a variety of techno-economic assumptions. Deploying DACCS significantly reduces mitigation costs, and it complements rather than substitutes oth…",
+    "keywords": [
+      "direct",
+      "air",
+      "capture"
+    ],
+    "priceUSDC": 32931
   },
   {
     "id": "p005",
-    "doi": "10.1073/pnas.ocean-alk-2024",
-    "title": "Ocean alkalinity enhancement: promise, uncertainty, and governance",
-    "authors": ["a007"],
-    "year": 2024,
-    "journal": "PNAS",
-    "abstract": "We propose a tiered governance framework for ocean alkalinity trials incorporating MRV, environmental safeguards, and benefit-sharing.",
-    "keywords": ["ocean alkalinity", "OAE", "governance"],
-    "priceUSDC": 35000
+    "doi": "10.1002/2017jb014019",
+    "title": "Dissolution and secondary mineral precipitation in basalts due to reactions with carbonic acid",
+    "authors": [
+      "a016",
+      "a017",
+      "a018",
+      "a019"
+    ],
+    "year": 2017,
+    "journal": "Journal of Geophysical Research Solid Earth",
+    "abstract": "Abstract One of the leading hydrothermal alteration processes in volcanic environments is when rock‐forming minerals with high concentrations of iron, magnesium, and calcium react with CO 2 and water to form carbonate minerals. This is used to the advantage of geologic sequestration of anthropogenic CO 2 . Here we experimentally investigate how mineral carbonation processes alter the rock microstructure due to CO 2 ‐water‐rock interactions. In order to characterize these c…",
+    "keywords": [
+      "carbon",
+      "mineralization",
+      "basalt"
+    ],
+    "priceUSDC": 33908
   },
   {
     "id": "p006",
-    "doi": "10.1038/s41586-2023-afforest",
-    "title": "The afforestation gap: satellite evidence on planted forest carbon yields",
-    "authors": ["a008", "a005"],
-    "year": 2023,
-    "journal": "Nature",
-    "abstract": "Analysis of 27,000 plantations shows median realized carbon yields are 42% below reported baselines, driven by mortality and species mismatch.",
-    "keywords": ["afforestation", "reforestation", "carbon accounting"],
-    "priceUSDC": 40000
+    "doi": "10.3390/su142215195",
+    "title": "Variations in Permeability and Mechanical Properties of Basaltic Rocks Induced by Carbon Mineralization",
+    "authors": [
+      "a020",
+      "a021",
+      "a022",
+      "a023"
+    ],
+    "year": 2022,
+    "journal": "Sustainability",
+    "abstract": "Carbon capture, utilization, and storage (CCUS/CCS) is a strategic choice for ensuring energy security and reducing carbon dioxide emissions across the globe. The injection of CO2 into the basaltic reservoir is one strategy for the permanent disposal of carbon emissions. Basaltic rocks, which are widely distributed in Hainan Island, are capable of CO2 geological sequestration. In this study, the reaction of CO2-NaOH/Ca(OH)2-basaltic rocks under conditions of 6.0 M Pa and 3…",
+    "keywords": [
+      "carbon",
+      "mineralization",
+      "basalt"
+    ],
+    "priceUSDC": 34885
   },
   {
     "id": "p007",
-    "doi": "10.1021/acsnano.enzyme-2024",
-    "title": "Engineered carbonic anhydrase immobilization for post-combustion capture",
-    "authors": ["a009"],
-    "year": 2024,
-    "journal": "ACS Nano",
-    "abstract": "A metal-organic framework host enhances enzyme turnover by 12x vs free enzyme, enabling continuous capture at flue-gas temperatures.",
-    "keywords": ["enzyme", "carbonic anhydrase", "MOF"],
-    "priceUSDC": 35000
+    "doi": "10.1021/acsearthspacechem.2c00165",
+    "title": "Pore-Scale Microenvironments Control Anthropogenic Carbon Mineralization Outcomes in Basalt",
+    "authors": [
+      "a024",
+      "a025",
+      "a026",
+      "a027"
+    ],
+    "year": 2022,
+    "journal": "ACS Earth and Space Chemistry",
+    "abstract": "Thin sections and hand samples from 50 sidewall cores from the Wallula Basalt Pilot Demonstration, a basaltic carbon sequestration demonstration, provided the opportunity for the in-depth analysis of carbon mineralization induced by the injection of supercritical CO2. In this study, we used optical petrography and scanning electron microscopy to characterize the physical and chemical characteristics of the basalt components influenced by carbon mineralization reactions fro…",
+    "keywords": [
+      "carbon",
+      "mineralization",
+      "basalt"
+    ],
+    "priceUSDC": 35862
   },
   {
     "id": "p008",
-    "doi": "10.1038/s41558-2024-policy",
-    "title": "Carbon removal incentive design: lessons from the 45Q, CCfD, and ERF experiments",
-    "authors": ["a010", "a001"],
-    "year": 2024,
-    "journal": "Nature Climate Change",
-    "abstract": "Comparative analysis of three major CDR incentive regimes reveals durability-pricing and MRV rigor as strongest determinants of project survival.",
-    "keywords": ["policy", "45Q", "CCfD", "incentive"],
-    "priceUSDC": 40000
+    "doi": "10.1021/acs.est.2c03269",
+    "title": "Exotic Carbonate Mineralization Recovered from a Deep Basalt Carbon Storage Demonstration",
+    "authors": [
+      "a028",
+      "a029",
+      "a027",
+      "a030"
+    ],
+    "year": 2022,
+    "journal": "Environmental Science & Technology",
+    "abstract": "in reactive mafic-ultramafic reservoirs.",
+    "keywords": [
+      "carbon",
+      "mineralization",
+      "basalt"
+    ],
+    "priceUSDC": 36839
   },
   {
     "id": "p009",
-    "doi": "10.1039/ee-electrolysis-2024",
-    "title": "Low-temperature CO2 electrolysis to ethylene: a roadmap for industrial deployment",
-    "authors": ["a011", "a006"],
-    "year": 2024,
-    "journal": "Energy & Environmental Science",
-    "abstract": "Bipolar membrane systems demonstrate 72% Faradaic efficiency for ethylene at ambient temperature with projected costs <$800/t by 2030.",
-    "keywords": ["CO2 electrolysis", "ethylene", "CCU"],
-    "priceUSDC": 40000
+    "doi": "10.1111/gcb.13178",
+    "title": "Soil carbon sequestration and biochar as negative emission technologies",
+    "authors": [
+      "a031"
+    ],
+    "year": 2016,
+    "journal": "Global Change Biology",
+    "abstract": "Despite 20 years of effort to curb emissions, greenhouse gas (GHG) emissions grew faster during the 2000s than in the 1990s, which presents a major challenge for meeting the international goal of limiting warming to <2 °C relative to the preindustrial era. Most recent scenarios from integrated assessment models require large-scale deployment of negative emissions technologies (NETs) to reach the 2 °C target. A recent analysis of NETs, including direct air capture, enhanced…",
+    "keywords": [
+      "biochar",
+      "negative",
+      "emissions"
+    ],
+    "priceUSDC": 37816
   },
   {
     "id": "p010",
-    "doi": "10.1038/s41893-2024-blue",
-    "title": "Blue carbon restoration: quantifying 30-year sequestration trajectories in mangroves",
-    "authors": ["a012"],
-    "year": 2024,
-    "journal": "Nature Sustainability",
-    "abstract": "Long-term monitoring of 68 mangrove restoration sites reveals cumulative sequestration of 2.8-4.1 tCO2/ha/yr with strong co-benefits for coastal protection.",
-    "keywords": ["blue carbon", "mangrove", "restoration"],
-    "priceUSDC": 30000
+    "doi": "10.1021/acs.est.9b01615",
+    "title": "Prospective Life Cycle Assessment of Large-Scale Biochar Production and Use for Negative Emissions in Stockholm",
+    "authors": [
+      "a032",
+      "a033",
+      "a034"
+    ],
+    "year": 2019,
+    "journal": "Environmental Science & Technology",
+    "abstract": "Several cities in Sweden are aiming for climate neutrality within a few decades and for negative emissions thereafter. Combined biochar, heat, and power production is an option to achieve carbon sequestration for cities relying on biomass-fuelled district heating, while biochar use could mitigate environmental pollution and greenhouse gas emissions from the agricultural sector. By using prospective life cycle assessment, the climate impact of the pyrolysis of woodchips in …",
+    "keywords": [
+      "biochar",
+      "negative",
+      "emissions"
+    ],
+    "priceUSDC": 38793
   },
   {
     "id": "p011",
-    "doi": "10.1126/science.adv-2023-dac",
-    "title": "Heat-exchanger thermodynamic limits for solid-sorbent DAC",
-    "authors": ["a013", "a003"],
-    "year": 2023,
-    "journal": "Science",
-    "abstract": "First-principles thermodynamic bounds on solid-sorbent DAC systems show minimum 1.2 GJ/tCO2 theoretical, with current systems at 6-8 GJ/tCO2.",
-    "keywords": ["DAC", "thermodynamics", "sorbent"],
-    "priceUSDC": 45000
+    "doi": "10.1038/s41467-024-45314-y",
+    "title": "Exploring negative emission potential of biochar to achieve carbon neutrality goal in China",
+    "authors": [
+      "a035",
+      "a036",
+      "a037",
+      "a038"
+    ],
+    "year": 2024,
+    "journal": "Nature Communications",
+    "abstract": "in a sustainable manner, which could satisfy the negative emission demands in most mitigation scenarios compatible with China's target of carbon neutrality by 2060.",
+    "keywords": [
+      "biochar",
+      "negative",
+      "emissions"
+    ],
+    "priceUSDC": 39770
   },
   {
     "id": "p012",
-    "doi": "10.1016/j.oneear.storage-2024",
-    "title": "Storage capacity assessment for saline aquifers in Southeast Asia",
-    "authors": ["a014"],
-    "year": 2024,
-    "journal": "One Earth",
-    "abstract": "Regional assessment identifies 140-210 GtCO2 storage capacity across Indonesian, Malaysian, and Vietnamese basins with suitability scoring.",
-    "keywords": ["CO2 storage", "saline aquifer", "southeast asia"],
-    "priceUSDC": 30000
+    "doi": "10.1038/srep35984",
+    "title": "Particulate matter emissions from biochar-amended soils as a potential tradeoff to the negative emission potential",
+    "authors": [
+      "a039",
+      "a040",
+      "a041",
+      "a042"
+    ],
+    "year": 2016,
+    "journal": "Scientific Reports",
+    "abstract": "Novel carbon sequestration strategies such as large-scale land application of biochar may provide sustainable pathways to increase the terrestrial storage of carbon. Biochar has a long residence time in the soil and hence comprehensive studies are urgently needed to quantify the environmental impacts of large-scale biochar application. In particular, black carbon emissions from soils amended with biochar may counteract the negative emission potential due to the impacts on …",
+    "keywords": [
+      "biochar",
+      "negative",
+      "emissions"
+    ],
+    "priceUSDC": 40747
   },
   {
     "id": "p013",
-    "doi": "10.1038/s41560-2024-grid",
-    "title": "Grid integration of 100% renewable systems: reliability under extreme weather",
-    "authors": ["a006", "a015"],
-    "year": 2024,
-    "journal": "Nature Energy",
-    "abstract": "Multi-scenario modeling demonstrates 100% renewable grids maintain >99.95% reliability with 8-12 hour storage plus geographic dispersion.",
-    "keywords": ["renewable", "grid", "reliability", "storage"],
-    "priceUSDC": 40000
+    "doi": "10.1126/science.abd4016",
+    "title": "Monolithic perovskite/silicon tandem solar cell with &gt;29% efficiency by enhanced hole extraction",
+    "authors": [
+      "a043",
+      "a044",
+      "a045",
+      "a046"
+    ],
+    "year": 2020,
+    "journal": "Science",
+    "abstract": "Tandem solar cells that pair silicon with a metal halide perovskite are a promising option for surpassing the single-cell efficiency limit. We report a monolithic perovskite/silicon tandem with a certified power conversion efficiency of 29.15%. The perovskite absorber, with a bandgap of 1.68 electron volts, remained phase-stable under illumination through a combination of fast hole extraction and minimized nonradiative recombination at the hole-selective interface. These f…",
+    "keywords": [
+      "tandem",
+      "perovskite",
+      "silicon"
+    ],
+    "priceUSDC": 41724
   },
   {
     "id": "p014",
-    "doi": "10.1021/acssuschem.bioenergy-2024",
-    "title": "BECCS deployment constraints: sustainability, land, and biodiversity trade-offs",
-    "authors": ["a016", "a004"],
-    "year": 2024,
-    "journal": "ACS Sustainable Chem. Eng.",
-    "abstract": "Bioenergy with CCS pathways constrained to 1.5-3.5 GtCO2/yr by sustainable biomass availability without biodiversity loss.",
-    "keywords": ["BECCS", "biomass", "sustainability"],
-    "priceUSDC": 35000
+    "doi": "10.1126/science.aaz3691",
+    "title": "Efficient tandem solar cells with solution-processed perovskite on textured crystalline silicon",
+    "authors": [
+      "a047",
+      "a048",
+      "a049",
+      "a050"
+    ],
+    "year": 2020,
+    "journal": "Science",
+    "abstract": "Stacking solar cells with decreasing band gaps to form tandems presents the possibility of overcoming the single-junction Shockley-Queisser limit in photovoltaics. The rapid development of solution-processed perovskites has brought perovskite single-junction efficiencies >20%. However, this process has yet to enable monolithic integration with industry-relevant textured crystalline silicon solar cells. We report tandems that combine solution-processed micrometer-thick pero…",
+    "keywords": [
+      "tandem",
+      "perovskite",
+      "silicon"
+    ],
+    "priceUSDC": 42701
   },
   {
     "id": "p015",
-    "doi": "10.1038/s41586-2024-verification",
-    "title": "Cryptographic verification of carbon removal: a registry architecture",
-    "authors": ["a017", "a010"],
+    "doi": "10.1039/c4ee03322a",
+    "title": "Semi-transparent perovskite solar cells for tandems with silicon and CIGS",
+    "authors": [
+      "a051",
+      "a052",
+      "a053",
+      "a054"
+    ],
+    "year": 2014,
+    "journal": "Energy & Environmental Science",
+    "abstract": "Semi-transparent perovskite solar cells with silver nanowires are stacked on CIGS and Si to achieve solid-state polycrystalline tandems with efficiency improvement.",
+    "keywords": [
+      "tandem",
+      "perovskite",
+      "silicon"
+    ],
+    "priceUSDC": 43678
+  },
+  {
+    "id": "p016",
+    "doi": "10.1126/science.adf5872",
+    "title": "Interface engineering for high-performance, triple-halide perovskite–silicon tandem solar cells",
+    "authors": [
+      "a055",
+      "a044",
+      "a056",
+      "a057"
+    ],
+    "year": 2023,
+    "journal": "Science",
+    "abstract": "Improved stability and efficiency of two-terminal monolithic perovskite-silicon tandem solar cells will require reductions in recombination losses. By combining a triple-halide perovskite (1.68 electron volt bandgap) with a piperazinium iodide interfacial modification, we improved the band alignment, reduced nonradiative recombination losses, and enhanced charge extraction at the electron-selective contact. Solar cells showed open-circuit voltages of up to 1.28 volts in p-…",
+    "keywords": [
+      "tandem",
+      "perovskite",
+      "silicon"
+    ],
+    "priceUSDC": 44655
+  },
+  {
+    "id": "p017",
+    "doi": "10.3389/fclim.2019.00007",
+    "title": "CO2 Removal With Enhanced Weathering and Ocean Alkalinity Enhancement: Potential Risks and Co-benefits for Marine Pelagic Ecosystems",
+    "authors": [
+      "a058",
+      "a059",
+      "a060",
+      "a061"
+    ],
+    "year": 2019,
+    "journal": "Frontiers in Climate",
+    "abstract": "&lt;p&gt;Humankind will need to remove hundreds of gigatons of carbon dioxide (CO&lt;sub&gt;2&lt;/sub&gt;) from the atmosphere by the end of the twenty-first century to keep global warming below 2°C within the constraints of the global carbon budget. However, so far it is unclear if and how this could be achieved. A widely recognized idea is to accelerate weathering reactions of minerals that consume CO&lt;sub&gt;2&lt;/sub&gt; when they dissolve. Acceleration could be real…",
+    "keywords": [
+      "ocean",
+      "alkalinity",
+      "enhancement"
+    ],
+    "priceUSDC": 45632
+  },
+  {
+    "id": "p018",
+    "doi": "10.5194/bg-19-5375-2022",
+    "title": "Assessing the influence of ocean alkalinity enhancement on a coastal phytoplankton community",
+    "authors": [
+      "a062",
+      "a063",
+      "a064",
+      "a065"
+    ],
+    "year": 2022,
+    "journal": "Biogeosciences",
+    "abstract": "Abstract. Ocean alkalinity enhancement (OAE) is a proposed method to counteract climate change by increasing the alkalinity of the surface ocean and thus the chemical storage capacity of seawater for atmospheric CO2. The impact of OAE on marine ecosystems, including phytoplankton communities which make up the base of the marine food web, is largely unknown. To investigate the influence of OAE on phytoplankton communities, we enclosed a natural plankton community from coast…",
+    "keywords": [
+      "ocean",
+      "alkalinity",
+      "enhancement"
+    ],
+    "priceUSDC": 46609
+  },
+  {
+    "id": "p019",
+    "doi": "10.5194/sp-2-oae2023-3-2023",
+    "title": "Assessing the technical aspects of ocean-alkalinity-enhancement approaches",
+    "authors": [
+      "a066",
+      "a067",
+      "a068",
+      "a069"
+    ],
+    "year": 2023,
+    "journal": "State of the Planet",
+    "abstract": "Abstract. Ocean alkalinity enhancement (OAE) is an emerging strategy that aims to mitigate climate change by increasing the alkalinity of seawater. This approach involves increasing the alkalinity of the ocean to enhance its capacity to absorb and store carbon dioxide (CO2) from the atmosphere. This chapter presents an overview of the technical aspects associated with the full range of OAE methods being pursued and discusses implications for undertaking research on these a…",
+    "keywords": [
+      "ocean",
+      "alkalinity",
+      "enhancement"
+    ],
+    "priceUSDC": 47586
+  },
+  {
+    "id": "p020",
+    "doi": "10.1029/2021gb007246",
+    "title": "The Availability of Limestone and Other Raw Materials for Ocean Alkalinity Enhancement",
+    "authors": [
+      "a070",
+      "a071",
+      "a072"
+    ],
+    "year": 2022,
+    "journal": "Global Biogeochemical Cycles",
+    "abstract": "Abstract The work assesses the availability and localizations of different raw materials suitable for ocean alkalinity enhancement (OAE), like limestone, olivine, magnesite and brucite, since several billion tons of rocky materials are needed to achieve meaningful results for carbon sequestration through OAE. Resources of carbonates are immense and widespread around all continents. Availability of pure carbonates is still very large (outcrop area 4.1 million km 2 ) and is …",
+    "keywords": [
+      "ocean",
+      "alkalinity",
+      "enhancement"
+    ],
+    "priceUSDC": 48563
+  },
+  {
+    "id": "p021",
+    "doi": "10.1111/j.1365-2486.2005.01011.x",
+    "title": "Effects of afforestation on water yield: a global synthesis with implications for policy",
+    "authors": [
+      "a073",
+      "a074",
+      "a075"
+    ],
+    "year": 2005,
+    "journal": "Global Change Biology",
+    "abstract": "Abstract Carbon sequestration programs, including afforestation and reforestation, are gaining attention globally and will alter many ecosystem processes, including water yield. Some previous analyses have addressed deforestation and water yield, while the effects of afforestation on water yield have been considered for some regions. However, to our knowledge no systematic global analysis of the effects of afforestation on water yield has been undertaken. To assess and pre…",
+    "keywords": [
+      "afforestation",
+      "carbon",
+      "yield"
+    ],
+    "priceUSDC": 49540
+  },
+  {
+    "id": "p022",
+    "doi": "10.1088/1748-9326/9/6/064029",
+    "title": "Investigating afforestation and bioenergy CCS as climate change mitigation strategies",
+    "authors": [
+      "a076",
+      "a077",
+      "a078",
+      "a079"
+    ],
+    "year": 2014,
+    "journal": "Environmental Research Letters",
+    "abstract": "The land-use sector can contribute to climate change mitigation not only by reducing greenhouse gas (GHG) emissions, but also by increasing carbon uptake from the atmosphere and thereby creating negative CO2 emissions. In this paper, we investigate two land-based climate change mitigation strategies for carbon removal: (1) afforestation and (2) bioenergy in combination with carbon capture and storage technology (bioenergy CCS). In our approach, a global tax on GHG emission…",
+    "keywords": [
+      "afforestation",
+      "carbon",
+      "yield"
+    ],
+    "priceUSDC": 30516
+  },
+  {
+    "id": "p023",
+    "doi": "10.1093/forestry/76.3.299",
+    "title": "Carbon balance of afforested peatland in Scotland",
+    "authors": [
+      "a080"
+    ],
+    "year": 2003,
+    "journal": "Forestry An International Journal of Forest Research",
+    "abstract": "The annual net CO 2 exchange over undisturbed deep peatland in Scotland was measured continuously for 22 months using eddy covariance. Annual CO 2 exchanges over peatlands that had been drained, ploughed and afforested with conifers 1, 2, 3, 4, 8, 9 and 26 years previously were estimated by extrapolating two to four weekly measurements, using relationships between daytime fluxes and solar radiation and night-time fluxes and air temperature. The contribution of the trees to…",
+    "keywords": [
+      "afforestation",
+      "carbon",
+      "yield"
+    ],
+    "priceUSDC": 31493
+  },
+  {
+    "id": "p024",
+    "doi": "10.1890/1051-0761(2000)010[0470:bcovca]2.0.co;2",
+    "title": "BELOWGROUND CONSEQUENCES OF VEGETATION CHANGE AND THEIR TREATMENT IN MODELS",
+    "authors": [
+      "a075",
+      "a081",
+      "a074",
+      "a082"
+    ],
+    "year": 2000,
+    "journal": "Ecological Applications",
+    "abstract": "The extent and consequences of global land-cover and land-use change are increasingly apparent. One consequence not so apparent is the altered structure of plants belowground. This paper examines such belowground changes, emphasizing the interaction of altered root distributions with other factors and their treatment in models. Shifts of woody and herbaceous vegetation with deforestation, afforestation, and woody plant encroachment typically alter the depth and distributio…",
+    "keywords": [
+      "afforestation",
+      "carbon",
+      "yield"
+    ],
+    "priceUSDC": 32470
+  },
+  {
+    "id": "p025",
+    "doi": "10.1021/acs.est.4c09673",
+    "title": "Mass Transfer-Reaction Modeling of CO<sub>2</sub> Capture Mediated by Immobilized Carbonic Anhydrase Enzyme on Multiscale Supporting Structures",
+    "authors": [
+      "a083",
+      "a084",
+      "a085",
+      "a086"
+    ],
+    "year": 2025,
+    "journal": "Environmental Science & Technology",
+    "abstract": "absorption.",
+    "keywords": [
+      "carbonic",
+      "anhydrase",
+      "enzyme"
+    ],
+    "priceUSDC": 33447
+  },
+  {
+    "id": "p026",
+    "doi": "10.3303/cet1543044",
+    "title": "Immobilization of Carbonic Anhydrase for Biomimetic CO 2 Capture in a Slurry Absorber as Cross-Linked Enzyme Aggregates (CLEA)",
+    "authors": [
+      "a087",
+      "a088",
+      "a089",
+      "a090"
+    ],
+    "year": 2015,
+    "journal": "Socio-Environmental Systems Modeling",
+    "abstract": "Novel post-combustion Carbon Capture and Storage (CCS) processes include absorption of CO2 into aqueous solutions assisted by enzyme catalysis. Carbonic anhydrase EC 4.2.1.1 (CA) catalyzes CO2 hydration and it has been proposed as industrial biocatalyst for biomimetic CCS processes. The present study reports on the use of bovine CA immobilized via cross-linking of enzyme aggregates (CLEA). The aim of this study was to improve the biocatalyst stability at the typical operat…",
+    "keywords": [
+      "carbonic",
+      "anhydrase",
+      "enzyme"
+    ],
+    "priceUSDC": 34424
+  },
+  {
+    "id": "p027",
+    "doi": "10.1021/acs.est.4c04291",
+    "title": "Biomimetic CO<sub>2</sub> Capture Unlocked through Enzyme Mining: Discovery of a Highly Thermo- and Alkali-Stable Carbonic Anhydrase",
+    "authors": [
+      "a091",
+      "a092",
+      "a093",
+      "a094"
+    ],
     "year": 2024,
-    "journal": "Nature",
-    "abstract": "We propose a distributed ledger architecture enabling third-party verification of carbon removal claims with 100x reduction in verification cost.",
-    "keywords": ["verification", "MRV", "blockchain", "registry"],
-    "priceUSDC": 45000
+    "journal": "Environmental Science & Technology",
+    "abstract": "capture under HPC-relevant conditions, reported to date. CA-KR1 integration into industrial settings holds great promise in promoting efficient BioHPC, a potentially game-changing development for enhancing carbon-capture capacity toward industrial decarbonization.",
+    "keywords": [
+      "carbonic",
+      "anhydrase",
+      "enzyme"
+    ],
+    "priceUSDC": 35401
+  },
+  {
+    "id": "p028",
+    "doi": "10.1073/pnas.1411461111",
+    "title": "Directed evolution of an ultrastable carbonic anhydrase for highly efficient carbon capture from flue gas",
+    "authors": [
+      "a095",
+      "a096",
+      "a097",
+      "a098"
+    ],
+    "year": 2014,
+    "journal": "Proceedings of the National Academy of Sciences",
+    "abstract": "Carbonic anhydrase (CA) is one of nature's fastest enzymes and can dramatically improve the economics of carbon capture under demanding environments such as coal-fired power plants. The use of CA to accelerate carbon capture is limited by the enzyme's sensitivity to the harsh process conditions. Using directed evolution, the properties of a β-class CA from Desulfovibrio vulgaris were dramatically enhanced. Iterative rounds of library design, library generation, and high-th…",
+    "keywords": [
+      "carbonic",
+      "anhydrase",
+      "enzyme"
+    ],
+    "priceUSDC": 36378
+  },
+  {
+    "id": "p029",
+    "doi": "10.5194/se-10-871-2019",
+    "title": "Induced seismicity in geologic carbon storage",
+    "authors": [
+      "a099",
+      "a100",
+      "a101",
+      "a102"
+    ],
+    "year": 2019,
+    "journal": "Solid Earth",
+    "abstract": "Abstract. Geologic carbon storage, as well as other geo-energy applications, such as geothermal energy, seasonal natural gas storage and subsurface energy storage imply fluid injection and/or extraction that causes changes in rock stress field and may induce (micro)seismicity. If felt, seismicity has a negative effect on public perception and may jeopardize wellbore stability and damage infrastructure. Thus, induced earthquakes should be minimized to successfully deploy ge…",
+    "keywords": [
+      "geological",
+      "carbon",
+      "storage"
+    ],
+    "priceUSDC": 37355
+  },
+  {
+    "id": "p030",
+    "doi": "10.1016/j.jrmge.2016.09.001",
+    "title": "Fault activation and induced seismicity in geological carbon storage – Lessons learned from recent modeling studies",
+    "authors": [
+      "a102",
+      "a103",
+      "a104",
+      "a105"
+    ],
+    "year": 2016,
+    "journal": "Journal of Rock Mechanics and Geotechnical Engineering",
+    "abstract": "In the light of current concerns related to induced seismicity associated with geological carbon sequestration (GCS), this paper summarizes lessons learned from recent modeling studies on fault activation, induced seismicity, and potential for leakage associated with deep underground carbon dioxide (CO2) injection. Model simulations demonstrate that seismic events large enough to be felt by humans require brittle fault properties and continuous fault permeability allowing …",
+    "keywords": [
+      "geological",
+      "carbon",
+      "storage"
+    ],
+    "priceUSDC": 38332
+  },
+  {
+    "id": "p031",
+    "doi": "10.1073/pnas.1413284112",
+    "title": "Geologic carbon storage is unlikely to trigger large earthquakes and reactivate faults through which CO<sub>2</sub>could leak",
+    "authors": [
+      "a099",
+      "a100"
+    ],
+    "year": 2015,
+    "journal": "Proceedings of the National Academy of Sciences",
+    "abstract": "Zoback and Gorelick [(2012) Proc Natl Acad Sci USA 109(26):10164-10168] have claimed that geologic carbon storage in deep saline formations is very likely to trigger large induced seismicity, which may damage the caprock and ruin the objective of keeping CO2 stored deep underground. We argue that felt induced earthquakes due to geologic CO2 storage are unlikely because (i) sedimentary formations, which are softer than the crystalline basement, are rarely critically stresse…",
+    "keywords": [
+      "geological",
+      "carbon",
+      "storage"
+    ],
+    "priceUSDC": 39309
+  },
+  {
+    "id": "p032",
+    "doi": "10.1016/j.egypro.2013.06.614",
+    "title": "Geologic Carbon Storage Through Enhanced Oil Recovery",
+    "authors": [
+      "a106",
+      "a107",
+      "a108"
+    ],
+    "year": 2013,
+    "journal": "Energy Procedia",
+    "abstract": "The advancement of carbon capture technology combined with carbon dioxide (CO2) enhanced oil recovery (EOR) holds the promise of reducing the carbon footprint of coal-fired power plants and other industrial sources, while at the same time boosting production of oil. CO2 injection in deep formations has a long track record. Tertiary EOR with CO2 has its origins in West Texas in the 1970's, when CO2 was first used at large scale at the SACROC field to produce stranded oil fo…",
+    "keywords": [
+      "geological",
+      "carbon",
+      "storage"
+    ],
+    "priceUSDC": 40286
   }
 ]
