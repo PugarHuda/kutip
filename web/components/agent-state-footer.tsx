@@ -90,58 +90,42 @@ export function AgentStateFooter() {
     session !== null &&
     BigInt(session.intent.validUntil) > BigInt(Math.floor(now / 1000));
 
+  const sessionDaily =
+    sessionActive && session
+      ? `Local session: ${formatUSDC(session.spentToday)} / ${formatUSDC(session.intent.dailyCapUSDC)} today`
+      : null;
+
   return (
     <div className="px-4 py-3 border-t border-token space-y-2">
-      <div className="t-caption flex items-center justify-between">
-        <span>Agent state</span>
-        {aa ? (
+      <div
+        className="flex items-center justify-between t-mono-sm"
+        title={
+          aa
+            ? `Researcher AA · ${aa.address}${sessionDaily ? "\n" + sessionDaily : ""}`
+            : "Loading"
+        }
+      >
+        <span className="flex items-center gap-1.5 ink-3">
           <span
             className="status-dot"
             style={{
               width: 7,
               height: 7,
-              background: lowBalance
+              background: !aa
+                ? "var(--ink-4)"
+                : lowBalance
                 ? "var(--rose-500)"
                 : "var(--emerald-500)"
             }}
-            title={lowBalance ? "Low balance" : "Healthy"}
           />
-        ) : (
-          <span
-            className="status-dot status-dot--pending"
-            style={{ width: 7, height: 7 }}
-          />
-        )}
-      </div>
-
-      <div className="flex items-baseline justify-between">
-        <span className="t-small ink-3">Researcher AA</span>
-        <span
-          className={`t-mono-sm font-semibold ${
-            lowBalance ? "text-rose-500" : ""
-          }`}
-        >
-          {aa ? formatUSDC(aa.balance) : "…"}
+          AA
+        </span>
+        <span className={`font-semibold ${lowBalance ? "text-rose-500" : ""}`}>
+          {aa ? `${formatUSDC(aa.balance)} USDC` : "…"}
         </span>
       </div>
 
       <KitePassPanel />
-
-      {sessionActive && session ? (
-        <div className="pt-1 border-t border-token">
-          <div className="flex items-center gap-1.5 t-mono-sm">
-            <span
-              className="status-dot status-dot--done"
-              style={{ width: 6, height: 6 }}
-            />
-            <span className="text-kite-700 font-medium">Local session</span>
-          </div>
-          <div className="t-mono-sm ink-3 mt-0.5">
-            {formatUSDC(session.spentToday)} /{" "}
-            {formatUSDC(session.intent.dailyCapUSDC)} today
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -185,84 +169,47 @@ function KitePassPanel() {
     };
   }, []);
 
-  if (!info?.configured || !info.address) {
-    return (
-      <div className="pt-1 border-t border-token">
-        <div className="t-mono-sm ink-3">KitePass not configured</div>
-      </div>
-    );
-  }
-
-  if (info.error || !info.rules) {
-    return (
-      <div className="pt-1 border-t border-token">
-        <div className="flex items-center gap-1.5 t-mono-sm">
-          <span
-            className="status-dot status-dot--pending"
-            style={{ width: 6, height: 6 }}
-          />
-          <span className="ink-2 font-medium">KitePass · check failed</span>
-        </div>
-      </div>
-    );
-  }
+  if (!info?.configured || !info.address) return null;
+  if (info.error || !info.rules) return null;
 
   const daily = info.rules.find((r) => r.humanLabel === "daily");
   const perTx = info.rules.find((r) => r.humanLabel === "per-tx");
   const dailyBudget = daily ? BigInt(daily.budget) : 0n;
   const dailyUsed = daily ? BigInt(daily.amountUsed) : 0n;
   const pct =
-    dailyBudget > 0n
-      ? Number((dailyUsed * 10000n) / dailyBudget) / 100
-      : 0;
+    dailyBudget > 0n ? Number((dailyUsed * 10000n) / dailyBudget) / 100 : 0;
+
+  const tooltip = [
+    daily && `Daily: ${formatUSDC(daily.amountUsed)} / ${formatUSDC(daily.budget)} USDC`,
+    perTx && `Per-tx cap: ${formatUSDC(perTx.budget)} USDC`,
+    info.address && `Vault: ${info.address}`
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   return (
-    <div className="pt-1 border-t border-token">
-      <div className="flex items-center justify-between gap-1.5">
-        <div className="flex items-center gap-1.5 t-mono-sm">
-          <span
-            className="status-dot status-dot--done"
-            style={{ width: 6, height: 6 }}
-          />
-          <span className="text-kite-700 font-medium">KitePass on-chain</span>
-        </div>
-        <a
-          href={info.explorer}
-          target="_blank"
-          rel="noreferrer"
-          className="t-mono-sm ink-3 hover:text-kite-500"
-        >
-          ↗
-        </a>
+    <a
+      href={info.explorer}
+      target="_blank"
+      rel="noreferrer"
+      title={tooltip}
+      className="block no-underline text-inherit"
+    >
+      <div className="flex items-center justify-between gap-1.5 t-mono-sm">
+        <span className="ink-3">KitePass</span>
+        <span className="ink-3">{Math.round(pct)}% today ↗</span>
       </div>
-      {daily && (
-        <>
-          <div className="flex items-baseline justify-between mt-1.5">
-            <span className="t-mono-sm ink-3">Daily</span>
-            <span className="t-mono-sm font-semibold">
-              {formatUSDC(daily.amountUsed)} /{" "}
-              {formatUSDC(daily.budget)}
-            </span>
-          </div>
-          <div
-            className="h-1 mt-1 rounded-full overflow-hidden"
-            style={{
-              background: "color-mix(in srgb, var(--kite-500) 12%, transparent)"
-            }}
-          >
-            <div
-              className="h-full bg-kite-500 transition-all duration-500"
-              style={{ width: `${Math.min(100, pct)}%` }}
-            />
-          </div>
-        </>
-      )}
-      {perTx && (
-        <div className="flex items-baseline justify-between mt-1.5">
-          <span className="t-mono-sm ink-3">Per-tx cap</span>
-          <span className="t-mono-sm">{formatUSDC(perTx.budget)}</span>
-        </div>
-      )}
-    </div>
+      <div
+        className="h-1 mt-1 rounded-full overflow-hidden"
+        style={{
+          background: "color-mix(in srgb, var(--kite-500) 12%, transparent)"
+        }}
+      >
+        <div
+          className="h-full bg-kite-500 transition-all duration-500"
+          style={{ width: `${Math.min(100, pct)}%` }}
+        />
+      </div>
+    </a>
   );
 }

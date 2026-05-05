@@ -68,37 +68,36 @@ export function ActivityTicker() {
 
   if (items.length === 0) return null;
 
+  const last = items[0];
+  const total = items.reduce(
+    (acc, it) => acc + BigInt(it.totalPaid),
+    0n
+  );
+  const tooltip = items
+    .map(
+      (it) =>
+        `${timeAgo(it.timestamp)} ago · ${it.citationCount} cites · +${formatUSDC(it.totalPaid)} USDC`
+    )
+    .join("\n");
+
   return (
-    <div className="px-4 py-3 border-t border-token">
-      <div className="t-caption flex items-center justify-between mb-1.5">
-        <span>Live activity</span>
-        <Link
-          href="/dashboard/activity"
-          className="t-mono-sm ink-3 hover:text-kite-500"
-        >
-          all →
-        </Link>
+    <Link
+      href="/dashboard/activity"
+      title={tooltip}
+      className="block px-4 py-3 border-t border-token no-underline text-inherit hover:surface-raised transition-colors"
+    >
+      <div className="flex items-center justify-between gap-2 t-mono-sm">
+        <span className="flex items-center gap-1.5 ink-3 truncate">
+          <span
+            className="status-dot status-dot--done animate-pulse-dot"
+            style={{ width: 5, height: 5 }}
+          />
+          Last attestation · {timeAgo(last.timestamp)} ago
+        </span>
+        <span className="text-emerald-700 font-semibold">
+          +{formatUSDC(total.toString())}
+        </span>
       </div>
-      <div className="space-y-1.5">
-        {items.map((it) => (
-          <Link
-            key={it.id}
-            href={`/dashboard/verify/${it.id}`}
-            className="flex items-center justify-between gap-2 t-mono-sm no-underline ink-2 hover:text-kite-700 transition-colors"
-          >
-            <span className="flex items-center gap-1.5 truncate">
-              <span
-                className="status-dot status-dot--done"
-                style={{ width: 5, height: 5 }}
-              />
-              <span className="ink-3">{timeAgo(it.timestamp)}</span>
-            </span>
-            <span className="text-emerald-700 font-semibold">
-              +{formatUSDC(it.totalPaid)}
-            </span>
-          </Link>
-        ))}
-      </div>
-    </div>
+    </Link>
   );
 }
