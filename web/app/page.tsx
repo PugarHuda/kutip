@@ -79,8 +79,8 @@ export default async function HomePage() {
         </div>
 
         <div className="lg:col-span-5">
-          <div className="card-elev p-3">
-            <div className="flex justify-between items-center mb-2 px-2 pt-1">
+          <div className="card--torn p-5 pt-7 pb-7">
+            <div className="flex justify-between items-center mb-2 px-1">
               <span className="t-caption">A query, end-to-end</span>
               <span className="chip chip--success">
                 <span
@@ -93,7 +93,7 @@ export default async function HomePage() {
             <AutoDemo />
           </div>
 
-          <div className="card mt-4 p-5">
+          <div className="card--torn mt-4 p-6 pt-8 pb-8">
             <div className="flex justify-between items-center mb-2">
               <span className="t-caption">How the money moves</span>
               <span className="t-mono-sm ink-3">one cycle · every 12s</span>
