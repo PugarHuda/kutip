@@ -265,11 +265,11 @@ Kutip/
 - Property-based: fund conservation invariant, yield linearity
 - Boundary cases: weight 9999/10001, dust payment, dust principal, double-claim revert
 
-**Vitest — 7 test files, ~150 cases** (`cd web && pnpm test`):
-- 6 unit suites + 1 integration (`/api/claim` full flow with nock)
+**Vitest — 142 cases across 7 files** (`cd web && pnpm test`):
+- 136 unit (6 suites) + 6 integration (`/api/claim` full flow with nock)
 - London-school isolation, real `ethers.Wallet` for crypto primitives
 - `fast-check` property-based tests on financial invariants (weight sum=10000)
-- Coverage gate: 80% lines / **100% branches** on `lib/agent.ts`
+- Coverage gates: **100% on `lib/x402.ts`**, 100% branches on `session.ts` + `claim-registry.ts`, 90%+ branches on `orcid-oauth.ts`
 
 **CI** — `.github/workflows/test.yml` runs both jobs on every PR.
 
@@ -278,9 +278,68 @@ Convention: `describe(method) → describe(positive|negative|edge) → it`. See 
 ```bash
 # Reproduce local test run
 cd contracts && forge test            # 50 contract tests
-cd ../web && pnpm test                # ~150 TypeScript tests
+cd ../web && pnpm test                # 142 TypeScript tests
 pnpm test:coverage                    # HTML report at web/coverage/
 ```
+
+---
+
+## Integrate with Kutip
+
+Kutip is composable. Other agents, indexers, and apps can plug into the
+research-and-pay loop three ways — pick whichever matches your runtime.
+
+### 1. MCP — for AI agents (Claude Desktop, Cursor, Cline)
+
+The fastest path. One stdio process, three tools that any MCP-compatible
+LLM client can call natively. Full setup in [`mcp/README.md`](mcp/README.md).
+
+| Tool | Description |
+|---|---|
+| `kutip.research(query, budgetUSDC)` | Run a query end-to-end. Returns summary + citations + Kite tx hash. |
+| `kutip.summary(queryId)` | Fetch a past summary via reverse-x402 paywall. |
+| `kutip.authors(limit, onlyClaimed)` | List paid authors + their wallets. |
+
+> Why it matters: an external agent that cites Kutip's work pays Kutip,
+> which pays the original authors. Recursive royalties without escrow tracking.
+
+### 2. HTTP API — for any backend / curl
+
+Three public endpoints power most integrations. Every other route in
+`/api/*` is internal to the dashboard.
+
+```bash
+# Run a research query (the dashboard uses the same endpoint).
+curl -X POST https://kutip-zeta.vercel.app/api/query \
+  -H "content-type: application/json" \
+  -d '{"query":"What are the top carbon capture methods in 2024?","budgetUSDC":"0.10"}'
+
+# Retrieve a saved summary (reverse-x402: receipt-or-pay).
+curl https://kutip-zeta.vercel.app/api/summaries/<queryId>
+
+# Bind ORCID → wallet (after OAuth + EIP-712 signature).
+curl -X POST https://kutip-zeta.vercel.app/api/claim \
+  -H "content-type: application/json" \
+  --cookie "kutip_orcid_verified=<signed-cookie>" \
+  -d '{"orcid":"0009-0002-8864-0901","wallet":"0x...","signature":"0x..."}'
+```
+
+Full request/response shapes live in the route files:
+[`api/query`](web/app/api/query/route.ts) · [`api/summaries/[queryId]`](web/app/api/summaries/[queryId]/route.ts) · [`api/claim`](web/app/api/claim/route.ts).
+
+### 3. On-chain — for indexers, wallets, settlement bots
+
+Read directly from `AttributionLedger` (Kite testnet) or the Goldsky
+subgraph. No HTTP layer, no rate limits.
+
+| Source | Use for |
+|---|---|
+| `AttributionLedger.attestAndSplit` event | Watch every paid query, indexer-friendly |
+| `AttributionLedger.authorEarnings(addr)` | Lifetime USDC earned for a wallet |
+| Goldsky subgraph | Pre-aggregated leaderboard + recent attestations |
+| `CitationMirror` (Fuji) | Cross-chain proof reachable from Avalanche-native apps |
+
+ABIs are in [`contracts/abi/`](contracts/abi/) (auto-exported from Foundry build).
 
 ---
 

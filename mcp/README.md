@@ -13,11 +13,57 @@ search → x402 per-paper → summarise → attest on Kite → mirror to Fuji
 
 ## Tools
 
-| Tool | What it does |
+| Tool | Description |
 |---|---|
 | `kutip.research(query, budgetUSDC)` | Run a research query. Authors paid, citations attested on-chain. |
 | `kutip.summary(queryId)` | Retrieve a past summary via reverse-x402 paywall. |
 | `kutip.authors(limit, onlyClaimed)` | List claimed authors + their wallets. |
+
+### `kutip.research`
+
+Inputs: `{ query: string, budgetUSDC: number }` · default `budgetUSDC: 0.1`.
+
+Returns text payload (formatted for chat) plus structured fields:
+
+```json
+{
+  "queryId": "0x2e39f84f…ffb2d",
+  "summary": "In 2024, the most prominent carbon capture methods…",
+  "citations": [
+    {
+      "paperId": "p001",
+      "title": "Direct air capture at scale: progress, challenges…",
+      "authors": [
+        { "name": "Dr. Sarah Chen",     "wallet": "0x9810…2513", "weight": 5000 },
+        { "name": "Dr. Marcus Hoffmann", "wallet": "0x519F…3392", "weight": 5000 }
+      ],
+      "weight": 5000
+    }
+  ],
+  "totalPaidUSDC": "0.10",
+  "kiteTx": "https://testnet.kitescan.ai/tx/0xf871…35b6",
+  "mirrorTx": "https://testnet.snowtrace.io/tx/0x0815…8a22",
+  "kitePassRule": { "dailyUsed": "0.10", "dailyBudget": "10.00", "perTxCap": "2.00" }
+}
+```
+
+### `kutip.summary`
+
+Input: `{ queryId: string }`. Caches the answer behind a reverse-x402 paywall —
+external agents that re-cite Kutip pay Kutip, which pays the original authors.
+Returns the cached `summary` + `citations` if access is already settled, or
+a `paymentRequired` payload otherwise.
+
+### `kutip.authors`
+
+Inputs: `{ limit?: number, onlyClaimed?: boolean }`. Returns leaderboard rows:
+
+```json
+[
+  { "rank": 1, "wallet": "0xcBab…7B40", "name": "Dr. Sarah Chen",
+    "earningsUSDC": "1.24", "citations": 57, "orcidBound": true }
+]
+```
 
 ## Install
 
@@ -33,14 +79,14 @@ Edit your Claude Desktop config:
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
-Add:
+Add (replace `<path-to-repo>` with the absolute path to your Kutip clone):
 
 ```json
 {
   "mcpServers": {
     "kutip": {
       "command": "node",
-      "args": ["F:/Hackathons/Hackathon Kite AI V2/Kutip/mcp/index.mjs"],
+      "args": ["<path-to-repo>/mcp/index.mjs"],
       "env": {
         "KUTIP_BASE_URL": "https://kutip-zeta.vercel.app"
       }
@@ -48,6 +94,8 @@ Add:
   }
 }
 ```
+
+Point `KUTIP_BASE_URL` at your own deployment if you forked.
 
 Restart Claude Desktop. The Kutip tools should appear when you type `/`
 or ask something research-oriented. The agent decides when to call
