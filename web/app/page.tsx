@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { getAAAddress, getSummarizerAAAddress, isAAEnabled } from "@/lib/agent-passport";
 import { getAuthorStats, getLedgerAddress } from "@/lib/ledger";
 import { listAuthors } from "@/lib/papers";
@@ -79,7 +80,10 @@ export default async function HomePage() {
         </div>
 
         <div className="lg:col-span-5">
-          <div className="card-elev p-5 pt-8 pb-8">
+          <div
+            className="card-elev p-5 pt-8 pb-8"
+            style={{ "--card-tilt": "-0.7deg" } as CSSProperties}
+          >
             <div className="flex justify-between items-center mb-2 px-1">
               <span className="t-caption">A query, end-to-end</span>
               <span className="chip chip--success">
@@ -172,7 +176,13 @@ export default async function HomePage() {
             Kite testnet, live.
           </p>
         </div>
-        <div className="card-elev p-8 pt-10 pb-10 mx-auto" style={{ maxWidth: 760 }}>
+        <div
+          className="card-elev p-8 pt-10 pb-10 mx-auto"
+          style={{
+            maxWidth: 760,
+            "--card-tilt": "0.5deg"
+          } as CSSProperties}
+        >
           <MoneyFlow />
         </div>
       </section>
