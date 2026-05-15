@@ -39,6 +39,8 @@ contract AttributionLedgerFuzzTest is Test {
             address(usdc), operator, ecosystem,
             OPERATOR_BPS, AUTHORS_BPS, ECOSYSTEM_BPS
         );
+        // attestAndSplit is now access-controlled to the operator.
+        vm.startPrank(operator);
     }
 
     /// Weights sum invariant: any 2-author split must succeed when weights
@@ -59,22 +61,27 @@ contract AttributionLedgerFuzzTest is Test {
         cites[0] = AttributionLedger.Citation({author: authorA, weightBps: weightA});
         cites[1] = AttributionLedger.Citation({author: authorB, weightBps: weightB});
 
-        vm.prank(payer);
+        // Already pranking as operator from setUp.
         ledger.attestAndSplit(keccak256(abi.encode(payment, weightA)), payment, cites);
 
-        // Operator + ecosystem precise
+        // Operator precise
         assertEq(usdc.balanceOf(operator), (payment * OPERATOR_BPS) / 10_000);
-        assertEq(usdc.balanceOf(ecosystem), payment - (payment * OPERATOR_BPS) / 10_000 - (payment * AUTHORS_BPS) / 10_000);
 
         // Author cuts must NOT exceed authorsShare (no overpay)
         uint256 authorsPool = (payment * AUTHORS_BPS) / 10_000;
         uint256 paidA = usdc.balanceOf(authorA);
         uint256 paidB = usdc.balanceOf(authorB);
         assertLe(paidA + paidB, authorsPool, "author overpay");
+
+        // Ecosystem now absorbs any author-side dust. Conservation:
+        // ecosystem = base ecosystem share + (authorsPool - paidA - paidB).
+        uint256 baseEco = payment - (payment * OPERATOR_BPS) / 10_000 - authorsPool;
+        uint256 authorDust = authorsPool - paidA - paidB;
+        assertEq(usdc.balanceOf(ecosystem), baseEco + authorDust, "ecosystem dust forwarding broken");
     }
 
     /// Conservation: total balance moved out of ledger must equal payment.
-    /// Within authorshare, residual rounding stays in ledger (expected).
+    /// With dust-forwarding, ledger ends at zero (no residual stuck).
     function testFuzz_ConservationOfFunds(uint256 payment, uint16 weightA) public {
         payment = bound(payment, 100, 1e24);
         weightA = uint16(bound(weightA, 1, 9999));
@@ -96,9 +103,12 @@ contract AttributionLedgerFuzzTest is Test {
             usdc.balanceOf(ecosystem) +
             usdc.balanceOf(authorA) +
             usdc.balanceOf(authorB);
-        // Residual rounding stays in ledger. sumOut + ledgerResidual == payment.
         uint256 ledgerAfter = usdc.balanceOf(address(ledger));
-        assertEq(sumOut + ledgerAfter, ledgerBefore, "fund conservation broken");
+        // Tight conservation: every wei is accounted for. Author-side
+        // truncation dust is forwarded to ecosystem, so the ledger has
+        // zero balance after settlement.
+        assertEq(ledgerAfter, 0, "ledger should hold no residual");
+        assertEq(sumOut, ledgerBefore, "fund conservation broken");
     }
 
     /// Dust resistance: payment of 1 wei must not revert.

@@ -69,6 +69,7 @@ contract AgentRegistry8004 is IAgentRegistry8004 {
     error NotOwner();
     error AlreadyRegistered();
     error NotFound();
+    error NotAgent();
 
     function register(
         address agent,
@@ -79,6 +80,11 @@ contract AgentRegistry8004 is IAgentRegistry8004 {
         address reputationTarget,
         uint256 reputationTokenId
     ) external {
+        // Only the agent itself (or its AA) can register its card. Stops
+        // a third party from frontrunning and squatting an agent address
+        // to plant attacker-controlled reputation / trust proof for the
+        // judge-facing demo surface.
+        if (msg.sender != agent) revert NotAgent();
         if (cards[agent].owner != address(0)) revert AlreadyRegistered();
 
         cards[agent] = AgentCard({

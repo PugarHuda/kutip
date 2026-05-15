@@ -59,6 +59,13 @@ contract AttributionLedger {
     error EmptyCitations();
     error WeightMismatch();
     error QueryAlreadyAttested();
+    error NotOperator();
+    error ZeroAddress();
+
+    modifier onlyOperator() {
+        if (msg.sender != operator) revert NotOperator();
+        _;
+    }
 
     constructor(
         address _paymentToken,
@@ -68,6 +75,11 @@ contract AttributionLedger {
         uint16 _authorsBps,
         uint16 _ecosystemBps
     ) {
+        if (
+            _paymentToken == address(0) ||
+            _operator == address(0) ||
+            _ecosystemFund == address(0)
+        ) revert ZeroAddress();
         if (_operatorBps + _authorsBps + _ecosystemBps != BPS_DENOMINATOR) {
             revert InvalidSplit();
         }
@@ -81,11 +93,16 @@ contract AttributionLedger {
 
     /// @notice Settle a query: user already transferred `totalPaid` to this contract.
     ///         Split + attest + emit events in one atomic operation.
+    /// @dev Gated to `operator` so a third party cannot frontrun a fresh
+    ///      x402 deposit by calling attestAndSplit with attacker-controlled
+    ///      citations and draining the contract's authorsShare. Operator
+    ///      is the agent AA (or its relayer) that legitimately settles
+    ///      every query end-to-end.
     function attestAndSplit(
         bytes32 queryId,
         uint256 totalPaid,
         Citation[] calldata citations
-    ) external {
+    ) external onlyOperator {
         if (queries[queryId].timestamp != 0) revert QueryAlreadyAttested();
         if (citations.length == 0) revert EmptyCitations();
 
@@ -108,20 +125,30 @@ contract AttributionLedger {
             citationCount: uint16(citations.length)
         });
 
+        // CEI ordering: bookkeeping first, transfer last. Means even if a
+        // hook-enabled paymentToken ever replaces Kite USDC, a malicious
+        // recipient can't reenter to see uninitialised authorEarnings /
+        // authorCitations counters mid-loop.
+        uint256 distributed;
         for (uint256 i; i < citations.length; ++i) {
             Citation calldata c = citations[i];
             uint256 cut = (authorsShare * c.weightBps) / BPS_DENOMINATOR;
-            paymentToken.safeTransfer(c.author, cut);
             authorEarnings[c.author] += cut;
             authorCitations[c.author] += 1;
+            distributed += cut;
+            paymentToken.safeTransfer(c.author, cut);
             emit CitationPaid(queryId, c.author, c.weightBps, cut);
         }
 
+        // Sweep bps-truncation dust into the ecosystem fund instead of
+        // leaving it stuck in the contract. Keeps the conservation
+        // invariant tight: totalPaid out = totalPaid in.
+        uint256 authorDust = authorsShare - distributed;
         paymentToken.safeTransfer(operator, operatorShare);
-        paymentToken.safeTransfer(ecosystemFund, ecosystemShare);
+        paymentToken.safeTransfer(ecosystemFund, ecosystemShare + authorDust);
 
         emit OperatorPaid(queryId, operatorShare);
-        emit EcosystemPaid(queryId, ecosystemShare);
+        emit EcosystemPaid(queryId, ecosystemShare + authorDust);
         emit QueryAttested(queryId, msg.sender, totalPaid, uint16(citations.length));
     }
 

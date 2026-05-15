@@ -15,7 +15,8 @@ contract AgentRegistry8004Test is Test {
     }
 
     function test_RegisterPopulatesCard() public {
-        vm.prank(alice);
+        // Agent registers its own card — owner becomes the agent itself.
+        vm.prank(researcher);
         reg.register(
             researcher,
             "Kutip Researcher",
@@ -27,20 +28,30 @@ contract AgentRegistry8004Test is Test {
         );
 
         IAgentRegistry8004.AgentCard memory c = reg.getAgent(researcher);
-        assertEq(c.owner, alice);
+        assertEq(c.owner, researcher);
         assertEq(c.name, "Kutip Researcher");
         assertEq(c.reputationTokenId, 1);
         assertEq(reg.agentCount(), 1);
     }
 
-    function test_DoubleRegisterReverts() public {
-        reg.register(researcher, "R", "{}", "none", bytes32(0), address(0), 0);
-        vm.expectRevert(AgentRegistry8004.AlreadyRegistered.selector);
+    function test_RevertOnNonAgentRegistration() public {
+        // alice tries to register `researcher`'s card — squatting attempt.
+        // The new gate rejects unless msg.sender == agent.
+        vm.prank(alice);
+        vm.expectRevert(AgentRegistry8004.NotAgent.selector);
         reg.register(researcher, "R", "{}", "none", bytes32(0), address(0), 0);
     }
 
+    function test_DoubleRegisterReverts() public {
+        vm.startPrank(researcher);
+        reg.register(researcher, "R", "{}", "none", bytes32(0), address(0), 0);
+        vm.expectRevert(AgentRegistry8004.AlreadyRegistered.selector);
+        reg.register(researcher, "R", "{}", "none", bytes32(0), address(0), 0);
+        vm.stopPrank();
+    }
+
     function test_UpdateCapabilitiesByOwner() public {
-        vm.startPrank(alice);
+        vm.startPrank(researcher);
         reg.register(researcher, "R", "{}", "none", bytes32(0), address(0), 0);
         reg.updateCapabilities(researcher, '{"skills":["new"]}');
         vm.stopPrank();
@@ -49,14 +60,15 @@ contract AgentRegistry8004Test is Test {
     }
 
     function test_UpdateCapabilitiesRevertsNonOwner() public {
-        vm.prank(alice);
+        vm.prank(researcher);
         reg.register(researcher, "R", "{}", "none", bytes32(0), address(0), 0);
+        vm.prank(alice);
         vm.expectRevert(AgentRegistry8004.NotOwner.selector);
         reg.updateCapabilities(researcher, "{}");
     }
 
     function test_AttestTrustEmitsEvent() public {
-        vm.startPrank(alice);
+        vm.startPrank(researcher);
         reg.register(researcher, "R", "{}", "none", bytes32(0), address(0), 0);
         vm.expectEmit(true, false, false, true);
         emit IAgentRegistry8004.TrustAttested(
@@ -69,7 +81,9 @@ contract AgentRegistry8004Test is Test {
     }
 
     function test_ListAgentsPaging() public {
+        vm.prank(researcher);
         reg.register(researcher, "R", "{}", "none", bytes32(0), address(0), 0);
+        vm.prank(summarizer);
         reg.register(summarizer, "S", "{}", "none", bytes32(0), address(0), 0);
         IAgentRegistry8004.AgentCard[] memory all = reg.listAgents(0, 10);
         assertEq(all.length, 2);

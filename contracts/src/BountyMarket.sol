@@ -124,10 +124,21 @@ contract BountyMarket {
 
         b.settled = true;
         uint256 paid = b.amount;
+        uint256 distributed;
 
         for (uint256 i; i < authors.length; ++i) {
             uint256 cut = (paid * weightsBps[i]) / BPS_DENOMINATOR;
             if (cut > 0) paymentToken.safeTransfer(authors[i], cut);
+            distributed += cut;
+        }
+
+        // Sweep bps-truncation dust to the first author so the bounty is
+        // fully closed. Tiny amount (< authors.length wei), but otherwise
+        // it sits in the contract forever — sponsor can't refund after
+        // settle, no operator sweep exists.
+        uint256 dust = paid - distributed;
+        if (dust > 0 && authors.length > 0) {
+            paymentToken.safeTransfer(authors[0], dust);
         }
 
         emit BountySettled(bountyId, queryId, authors, paid);
