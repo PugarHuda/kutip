@@ -68,6 +68,18 @@ function RealSpark({ points }: { points: number[] }) {
 type Range = "all" | "week" | "month";
 type Sort = "earnings" | "citations";
 
+/**
+ * 4-decimal USDC formatter. Per-paper attestations split 40% across
+ * multiple authors, so individual cuts land in the 0.001-0.05 range —
+ * the 2-decimal formatUSDC would render all of them as a misleading
+ * "0.00". 4 decimals shows the real (small but non-zero) micro-payment.
+ */
+function formatUSDC4(raw: bigint): string {
+  const whole = raw / 10n ** 18n;
+  const frac = (raw % 10n ** 18n).toString().padStart(18, "0").slice(0, 4);
+  return `${whole}.${frac}`;
+}
+
 export default async function LeaderboardPage({
   searchParams
 }: {
@@ -105,9 +117,17 @@ export default async function LeaderboardPage({
   let dataSource: "goldsky" | "rpc";
 
   if (useSubgraph) {
-    const leaderboard = days
+    const leaderboardRaw = days
       ? await fetchLeaderboardWindowedFromGoldsky(days)
-      : await fetchLeaderboardFromGoldsky(50);
+      : await fetchLeaderboardFromGoldsky(200);
+    // Keep only wallets that resolve to a real catalogued author.
+    // Early-development test attestations paid vanity addresses
+    // (0x1111…, 0xcbab…) that have no name — those were dominating
+    // the board as anonymous "Unclaimed · 0x…" rows. The on-chain
+    // events still exist; we just don't surface test noise here.
+    const leaderboard = leaderboardRaw
+      ? leaderboardRaw.filter((a) => walletToMeta.has(a.id.toLowerCase()))
+      : null;
     if (leaderboard) {
       dataSource = "goldsky";
       // Per-author 7d sparkline — fire in parallel for top 20
@@ -115,14 +135,14 @@ export default async function LeaderboardPage({
         leaderboard.slice(0, 20).map((a) => fetchAuthorHistoryFromGoldsky(a.id, 7))
       );
       rows = leaderboard.map((a, i) => {
-        const meta = walletToMeta.get(a.id.toLowerCase());
+        const meta = walletToMeta.get(a.id.toLowerCase())!;
         const days = history[i] ?? [];
         return {
-          id: a.id,
-          name: meta?.name ?? `Unclaimed · ${a.id.slice(0, 10)}…`,
-          affiliation: meta?.affiliation ?? "unknown author",
+          id: meta.id,
+          name: meta.name,
+          affiliation: meta.affiliation,
           wallet: a.id,
-          orcid: meta?.orcid ?? "",
+          orcid: meta.orcid,
           earnings: BigInt(a.totalEarnings),
           citations: a.citationCount,
           sparkPoints: days
@@ -208,7 +228,7 @@ export default async function LeaderboardPage({
           />
           <StatTile
             label="USDC paid out"
-            value={formatUSDC(totalEarnings)}
+            value={formatUSDC4(totalEarnings)}
             delta={totalEarnings > 0n ? "authors share only (40%)" : "awaiting first attestation"}
             accent="emerald"
           />
@@ -387,7 +407,7 @@ export default async function LeaderboardPage({
                     color: pod?.earningsColor ?? "var(--ink)"
                   }}
                 >
-                  {formatUSDC(r.earnings)}
+                  {formatUSDC4(r.earnings)}
                 </span>
                 <span className="flex justify-end">
                   <Addr

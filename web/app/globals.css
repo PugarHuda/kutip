@@ -283,13 +283,11 @@ body > * {
 }
 
 @layer components {
-  /* Torn-paper edge — applied to all cards by default.
-     - Polygon depth 0-7%, points spaced unevenly for organic tear.
-     - filter:drop-shadow follows the jagged silhouette (box-shadow can't).
-     - Border dropped because clip-path slices it mid-stroke; surface/bg
-       contrast + drop-shadow are enough to define the edge. */
-  /* Default .card — SUBTLE torn for dashboard / dense surfaces.
-     Depth 0-2.5%, fewer points, lighter shadow stack. */
+  /* Default .card — plain rounded card. The torn-paper treatment is now
+     reserved for .card-elev (landing showcase only) per design call:
+     dashboard surfaces are dense + functional, the jagged clip-path
+     read as noise there. Keeps the warm paper background tint so the
+     palette stays cohesive. */
   .card,
   .card--torn {
     background-color: var(--surface);
@@ -300,23 +298,11 @@ body > * {
       rgba(60, 45, 20, 0.02) 94%,
       rgba(60, 45, 20, 0.05) 100%
     );
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    filter:
-      drop-shadow(0 1px 1px rgba(60, 45, 20, 0.08))
-      drop-shadow(0 3px 8px rgba(60, 45, 20, 0.10));
-    clip-path: polygon(
-      /* TOP — gentle tear, depth 0-2.5% */
-      0% 1.4%, 5% 0.3%, 10% 1.8%, 15% 0.5%, 20% 1.6%, 25% 0.3%, 30% 2%,
-      35% 0.6%, 40% 1.5%, 45% 0.3%, 50% 1.8%, 55% 0.5%, 60% 1.4%, 65% 0.3%,
-      70% 1.7%, 75% 0.5%, 80% 1.6%, 85% 0.3%, 90% 1.8%, 95% 0.5%, 100% 1.4%,
-      /* BOTTOM — gentle, mirrored */
-      100% 98.6%, 95% 99.5%, 90% 98.3%, 85% 99.6%, 80% 98.4%, 75% 99.5%,
-      70% 98.2%, 65% 99.6%, 60% 98.5%, 55% 99.5%, 50% 98.3%, 45% 99.6%,
-      40% 98.5%, 35% 99.4%, 30% 98%, 25% 99.6%, 20% 98.4%, 15% 99.5%,
-      10% 98.2%, 5% 99.7%, 0% 98.6%
-    );
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow:
+      0 1px 1px rgba(60, 45, 20, 0.05),
+      0 3px 8px rgba(60, 45, 20, 0.07);
   }
   /* .card-elev — DRAMATIC torn for landing hero / showcase cards.
      Use deliberately; default to .card for everything else (dashboard,
