@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { BrandMark } from "@/components/icons";
 import { ConnectWallet } from "@/components/connect-wallet";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -134,9 +134,30 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   );
   const [infraOpen, setInfraOpen] = useState(onInfraPage);
 
+  // Close the mobile drawer on Escape — standard a11y expectation for
+  // any modal-ish overlay. Also closes on route change (handled by the
+  // onClick on each NavLink already).
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
+
   return (
     <div className="flex min-h-screen">
+      {/* Skip link — keyboard users tab here first, jumps past the sidebar
+          straight to the page content. Hidden visually unless focused. */}
+      <a
+        href="#dashboard-main"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-1.5 focus:bg-kite-500 focus:text-white focus:rounded-md focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       <aside
+        id="dashboard-sidebar"
         className={`
           fixed lg:sticky top-0 left-0 h-screen z-40
           w-[240px] lg:w-[220px] flex-none
@@ -229,7 +250,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             type="button"
             className="lg:hidden flex items-center gap-2 t-small"
             onClick={() => setMobileOpen(true)}
-            aria-label="Open navigation"
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
+            aria-controls="dashboard-sidebar"
           >
             <svg
               width="20"
@@ -259,7 +282,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <ConnectWallet />
         </div>
 
-        <main className="flex-1 min-w-0">{children}</main>
+        <main id="dashboard-main" className="flex-1 min-w-0">
+          {children}
+        </main>
       </div>
     </div>
   );
@@ -326,6 +351,7 @@ function NavLink({
     <Link
       href={item.href}
       onClick={onClick}
+      aria-current={active ? "page" : undefined}
       className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13.5px] transition-colors no-underline"
       style={
         active

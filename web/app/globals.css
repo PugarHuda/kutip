@@ -134,6 +134,54 @@ body > * {
   z-index: 1;
 }
 
+/* Visible focus ring for ANY keyboard-focused element that doesn't have
+   its own (`.btn:focus-visible` keeps its tighter custom ring). Without
+   this, links and unstyled buttons rely on browser-default rings which
+   are inconsistent across browsers and barely visible on warm paper. */
+*:focus-visible {
+  outline: 2px solid var(--kite-500);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* sr-only utility for skip links + screen-reader-only labels. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+.focus\:not-sr-only:focus {
+  position: absolute;
+  width: auto;
+  height: auto;
+  padding: 0.375rem 0.75rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Respect users who've opted out of motion. Caps everything to a near-
+   instant transition so the paper-tilt + AutoDemo loop don't trigger
+   vestibular discomfort. AutoDemo keeps running because it's content,
+   but the transition between states becomes snap-instead-of-animate. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer utilities {
   .pattern-grid {
     background-image: radial-gradient(var(--pattern-color) 1px, transparent 1px);
