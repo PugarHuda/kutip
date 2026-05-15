@@ -80,6 +80,10 @@ export default function DocsPage({
 }: {
   params: { slug?: string[] };
 }) {
+  // Reject multi-segment URLs (/docs/security/extra) — they'd otherwise
+  // render the security page at a non-canonical path (duplicate content,
+  // wrong nav-active state).
+  if ((params.slug?.length ?? 0) > 1) notFound();
   const slug = params.slug?.[0] ?? "";
   const entry = ALL_ITEMS.find((i) => i.slug === slug);
   if (!entry) notFound();

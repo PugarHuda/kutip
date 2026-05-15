@@ -53,11 +53,11 @@ export function MyEarningsCard({ rows }: { rows: PassthroughRow[] }) {
 
   const lower = address.toLowerCase();
   const mine = rows.find((r) => r.wallet.toLowerCase() === lower);
-  const earnings = mine ? BigInt(mine.earnings) : 0n;
+  const earnings = mine ? safeBigInt(mine.earnings) : 0n;
   // Rank: 1-indexed position among rows with positive earnings.
   const ranked = rows
-    .filter((r) => BigInt(r.earnings) > 0n)
-    .sort((a, b) => Number(BigInt(b.earnings) - BigInt(a.earnings)));
+    .filter((r) => safeBigInt(r.earnings) > 0n)
+    .sort((a, b) => Number(safeBigInt(b.earnings) - safeBigInt(a.earnings)));
   const rank =
     earnings > 0n
       ? ranked.findIndex((r) => r.wallet.toLowerCase() === lower) + 1
@@ -134,4 +134,18 @@ function formatBigUSDC(raw: bigint): string {
   const whole = raw / 10n ** 18n;
   const frac = (raw % 10n ** 18n).toString().padStart(18, "0").slice(0, 2);
   return `${whole}.${frac}`;
+}
+
+/**
+ * BigInt() throws a synchronous SyntaxError on a malformed string. The
+ * earnings strings cross a server→client serialisation boundary; one
+ * bad row would otherwise white-screen the whole Earnings page (client
+ * component, no error boundary). Fall back to 0n instead.
+ */
+function safeBigInt(s: string): bigint {
+  try {
+    return BigInt(s);
+  } catch {
+    return 0n;
+  }
 }

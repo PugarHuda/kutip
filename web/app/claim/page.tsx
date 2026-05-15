@@ -269,7 +269,15 @@ function ClaimPage() {
           <input
             type="text"
             value={orcid}
-            onChange={(e) => setOrcid(e.target.value)}
+            onChange={(e) => {
+              setOrcid(e.target.value);
+              // Editing the ORCID after a bind/error leaves the button
+              // stuck on the old outcome — reset to ready so a second
+              // claim can start without a page reload.
+              if (substatus.kind === "bound" || substatus.kind === "error") {
+                setSubstatus({ kind: "ready" });
+              }
+            }}
             placeholder="0000-0000-0000-0000"
             className="card mt-2 p-3 w-full font-mono text-sm bg-transparent focus:outline-none focus:border-kite-500"
           />
