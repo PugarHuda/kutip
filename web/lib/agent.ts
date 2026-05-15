@@ -440,9 +440,24 @@ Your 3-paragraph synthesis with [1], [2] style citations.
   if (weightsMatch) {
     const jsonCandidate = weightsMatch[1].trim().replace(/^```json\s*|\s*```$/g, "");
     try {
-      const parsed = JSON.parse(jsonCandidate) as Record<string, number>;
+      const parsed = JSON.parse(jsonCandidate) as Record<string, unknown>;
+      // Bounds-check every weight before trusting LLM output. Prevents
+      // a prompt-injection attacker who controls a paper title from
+      // sneaking in NaN/Infinity/MAX_SAFE_INTEGER values that would
+      // corrupt the bps math downstream, or unknown paper ids that
+      // route payouts to fabricated authors.
+      const paperIds = new Set(papers.map((p) => p.id));
+      const sanitized = new Map<string, number>();
       for (const [id, w] of Object.entries(parsed)) {
-        citationWeights.set(id, w);
+        if (!paperIds.has(id)) continue;
+        if (typeof w !== "number" || !Number.isFinite(w)) continue;
+        if (w < 0 || w > 10_000_000) continue;
+        sanitized.set(id, w);
+      }
+      if (sanitized.size === 0) {
+        evenWeights(papers, citationWeights);
+      } else {
+        for (const [id, w] of sanitized) citationWeights.set(id, w);
       }
     } catch {
       evenWeights(papers, citationWeights);

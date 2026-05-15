@@ -45,7 +45,32 @@ function toEnvelope(raw: z.infer<typeof SessionBody>): SessionEnvelope {
   };
 }
 
+// Anonymous (no session) queries are convenient for the landing AutoDemo
+// + first-visit judges, but a hard cap stops a botnet from draining the
+// agent AA via the unauthenticated path. Session-bound queries respect
+// the user's signed daily/per-query caps instead.
+const ANON_MAX_BUDGET_USDC = 0.5;
+
+function originAllowed(req: NextRequest): boolean {
+  const origin = req.headers.get("origin");
+  if (!origin) return true; // server-to-server, MCP, curl — let through
+  const allowList = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    "http://localhost:3000",
+    "http://localhost:3010",
+    "http://localhost:3011"
+  ].filter(Boolean) as string[];
+  return allowList.some((u) => origin === u);
+}
+
 export async function POST(req: NextRequest) {
+  if (!originAllowed(req)) {
+    return NextResponse.json(
+      { error: "Origin not allowed", hint: "Browser CORS calls must come from kutip-zeta.vercel.app." },
+      { status: 403 }
+    );
+  }
+
   const parsed = QuerySchema.safeParse(await req.json());
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
@@ -53,6 +78,19 @@ export async function POST(req: NextRequest) {
 
   const { query, budgetUSDC, session } = parsed.data;
   const envelope = session ? toEnvelope(session) : null;
+
+  // Anonymous abuse fence: without a signed delegation, cap the budget
+  // hard regardless of what Zod allowed. Session path stays at full
+  // bounds because the user signed for the cap themselves.
+  if (!envelope && budgetUSDC > ANON_MAX_BUDGET_USDC) {
+    return NextResponse.json(
+      {
+        error: "Anonymous queries are capped at 0.5 USDC.",
+        hint: "Connect a wallet and sign a session delegation to use the full per-query budget."
+      },
+      { status: 402 }
+    );
+  }
 
   const stream = new ReadableStream({
     async start(controller) {

@@ -4,7 +4,7 @@
 
 **What:** AI research agent on Kite AI that pays cited authors via x402 revenue split.
 **Track:** Kite AI Hackathon 2026 — Novel.
-**Deadline:** 2026-04-27 18:59 WIB.
+**Deadline:** 2026-05-18 18:59 WIB (Encode platform final submission cutoff).
 
 ## Stack Decisions (locked)
 

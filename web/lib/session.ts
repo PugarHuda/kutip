@@ -113,6 +113,22 @@ export interface SessionEnvelope {
   spentToday: bigint;
 }
 
+// Server-side spend ledger keyed by signature. The client-passed
+// env.spentToday is now a HINT — we use whichever is larger between
+// client and server state. Client value only matters during cold-starts
+// when the server map is empty; thereafter the server is authoritative.
+// On serverless cold starts this map resets per-lambda, so eventually
+// migrate to KV. Acceptable for hackathon-scale traffic.
+interface SpendRecord {
+  spentToday: bigint;
+  dayAnchor: number;
+}
+const spendStore = new Map<string, SpendRecord>();
+
+function spendKey(signature: string): string {
+  return keccak256(toHex(signature));
+}
+
 export async function checkSpendStateless(
   env: SessionEnvelope,
   amount: bigint
@@ -125,15 +141,33 @@ export async function checkSpendStateless(
     );
   }
 
-  const projected = env.spentToday + amount;
+  const now = Math.floor(Date.now() / 1000);
+  const today = startOfUtcDay(now);
+  const key = spendKey(env.signature);
+  const record = spendStore.get(key) ?? { spentToday: 0n, dayAnchor: today };
+  if (record.dayAnchor < today) {
+    record.spentToday = 0n;
+    record.dayAnchor = today;
+  }
+
+  // Server-side tracked spend is the floor; client value is a hint that
+  // can only INCREASE the floor (defends against missing-record after a
+  // cold start). Client cannot ever lower the floor below what we know.
+  const effectiveSpent =
+    env.spentToday > record.spentToday ? env.spentToday : record.spentToday;
+
+  const projected = effectiveSpent + amount;
   if (projected > session.intent.dailyCapUSDC) {
-    const remaining = session.intent.dailyCapUSDC - env.spentToday;
+    const remaining = session.intent.dailyCapUSDC - effectiveSpent;
     const leftStr = remaining < 0n ? "0.00" : fmt(remaining);
     throw new Error(
       `Daily cap would be exceeded: ${leftStr} USDC left today, query needs ${fmt(amount)}`
     );
   }
 
+  // Commit before returning so a concurrent second query sees the bump.
+  record.spentToday = projected;
+  spendStore.set(key, record);
   return { session, newSpentToday: projected };
 }
 

@@ -6,6 +6,7 @@ import {
   buildClaimMessage,
   isOnChainClaimEnabled,
   listClaims,
+  readBindingFromChain,
   recordClaim
 } from "@/lib/claim-registry";
 import { listAuthors } from "@/lib/papers";
@@ -103,17 +104,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "signature does not match wallet" }, { status: 401 });
   }
 
+  // Pre-bind on-chain conflict check. NameRegistry is first-write-wins;
+  // if the ORCID is already bound to a different wallet on-chain, refuse
+  // immediately and do NOT poison the in-memory cache. This blocks the
+  // attack where an attacker who can't write on-chain still poisons the
+  // cache for the citation hot path.
+  if (isOnChainClaimEnabled()) {
+    const existing = await readBindingFromChain(orcid);
+    if (existing && existing.wallet.toLowerCase() !== addr.toLowerCase()) {
+      return NextResponse.json(
+        {
+          error: "ORCID already bound to a different wallet",
+          hint: `Existing binding: ${existing.wallet}. If this is your wallet, sign with that one.`
+        },
+        { status: 409 }
+      );
+    }
+  }
+
   const claim = {
     orcid,
     wallet: addr,
     signature: signature as Hex,
     signedAt: new Date().toISOString()
   };
-  recordClaim(claim);
 
-  // Persist on-chain via operator AA. Non-blocking on failure — the
-  // cached claim still works for the current session, and a retry path
-  // can replay missed bindings later.
+  // Persist on-chain via operator AA. Cache only AFTER on-chain succeeds,
+  // so a revert (e.g. AlreadyBound race) doesn't poison the citation
+  // hot path with a binding the on-chain truth contradicts.
   let bindTx: string | undefined;
   if (isOnChainClaimEnabled()) {
     try {
@@ -123,6 +141,7 @@ export async function POST(req: NextRequest) {
       console.warn("[claim] on-chain persist failed, cached only:", err);
     }
   }
+  recordClaim(claim);
 
   return NextResponse.json({
     ok: true,
@@ -140,5 +159,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ claims: listClaims() });
+  // Strip signatures from the public response — the ORCID+wallet binding
+  // is meant to be public (it's literally on-chain), but the signature
+  // bytes are not needed by any UI consumer and exposing them invites
+  // cross-deployment replay (the EIP-191 message has no chainId).
+  const claims = listClaims().map(({ signature: _omit, ...rest }) => rest);
+  return NextResponse.json({ claims });
 }

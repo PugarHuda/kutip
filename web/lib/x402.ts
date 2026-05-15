@@ -41,11 +41,16 @@ export function buildPaymentRequired(opts: {
   };
 }
 
+// Cap the header at a generous-but-bounded size so a crafted huge base64
+// payload can't blow up the JSON parser. Real payment headers are <1KB.
+const MAX_PAYMENT_HEADER_BYTES = 4096;
+
 export function decodePaymentHeader(header: string | null): null | {
   signature: string;
   authorization: unknown;
 } {
   if (!header) return null;
+  if (header.length > MAX_PAYMENT_HEADER_BYTES) return null;
   try {
     const decoded = Buffer.from(header, "base64").toString("utf-8");
     return JSON.parse(decoded);

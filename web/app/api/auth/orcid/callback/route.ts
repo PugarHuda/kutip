@@ -25,14 +25,39 @@ export async function GET(req: NextRequest) {
   }
 
   let returnTo = "/claim";
+  let expectedOrcid: string | null = null;
   try {
-    if (storedReturn) returnTo = JSON.parse(storedReturn).returnTo ?? "/claim";
+    if (storedReturn) {
+      const parsed = JSON.parse(storedReturn);
+      returnTo = parsed.returnTo ?? "/claim";
+      expectedOrcid = parsed.expected || null;
+    }
   } catch {
     /* ignore */
   }
 
   try {
     const token = await exchangeCodeForOrcid(code);
+
+    // Reject mismatch: if /claim sent the user into OAuth expecting to
+    // bind ORCID X, but the user logged into ORCID Y on orcid.org, do
+    // NOT issue a cookie for Y. Forces the user to either restart the
+    // flow with their actual ORCID or log out and try again. Without
+    // this, a user mid-claim could accidentally bind the wrong identity.
+    if (
+      expectedOrcid &&
+      expectedOrcid.toUpperCase() !== token.orcid.toUpperCase()
+    ) {
+      const url = new URL(returnTo, req.url);
+      url.searchParams.set("err", "oauth_orcid_mismatch");
+      url.searchParams.set("expected", expectedOrcid);
+      url.searchParams.set("got", token.orcid);
+      const mismatchRes = NextResponse.redirect(url);
+      mismatchRes.cookies.delete("kutip_orcid_state");
+      mismatchRes.cookies.delete("kutip_orcid_return");
+      return mismatchRes;
+    }
+
     const payload = buildCookiePayload(token.orcid);
     const signed = signCookie(payload);
 

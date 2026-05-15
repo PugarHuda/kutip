@@ -24,11 +24,21 @@ const RESALE_PRICE_USDC_MICRO = "100000000000000000"; // 0.1 Test USD (18-dec)
  * producer (earns from downstream agents), proving the agentic
  * economy doesn't dead-end at humans.
  */
+const QUERY_ID_PATTERN = /^0x[a-fA-F0-9]{64}$/;
+
 export async function GET(
   req: NextRequest,
   ctx: { params: { queryId: string } }
 ) {
   const raw = ctx.params.queryId;
+  // Tight format check stops path-traversal-ish inputs from reaching
+  // the subgraph fetcher and also caps the queryId length implicitly.
+  if (typeof raw !== "string" || !QUERY_ID_PATTERN.test(raw)) {
+    return NextResponse.json(
+      { error: "Invalid queryId — expected a 32-byte hex hash" },
+      { status: 400 }
+    );
+  }
   const queryId = raw.toLowerCase();
 
   const stored = loadSummary(queryId);
