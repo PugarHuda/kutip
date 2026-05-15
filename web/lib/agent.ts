@@ -97,10 +97,17 @@ export async function runResearchAgent(opts: {
     step: { step: 1, label: searchLabel, status: "running" }
   });
 
-  const candidates = await discoverPapers(query);
+  // Normalize first — translates non-English / tool-flavoured queries
+  // into English academic keywords so live discovery actually hits.
+  const searchQuery = await normalizeSearchQuery(query);
+  const candidates = await discoverPapers(searchQuery);
 
   if (candidates.length === 0) {
-    throw new Error("No relevant papers found for this query");
+    throw new Error(
+      `No papers found for "${query}". Kutip searches the academic ` +
+        `literature — try a more research-oriented topic, or rephrase ` +
+        `in English (e.g. "workflow automation for content publishing").`
+    );
   }
 
   // Live-discovered papers carry an "oa:" (OpenAlex) or "ss:" (Semantic
@@ -359,6 +366,36 @@ async function attestOnChain(opts: {
       }
     });
     throw new Error(`Attestation failed: ${msg}`);
+  }
+}
+
+/**
+ * Turn a raw user request into English academic search keywords.
+ *
+ * OpenAlex's corpus is overwhelmingly English — an Indonesian query
+ * ("automasi publikasi konten") or a tool-flavoured one ("n8n workflow")
+ * matches nothing verbatim. One cheap LLM call translates + extracts the
+ * researchable core, so search hits real papers regardless of how the
+ * user phrased it. Falls back to the raw query if the LLM is unavailable.
+ */
+async function normalizeSearchQuery(query: string): Promise<string> {
+  try {
+    const prompt =
+      `Convert this research request into 3 to 8 English academic search ` +
+      `keywords suitable for a scholarly database. Translate to English if ` +
+      `needed. Output ONLY the keywords on one line — no quotes, no ` +
+      `explanation, no label.\n\nRequest: ${query}`;
+    const raw = await callOpenRouter(prompt, MODEL);
+    const firstLine = raw.trim().split("\n").find((l) => l.trim()) ?? "";
+    const cleaned = firstLine
+      .replace(/^["'`]+|["'`]+$/g, "")
+      .replace(/^(keywords?|search terms?)\s*[:\-]\s*/i, "")
+      .trim()
+      .slice(0, 160);
+    return cleaned.length >= 3 ? cleaned : query;
+  } catch (err) {
+    console.warn("[kutip] query normalization failed, using raw query:", err);
+    return query;
   }
 }
 
