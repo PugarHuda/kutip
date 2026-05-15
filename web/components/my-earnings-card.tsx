@@ -73,8 +73,23 @@ export function MyEarningsCard({ rows }: { rows: PassthroughRow[] }) {
       }}
     >
       <div className="min-w-0">
-        <div className="t-caption">Your earnings</div>
-        <div className="flex items-baseline gap-2 mt-1">
+        <div className="flex items-center gap-2">
+          <span className="t-caption">Your earnings</span>
+          {/* Explicit "connected" pill — without this, a connected wallet
+              with 0 earnings reads ambiguously as "is the wallet hooked up
+              or not?". Green dot + label removes the doubt. */}
+          <span
+            className="chip chip--success"
+            style={{ padding: "2px 8px", fontSize: 10 }}
+          >
+            <span
+              className="status-dot status-dot--done"
+              style={{ width: 6, height: 6 }}
+            />
+            Wallet connected
+          </span>
+        </div>
+        <div className="flex items-baseline gap-2 mt-1.5">
           <span className="t-mono font-bold text-[22px] text-emerald-700">
             {formatBigUSDC(earnings)} USDC
           </span>
@@ -91,16 +106,16 @@ export function MyEarningsCard({ rows }: { rows: PassthroughRow[] }) {
         </div>
       </div>
 
-      <div className="flex gap-2 flex-none">
+      <div className="flex gap-2 flex-none items-center">
         {earnings === 0n ? (
           <>
+            <div className="t-small ink-3 max-w-[220px] text-right">
+              This wallet is connected, but Kutip hasn't cited a paper you
+              authored yet. Bind your ORCID below — future shares land here.
+            </div>
             <Link href="/dashboard/claim" className="btn btn--primary btn--sm">
               Claim via ORCID
             </Link>
-            <div className="t-small ink-3 max-w-[220px]">
-              No on-chain attribution yet for this wallet — bind your ORCID
-              first, then your share of future queries lands here.
-            </div>
           </>
         ) : (
           <Link

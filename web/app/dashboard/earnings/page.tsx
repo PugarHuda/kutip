@@ -157,18 +157,24 @@ export default async function DashboardEarningsPage() {
               their share parks in UnclaimedYieldEscrow and accrues 5%
               APY until claimed. Surfacing the outstanding pool here so
               judges (and any future author) see the yield narrative
-              isn't hand-waving. */}
-          <StatTile
-            label="In escrow · 5% APY"
-            value={formatUSDC(escrowSnapshot.outstanding)}
-            delta={
-              escrowSnapshot.configured
-                ? escrowSnapshot.outstanding > 0n
-                  ? "waiting on ORCID claim"
-                  : "all earnings claimed"
-                : "escrow not configured"
-            }
-          />
+              isn't hand-waving. Linked to /dashboard/escrow which
+              breaks out per-author principals + simulated APY accrual. */}
+          <Link
+            href="/dashboard/escrow"
+            className="no-underline text-inherit block"
+          >
+            <StatTile
+              label="In escrow · 5% APY ↗"
+              value={formatUSDC(escrowSnapshot.outstanding)}
+              delta={
+                escrowSnapshot.configured
+                  ? escrowSnapshot.outstanding > 0n
+                    ? "view escrow flow"
+                    : "all earnings claimed"
+                  : "escrow not configured"
+              }
+            />
+          </Link>
         </div>
 
         {podium.some((p) => p.earnings > 0n) && (
