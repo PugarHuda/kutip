@@ -87,8 +87,67 @@ export function StatusDot({
   );
 }
 
-export function Cite({ n }: { n: number }) {
-  return <span className="cite">{n}</span>;
+/** Compact, human-readable form of a citation URL for the tooltip. */
+function shortLink(url: string): string {
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, "");
+    const tail = `${u.pathname}${u.search}`;
+    const path = tail.length > 26 ? `${tail.slice(0, 25)}…` : tail;
+    return `${host}${path}`;
+  } catch {
+    return url;
+  }
+}
+
+export function Cite({
+  n,
+  paper
+}: {
+  n: number;
+  paper?: { title: string; journalYear: string; link: string };
+}) {
+  // No matching paper (LLM cited a number beyond the corpus) — render
+  // the inert pill so the summary text still reads correctly.
+  if (!paper) return <span className="cite">{n}</span>;
+
+  return (
+    <a
+      href={paper.link}
+      target="_blank"
+      rel="noreferrer"
+      className="cite group relative no-underline"
+      aria-label={`Citation ${n}: ${paper.title} — opens source in a new tab`}
+    >
+      {n}
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute left-1/2 bottom-full z-30 mb-2 w-[260px] -translate-x-1/2 text-left opacity-0 invisible transition-all duration-150 group-hover:opacity-100 group-hover:visible"
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border-strong)",
+          borderRadius: 10,
+          padding: "10px 12px",
+          boxShadow: "0 8px 28px color-mix(in srgb, var(--ink) 22%, transparent)"
+        }}
+      >
+        <span className="block t-caption">Citation [{n}]</span>
+        <span
+          className="block t-small font-semibold mt-0.5 leading-snug"
+          style={{ color: "var(--ink)" }}
+        >
+          {paper.title}
+        </span>
+        <span className="block t-mono-sm ink-3 mt-1">{paper.journalYear}</span>
+        <span
+          className="block t-mono-sm mt-1.5 break-all"
+          style={{ color: "var(--kite-700)" }}
+        >
+          {shortLink(paper.link)} ↗
+        </span>
+      </span>
+    </a>
+  );
 }
 
 export function Skeleton({

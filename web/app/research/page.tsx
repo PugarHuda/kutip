@@ -10,6 +10,7 @@ import {
   type SessionEnvelope
 } from "@/components/session-manager";
 import { useAccount } from "wagmi";
+import { papersForBudget } from "@/lib/kite";
 
 interface WalletBalance {
   address: string;
@@ -361,6 +362,23 @@ function ResearchSidebar({
         {customMode
           ? "Between 0.10 and 20 USDC · paid by agent smart account"
           : "USDC · paid by agent smart account"}
+      </div>
+
+      {/* A bigger budget is tangibly worth more: it funds a broader
+          literature review and a larger payout pool for cited authors
+          (40% of the budget). 0.4 mirrors AUTHORS_BPS in the ledger. */}
+      <div
+        className="mt-2.5 p-2.5 rounded-lg t-mono-sm flex items-center justify-between gap-2"
+        style={{
+          background: "color-mix(in srgb, var(--kite-500) 7%, transparent)",
+          border: "1px solid color-mix(in srgb, var(--kite-500) 18%, var(--border))"
+        }}
+      >
+        <span className="ink-3">This budget funds</span>
+        <span className="font-semibold text-kite-700">
+          ≈ {papersForBudget(budget)} papers · {(budget * 0.4).toFixed(2)} USDC
+          to authors
+        </span>
       </div>
 
       <button
@@ -1004,7 +1022,10 @@ function ResultView({
           "{result.query}"
         </div>
         <div className="t-body m-0 max-w-[780px]">
-          <RenderWithCitations text={result.summary} />
+          <RenderWithCitations
+            text={result.summary}
+            papers={result.paperDetails}
+          />
         </div>
       </div>
 
@@ -1182,7 +1203,15 @@ function ResultView({
           <ul className="mt-3 space-y-2 text-sm">
             {result.paperDetails.map((p) => (
               <li key={p.id} className="pl-3 border-l-2 border-kite-200">
-                <div className="t-serif text-[15px]">{p.title}</div>
+                <a
+                  href={p.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="t-serif text-[15px] no-underline hover:text-kite-700"
+                  style={{ color: "var(--ink)" }}
+                >
+                  {p.title} <span className="t-mono-sm ink-3">↗</span>
+                </a>
                 <div className="t-small ink-3">{p.journalYear}</div>
                 <div className="t-mono-sm ink-3">
                   {p.id} · {p.authors.map((a) => a.name).join(" · ")}
@@ -1228,7 +1257,13 @@ function ResultView({
   );
 }
 
-function RenderWithCitations({ text }: { text: string }) {
+function RenderWithCitations({
+  text,
+  papers
+}: {
+  text: string;
+  papers: ResearchResult["paperDetails"];
+}) {
   const parts = useMemo(() => {
     const segments: Array<{ type: "text" | "cite"; value: string }> = [];
     const regex = /\[(\d+)\]/g;
@@ -1251,7 +1286,11 @@ function RenderWithCitations({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         part.type === "cite" ? (
-          <Cite key={i} n={Number(part.value)} />
+          <Cite
+            key={i}
+            n={Number(part.value)}
+            paper={papers[Number(part.value) - 1]}
+          />
         ) : (
           <Fragment key={i}>{part.value}</Fragment>
         )

@@ -179,8 +179,13 @@ export async function POST(req: NextRequest) {
   return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive"
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+      // Without this, Vercel's edge proxy buffers the small SSE chunks
+      // and flushes them all at once when the stream closes — the step
+      // animation looks frozen, then the result appears instantly.
+      // `X-Accel-Buffering: no` forces per-chunk pass-through.
+      "X-Accel-Buffering": "no"
     }
   });
 }

@@ -24,7 +24,7 @@ import { erc20TransferAbi } from "./abi";
 import { getAAAddress, isAAEnabled } from "./agent-passport";
 import { lookupClaim, warmClaimCache } from "./claim-registry";
 import { getEscrowAddress } from "./escrow";
-import { KITE_TESTNET_USDC, parseUSDC, formatUSDC } from "./kite";
+import { KITE_TESTNET_USDC, papersForBudget, parseUSDC, formatUSDC } from "./kite";
 import { saveSummary } from "./summary-store";
 import { isMirrorEnabled, mirrorToFuji } from "./cross-chain";
 import type { AgentEvent, Citation, ResearchResult } from "./types";
@@ -133,28 +133,6 @@ export async function runResearchAgent(opts: {
 
   const purchased = await purchasePapers(candidates, budgetUSDC);
 
-  // Fail fast + clearly if the budget couldn't afford a single paper.
-  // Otherwise the flow would carry 0 papers all the way to step 5,
-  // where attestAndSplit reverts on EmptyCitations with an opaque
-  // "execution reverted".
-  if (purchased.length === 0) {
-    const cheapest = Math.min(...candidates.map((p) => p.priceUSDC));
-    emit({
-      type: "step",
-      step: {
-        step: 2,
-        label: "Purchasing papers via x402",
-        status: "error",
-        detail: "Budget too small — no papers affordable"
-      }
-    });
-    throw new Error(
-      `Budget of ${budgetUSDC} USDC is too small — the cheapest matching ` +
-        `paper costs ${(cheapest / 1_000_000).toFixed(2)} USDC. Raise the ` +
-        `budget and try again.`
-    );
-  }
-
   emit({
     type: "step",
     step: {
@@ -261,6 +239,7 @@ export async function runResearchAgent(opts: {
     return {
       id: p.id,
       title: p.title,
+      link: paperLink(p),
       authors,
       journalYear: `${p.journal} ${p.year}`
     };
@@ -422,7 +401,9 @@ async function normalizeSearchQuery(query: string): Promise<string> {
 }
 
 async function discoverPapers(query: string): Promise<Paper[]> {
-  const mockCandidates = searchPapers(query, 8);
+  // Fetch up to the ceiling `papersForBudget` can ask for, so a
+  // large-budget query has enough candidates to actually spend on.
+  const mockCandidates = searchPapers(query, 10);
 
   // Live discovery: OpenAlex first (no key, any discipline, polite-pool
   // rate limit comfortable for interactive traffic), Semantic Scholar
@@ -433,14 +414,14 @@ async function discoverPapers(query: string): Promise<Paper[]> {
 
   if (isOpenAlexEnabled()) {
     try {
-      live = await searchOpenAlex(query, 6);
+      live = await searchOpenAlex(query, 10);
     } catch (err) {
       console.warn("[kutip] OpenAlex discovery failed:", err);
     }
   }
   if ((!live || live.papers.length === 0) && isSemanticScholarEnabled()) {
     try {
-      live = await searchSemanticScholar(query, 6);
+      live = await searchSemanticScholar(query, 10);
     } catch (err) {
       console.warn("[kutip] Semantic Scholar discovery failed:", err);
     }
@@ -458,21 +439,17 @@ async function discoverPapers(query: string): Promise<Paper[]> {
       seen.add(key);
       return true;
     })
-    .slice(0, 8);
+    .slice(0, 10);
 }
 
+/**
+ * Budget decides research depth: a bigger spend buys access to more
+ * papers (up to the gas-safe ceiling in `papersForBudget`), so a larger
+ * query is tangibly worth more — broader synthesis AND, via the authors
+ * split, a bigger payout pool for the humans cited.
+ */
 async function purchasePapers(candidates: Paper[], budgetUSDC: number): Promise<Paper[]> {
-  let remaining = budgetUSDC * 1_000_000;
-  const purchased: Paper[] = [];
-
-  for (const paper of candidates) {
-    if (remaining >= paper.priceUSDC) {
-      purchased.push(paper);
-      remaining -= paper.priceUSDC;
-    }
-    if (purchased.length >= 5) break;
-  }
-
+  const purchased = candidates.slice(0, papersForBudget(budgetUSDC));
   await new Promise((r) => setTimeout(r, 400));
   return purchased;
 }
@@ -606,6 +583,23 @@ function supportsReasoningToggle(model: string): boolean {
     model.includes("-sonnet") ||
     model.includes("-nemotron")
   );
+}
+
+/**
+ * Best-effort public URL for a paper — backs the clickable in-summary
+ * citation pills. Order: real DOI → arXiv → OpenAlex landing page →
+ * Google Scholar title search (always resolves, even for the seeded
+ * catalog and Semantic Scholar papers without a DOI).
+ */
+function paperLink(p: Paper): string {
+  const doi = (p.doi ?? "").trim();
+  if (/^10\.\d{4,}\/\S+$/.test(doi)) return `https://doi.org/${doi}`;
+  const arxiv = doi.replace(/^arxiv:/i, "");
+  if (/^\d{4}\.\d{4,5}(v\d+)?$/.test(arxiv)) {
+    return `https://arxiv.org/abs/${arxiv}`;
+  }
+  if (p.id.startsWith("oa:")) return `https://openalex.org/${p.id.slice(3)}`;
+  return `https://scholar.google.com/scholar?q=${encodeURIComponent(p.title)}`;
 }
 
 function modelFriendlyName(modelId: string): string {

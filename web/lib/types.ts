@@ -24,6 +24,7 @@ export interface ResearchResult {
   paperDetails: {
     id: string;
     title: string;
+    link: string;
     authors: { name: string; wallet: string; share: number }[];
     journalYear: string;
   }[];

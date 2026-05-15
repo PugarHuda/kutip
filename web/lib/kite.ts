@@ -38,6 +38,22 @@ export function parseUSDC(amount: number): bigint {
   return BigInt(Math.round(amount * 100)) * (USDC_UNIT / 100n);
 }
 
+/**
+ * How many papers a query budget funds — the lever that makes a bigger
+ * spend tangibly worth more. More budget → broader literature review,
+ * and (via the authors split) a larger payout to each cited author.
+ *
+ * Capped at 10: one `attestAndSplit` then settles ≤10 papers × ≤3
+ * authors = ≤30 transfers, the batch size the seed scripts proved safe
+ * within block gas limits. Floor of 3 keeps even a 0.1-USDC query useful.
+ *
+ * Shared by the agent (actual purchase count) and the research UI
+ * (the "≈ N papers" budget hint) so the estimate never drifts.
+ */
+export function papersForBudget(budgetUSDC: number): number {
+  return Math.min(10, Math.max(3, Math.round(2 + budgetUSDC * 5)));
+}
+
 export function formatUSDC(raw: bigint): string {
   const whole = raw / USDC_UNIT;
   const frac = raw % USDC_UNIT;
