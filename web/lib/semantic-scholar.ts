@@ -53,6 +53,9 @@ export async function searchSemanticScholar(
 
   const res = await fetch(url.toString(), {
     headers: { Accept: "application/json" },
+    // 8s ceiling — SS rate-limits aggressively; without an abort signal
+    // a stalled response would freeze the agent's step-1 animation.
+    signal: AbortSignal.timeout(8000),
     next: { revalidate: 300 }
   });
 

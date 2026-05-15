@@ -11,6 +11,7 @@ import {
   isSemanticScholarEnabled,
   searchSemanticScholar
 } from "./semantic-scholar";
+import { isOpenAlexEnabled, searchOpenAlex } from "./openalex";
 import {
   getLedgerAddress,
   getPublicClient,
@@ -86,9 +87,10 @@ export async function runResearchAgent(opts: {
 }): Promise<ResearchResult> {
   const { query, budgetUSDC, sessionInfo, emit } = opts;
 
-  const searchLabel = isSemanticScholarEnabled()
-    ? "Searching Semantic Scholar corpus"
-    : "Searching paper catalog";
+  const searchLabel =
+    isOpenAlexEnabled() || isSemanticScholarEnabled()
+      ? "Searching the academic corpus"
+      : "Searching paper catalog";
 
   emit({
     type: "step",
@@ -101,8 +103,12 @@ export async function runResearchAgent(opts: {
     throw new Error("No relevant papers found for this query");
   }
 
-  const mockCount = candidates.filter((p) => !p.id.startsWith("ss:")).length;
-  const realCount = candidates.filter((p) => p.id.startsWith("ss:")).length;
+  // Live-discovered papers carry an "oa:" (OpenAlex) or "ss:" (Semantic
+  // Scholar) id prefix; everything else is the seeded local catalog.
+  const isLive = (p: Paper) =>
+    p.id.startsWith("oa:") || p.id.startsWith("ss:");
+  const realCount = candidates.filter(isLive).length;
+  const mockCount = candidates.length - realCount;
   const detail =
     realCount > 0
       ? `${candidates.length} papers (${realCount} real, ${mockCount} mock)`
@@ -358,23 +364,42 @@ async function attestOnChain(opts: {
 
 async function discoverPapers(query: string): Promise<Paper[]> {
   const mockCandidates = searchPapers(query, 8);
-  if (!isSemanticScholarEnabled()) return mockCandidates;
 
-  try {
-    const { papers, authors } = await searchSemanticScholar(query, 6);
-    registerRuntimePapers(papers, authors);
-    const merged = [...papers, ...mockCandidates];
-    const seen = new Set<string>();
-    return merged.filter((p) => {
+  // Live discovery: OpenAlex first (no key, any discipline, polite-pool
+  // rate limit comfortable for interactive traffic), Semantic Scholar
+  // only if explicitly enabled. Both calls carry an AbortSignal timeout
+  // so a slow upstream can't freeze step 1 — on any failure we fall
+  // back to the local catalog and the flow continues.
+  let live: { papers: Paper[]; authors: Author[] } | null = null;
+
+  if (isOpenAlexEnabled()) {
+    try {
+      live = await searchOpenAlex(query, 6);
+    } catch (err) {
+      console.warn("[kutip] OpenAlex discovery failed:", err);
+    }
+  }
+  if ((!live || live.papers.length === 0) && isSemanticScholarEnabled()) {
+    try {
+      live = await searchSemanticScholar(query, 6);
+    } catch (err) {
+      console.warn("[kutip] Semantic Scholar discovery failed:", err);
+    }
+  }
+
+  if (!live || live.papers.length === 0) return mockCandidates;
+
+  registerRuntimePapers(live.papers, live.authors);
+  const merged = [...live.papers, ...mockCandidates];
+  const seen = new Set<string>();
+  return merged
+    .filter((p) => {
       const key = p.title.toLowerCase();
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
-    }).slice(0, 8);
-  } catch (err) {
-    console.warn("[kutip] Semantic Scholar failed, falling back to mock catalog:", err);
-    return mockCandidates;
-  }
+    })
+    .slice(0, 8);
 }
 
 async function purchasePapers(candidates: Paper[], budgetUSDC: number): Promise<Paper[]> {
