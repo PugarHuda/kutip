@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useAccount, useConnect, useSignMessage } from "wagmi";
 import { Addr, Breadcrumb } from "@/components/ui";
 import { useToast } from "@/components/toast";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
@@ -17,13 +18,14 @@ interface OauthStatus {
 
 const EXAMPLE_ORCID = "0000-0002-1825-0097"; // Josiah Carberry — real public test ORCID
 
-type Status =
-  | { kind: "idle" }
-  | { kind: "connecting" }
-  | { kind: "connected"; address: string }
-  | { kind: "signing"; address: string }
-  | { kind: "submitting"; address: string }
-  | { kind: "bound"; address: string; name: string }
+// Sub-states beyond what wagmi already tracks for connection. Wagmi
+// owns `idle | connecting | connected` via useAccount + useConnect;
+// these are the post-connect claim-specific phases.
+type SubStatus =
+  | { kind: "ready" }
+  | { kind: "signing" }
+  | { kind: "submitting" }
+  | { kind: "bound"; name: string }
   | { kind: "error"; message: string };
 
 type Preview =
@@ -40,16 +42,6 @@ type Preview =
   | { state: "invalid"; message: string }
   | { state: "unknown"; message: string };
 
-interface EthereumProvider {
-  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-}
-
-function eth(): EthereumProvider | null {
-  if (typeof window === "undefined") return null;
-  const w = window as unknown as { ethereum?: EthereumProvider };
-  return w.ethereum ?? null;
-}
-
 const ORCID_PATTERN = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
 
 export default function ClaimPageWrapper() {
@@ -64,10 +56,18 @@ function ClaimPage() {
   const searchParams = useSearchParams();
   const prefill = searchParams.get("orcid") ?? searchParams.get("verified");
   const [orcid, setOrcid] = useState(prefill ?? EXAMPLE_ORCID);
-  const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [substatus, setSubstatus] = useState<SubStatus>({ kind: "ready" });
   const [preview, setPreview] = useState<Preview>({ state: "hidden" });
   const [oauth, setOauth] = useState<OauthStatus | null>(null);
   const toast = useToast();
+
+  // Wagmi is the source of truth for wallet connection state. The
+  // topbar's ConnectWallet, this page's connect button, and the
+  // MyEarningsCard widget all read the same useAccount() — connecting
+  // anywhere stays connected everywhere on the next route.
+  const { address, isConnected } = useAccount();
+  const { connectors, connect, isPending: connectPending } = useConnect();
+  const { signMessageAsync } = useSignMessage();
 
   useEffect(() => {
     async function load() {
@@ -135,19 +135,22 @@ function ClaimPage() {
     };
   }, [orcid]);
 
-  async function connect() {
-    const provider = eth();
-    if (!provider) {
-      setStatus({ kind: "error", message: "MetaMask (or compatible wallet) not detected." });
+  async function connectWallet() {
+    // Use the first available wagmi connector (typically injected
+    // MetaMask). Picks up whatever the topbar offers — same providers,
+    // same state, no separate stack.
+    const connector = connectors[0];
+    if (!connector) {
+      setSubstatus({
+        kind: "error",
+        message: "No wallet connectors configured. Check NEXT_PUBLIC_WAGMI_* env."
+      });
       return;
     }
-    setStatus({ kind: "connecting" });
     try {
-      const accounts = (await provider.request({ method: "eth_requestAccounts" })) as string[];
-      if (!accounts?.[0]) throw new Error("no account returned");
-      setStatus({ kind: "connected", address: accounts[0] });
+      await connect({ connector });
     } catch (err) {
-      setStatus({
+      setSubstatus({
         kind: "error",
         message: err instanceof Error ? err.message : "wallet connect rejected"
       });
@@ -155,23 +158,19 @@ function ClaimPage() {
   }
 
   async function signAndSubmit() {
-    const provider = eth();
-    if (!provider || status.kind !== "connected") return;
-    const wallet = status.address;
+    if (!isConnected || !address) return;
+    const wallet = address;
     // 10-minute signing window — long enough for slow networks and
     // wallet confirmation, short enough that a leaked signature can't
     // be replayed by an attacker hours later.
     const validUntil = Math.floor(Date.now() / 1000) + 600;
     const message = buildMessage(orcid, wallet, validUntil);
 
-    setStatus({ kind: "signing", address: wallet });
+    setSubstatus({ kind: "signing" });
     try {
-      const signature = (await provider.request({
-        method: "personal_sign",
-        params: [message, wallet]
-      })) as string;
+      const signature = await signMessageAsync({ message });
 
-      setStatus({ kind: "submitting", address: wallet });
+      setSubstatus({ kind: "submitting" });
       const res = await fetch("/api/claim", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -185,14 +184,14 @@ function ClaimPage() {
       };
 
       if (!res.ok || !data.ok) {
-        setStatus({
+        setSubstatus({
           kind: "error",
           message: data.hint ?? data.error ?? "claim rejected by server"
         });
         return;
       }
 
-      setStatus({ kind: "bound", address: wallet, name: data.bound!.name });
+      setSubstatus({ kind: "bound", name: data.bound!.name });
       const bindTx = (data.bound as { bindTx?: string } | undefined)?.bindTx;
       toast.push({
         kind: "success",
@@ -202,18 +201,16 @@ function ClaimPage() {
         hrefLabel: bindTx ? "View binding tx" : undefined
       });
     } catch (err) {
-      setStatus({
+      setSubstatus({
         kind: "error",
         message: err instanceof Error ? err.message : "signing failed"
       });
     }
   }
 
-  const connected =
-    status.kind === "connected" ||
-    status.kind === "signing" ||
-    status.kind === "submitting" ||
-    status.kind === "bound";
+  // Derived flags so the JSX stays declarative.
+  const connected = isConnected && !!address;
+  const connecting = connectPending;
 
   const normalizedOrcid = orcid.replace(/\s+/g, "").toUpperCase();
   const oauthRequired = oauth?.enabled === true;
@@ -250,16 +247,16 @@ function ClaimPage() {
           <label className="t-caption block">Step 1 — Connect your wallet</label>
           <button
             type="button"
-            onClick={connect}
-            disabled={connected || status.kind === "connecting"}
+            onClick={connectWallet}
+            disabled={connected || connecting}
             className="btn btn--primary mt-2.5"
           >
-            {connected && "address" in status ? (
+            {connected && address ? (
               <>
-                <CheckIcon size={14} /> Connected · {status.address.slice(0, 6)}…
-                {status.address.slice(-4)}
+                <CheckIcon size={14} /> Connected · {address.slice(0, 6)}…
+                {address.slice(-4)}
               </>
-            ) : status.kind === "connecting" ? (
+            ) : connecting ? (
               "Connecting…"
             ) : (
               <>
@@ -366,22 +363,22 @@ function ClaimPage() {
             onClick={signAndSubmit}
             disabled={
               !canSign ||
-              status.kind === "signing" ||
-              status.kind === "submitting" ||
-              status.kind === "bound"
+              substatus.kind === "signing" ||
+              substatus.kind === "submitting" ||
+              substatus.kind === "bound"
             }
             className="btn btn--primary btn--lg w-full justify-center mt-2.5"
           >
-            {status.kind === "signing" && "Sign in your wallet…"}
-            {status.kind === "submitting" && "Verifying…"}
-            {status.kind === "bound" && (
+            {substatus.kind === "signing" && "Sign in your wallet…"}
+            {substatus.kind === "submitting" && "Verifying…"}
+            {substatus.kind === "bound" && (
               <>
-                <CheckIcon size={14} /> Bound to {status.name}
+                <CheckIcon size={14} /> Bound to {substatus.name}
               </>
             )}
-            {status.kind !== "signing" &&
-              status.kind !== "submitting" &&
-              status.kind !== "bound" && (
+            {substatus.kind !== "signing" &&
+              substatus.kind !== "submitting" &&
+              substatus.kind !== "bound" && (
                 <>
                   Sign &amp; bind ORCID <ArrowRightIcon />
                 </>
@@ -394,17 +391,17 @@ function ClaimPage() {
             </div>
           )}
 
-          {status.kind === "bound" && (
+          {substatus.kind === "bound" && address && (
             <div className="mt-5 p-4 rounded-lg bg-emerald-50 text-[color:var(--emerald-700)] text-sm">
-              <strong>{status.name}</strong> is now bound to{" "}
-              <Addr>{`${status.address.slice(0, 6)}…${status.address.slice(-4)}`}</Addr>
+              <strong>{substatus.name}</strong> is now bound to{" "}
+              <Addr>{`${address.slice(0, 6)}…${address.slice(-4)}`}</Addr>
               . From the next query onwards, citations to their papers pay your wallet.
             </div>
           )}
 
-          {status.kind === "error" && (
+          {substatus.kind === "error" && (
             <div className="mt-5 p-4 rounded-lg bg-rose-50 text-[color:var(--rose-700)] text-sm">
-              {status.message}
+              {substatus.message}
             </div>
           )}
         </div>
