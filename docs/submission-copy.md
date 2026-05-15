@@ -141,7 +141,7 @@ flowchart TB
     KitePass[Kite Passport vault<br/>0xe2c4e9…ebc4c<br/>10 USDC/day · 2 USDC/tx]
     Researcher[Researcher AA<br/>0x4da7f4cF…]
     Summarizer[Summarizer AA<br/>0xA6C36bA2…]
-    Ledger[AttributionLedger<br/>0x99359DaF…]
+    Ledger[AttributionLedger<br/>0xbC4eeC2f…]
     NameReg[NameRegistry<br/>0x5a9b1304…]
     Escrow[UnclaimedYieldEscrow<br/>0xcbab887d…]
     Mirror[CitationMirror<br/>Fuji · 0x99359dAf…]
@@ -276,7 +276,7 @@ Sequential stress test · 5 research queries · 0.1 USDC budget:
 ## Contract addresses (submission form / docs)
 
 ### Kite testnet (chain 2368)
-- AttributionLedger: `0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa`
+- AttributionLedger: `0xbC4eeC2f75a0DCf61509842e1c18Abff7236A338`
 - UnclaimedYieldEscrow: `0xcbab887da9c2a16612a9120b4170e74c50547b40`
 - BountyMarket: `0x1ba00a38b25adf68ac599cd25094e2aa923b3f72`
 - AgentReputation (ERC-721): `0x8f53EB5C04B773F0F31FE41623EA19d2Fd84db15`

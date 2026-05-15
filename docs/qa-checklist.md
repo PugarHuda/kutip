@@ -171,7 +171,7 @@ Morning of 2026-04-27, ≤4 hours before 18:59 WIB deadline:
 
 | Contract | Address | Tests |
 |---|---|---|
-| AttributionLedger | `0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa` | 5 |
+| AttributionLedger | `0xbC4eeC2f75a0DCf61509842e1c18Abff7236A338` | 5 |
 | UnclaimedYieldEscrow | `0xcbab887da9c2a16612a9120b4170e74c50547b40` | 8 |
 | BountyMarket | `0x1ba00a38b25adf68ac599cd25094e2aa923b3f72` | 7 |
 | AgentReputation (ERC-721) | `0x8f53EB5C04B773F0F31FE41623EA19d2Fd84db15` | 7 |

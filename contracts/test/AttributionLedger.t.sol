@@ -22,6 +22,7 @@ contract AttributionLedgerTest is Test {
     MockUSDC usdc;
 
     address operator = makeAddr("operator");
+    address agent = makeAddr("agent");
     address ecosystem = makeAddr("ecosystem");
     address alice = makeAddr("alice");
     address authorA = makeAddr("authorA");
@@ -36,6 +37,7 @@ contract AttributionLedgerTest is Test {
         ledger = new AttributionLedger(
             address(usdc),
             operator,
+            agent,
             ecosystem,
             OPERATOR_BPS,
             AUTHORS_BPS,
@@ -124,7 +126,17 @@ contract AttributionLedgerTest is Test {
         AttributionLedger.Citation[] memory cites = new AttributionLedger.Citation[](1);
         cites[0] = AttributionLedger.Citation({author: authorA, weightBps: 10_000});
         vm.prank(alice);
-        vm.expectRevert(AttributionLedger.NotOperator.selector);
+        vm.expectRevert(AttributionLedger.NotAuthorized.selector);
         ledger.attestAndSplit(keccak256("frontrun"), 1e6, cites);
+    }
+
+    function test_AgentCanAttest() public {
+        vm.stopPrank(); // exit setUp's operator prank — settle as the agent AA
+        usdc.mint(address(ledger), 1e6);
+        AttributionLedger.Citation[] memory cites = new AttributionLedger.Citation[](1);
+        cites[0] = AttributionLedger.Citation({author: authorA, weightBps: 10_000});
+        vm.prank(agent);
+        ledger.attestAndSplit(keccak256("agent-query"), 1e6, cites);
+        assertEq(ledger.getQuery(keccak256("agent-query")).totalPaid, 1e6);
     }
 }

@@ -37,7 +37,7 @@ We explicitly *don't* defend against:
 | `/api/claim` | OAuth-cookie ORCID match | EIP-191 sig recovers to wallet | On-chain `NameRegistry` already-bound conflict check (409) |
 | `/api/session` (DELETE) | Caller address parsed | Signature recovers to caller | `validUntil` window (10 min) prevents replay |
 | `/api/query` | Origin allowlist | `KUTIP_API_KEY` for non-browser callers | Anonymous budget cap (0.5 USDC) |
-| `AttributionLedger.attestAndSplit` | `onlyOperator` modifier | CEI ordering in citation loop | Dust forwarding to ecosystem (conservation invariant) |
+| `AttributionLedger.attestAndSplit` | `onlyAuthorized` modifier (operator EOA + agent AA) | CEI ordering in citation loop | Dust forwarding to ecosystem (conservation invariant) |
 | `UnclaimedYieldEscrow.claim` | `onlyOperator` modifier | `NameRegistry.walletOf == claimer` gate | First-write-wins on `Deposit.claimer` |
 | LLM citation weights | XML tag extraction | Schema validation | `Number.isFinite` + range + paper-id whitelist |
 
@@ -113,7 +113,7 @@ the first round missed:
 
 | # | Severity | Fix |
 |---|---|---|
-| C1 | Critical | **`AttributionLedger.attestAndSplit` is now `onlyOperator`.** Was unauthenticated — any attacker could call with attacker-controlled citations and drain the full authors share of any pre-funded balance. The fix is one modifier; the regression is locked in by `test_RevertOnNonOperator`. |
+| C1 | Critical | **`AttributionLedger.attestAndSplit` is now `onlyAuthorized`** (operator EOA or agent AA). Was unauthenticated — any attacker could call with attacker-controlled citations and drain the full authors share of any pre-funded balance. The fix is one modifier; the regression is locked in by `test_RevertOnNonOperator` + `test_AgentCanAttest`. |
 | H1 | High | CEI ordering in citation loop — bookkeeping before transfer |
 | H2 | High | Author-side dust forwarded to ecosystem (conservation invariant tightens) |
 | H3 | High | Bounty-side dust forwarded to first author |

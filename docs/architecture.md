@@ -122,7 +122,7 @@ All on **Kite testnet (chain 2368)** unless noted:
 
 | Contract | Purpose | Address |
 |---|---|---|
-| AttributionLedger | Revenue split + attestation ledger | `0x99359DaF…E5fA` |
+| AttributionLedger | Revenue split + attestation ledger | `0xbC4eeC2f…A338` |
 | UnclaimedYieldEscrow | Holds unclaimed author shares + APY | `0xcbab887d…547b40` |
 | NameRegistry | ORCID hash → wallet binding | `0x5a9b1304…2FEF9` |
 | BountyMarket | Topic-keyed research bounties | `0x1ba00a38…b3f72` |

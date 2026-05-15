@@ -8,6 +8,7 @@ contract Deploy is Script {
     function run() external returns (AttributionLedger ledger) {
         address paymentToken = vm.envAddress("KITE_TESTNET_USDC");
         address operator = vm.envAddress("NEXT_PUBLIC_AGENT_OPERATOR_ADDRESS");
+        address agent = vm.envAddress("AGENT_AA_ADDRESS");
         address ecosystemFund = vm.envAddress("NEXT_PUBLIC_ECOSYSTEM_FUND_ADDRESS");
 
         uint16 operatorBps = uint16(vm.envUint("OPERATOR_BPS"));
@@ -18,6 +19,7 @@ contract Deploy is Script {
         ledger = new AttributionLedger(
             paymentToken,
             operator,
+            agent,
             ecosystemFund,
             operatorBps,
             authorsBps,

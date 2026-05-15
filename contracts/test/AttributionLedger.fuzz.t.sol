@@ -26,6 +26,7 @@ contract AttributionLedgerFuzzTest is Test {
     AttributionLedger ledger;
     MockUSDC usdc;
     address operator = makeAddr("operator");
+    address agent = makeAddr("agent");
     address ecosystem = makeAddr("ecosystem");
     address payer = makeAddr("payer");
 
@@ -36,7 +37,7 @@ contract AttributionLedgerFuzzTest is Test {
     function setUp() public {
         usdc = new MockUSDC();
         ledger = new AttributionLedger(
-            address(usdc), operator, ecosystem,
+            address(usdc), operator, agent, ecosystem,
             OPERATOR_BPS, AUTHORS_BPS, ECOSYSTEM_BPS
         );
         // attestAndSplit is now access-controlled to the operator.
@@ -142,7 +143,7 @@ contract AttributionLedgerFuzzTest is Test {
     /// Constructor invariant: bps must sum to 10000.
     function test_RevertOnInvalidSplitConstructor() public {
         vm.expectRevert(AttributionLedger.InvalidSplit.selector);
-        new AttributionLedger(address(usdc), operator, ecosystem, 5000, 4000, 999); // 9999 ≠ 10000
+        new AttributionLedger(address(usdc), operator, agent, ecosystem, 5000, 4000, 999); // 9999 ≠ 10000
     }
 
     /// Edge: zero-weight citation embedded among others — sum still 10000.

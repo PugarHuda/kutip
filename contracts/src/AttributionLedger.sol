@@ -14,6 +14,7 @@ contract AttributionLedger {
 
     IERC20 public immutable paymentToken;
     address public immutable operator;
+    address public immutable agent;
     address public immutable ecosystemFund;
 
     uint16 public immutable operatorBps;
@@ -59,17 +60,24 @@ contract AttributionLedger {
     error EmptyCitations();
     error WeightMismatch();
     error QueryAlreadyAttested();
-    error NotOperator();
+    error NotAuthorized();
     error ZeroAddress();
 
-    modifier onlyOperator() {
-        if (msg.sender != operator) revert NotOperator();
+    /// @dev Authorises the operator EOA (admin + deterministic seed
+    ///      scripts) and the agent AA (live, end-to-end query
+    ///      settlement). Both are legitimate settlers; everyone else is
+    ///      rejected so a third party cannot frontrun an x402 deposit.
+    modifier onlyAuthorized() {
+        if (msg.sender != operator && msg.sender != agent) {
+            revert NotAuthorized();
+        }
         _;
     }
 
     constructor(
         address _paymentToken,
         address _operator,
+        address _agent,
         address _ecosystemFund,
         uint16 _operatorBps,
         uint16 _authorsBps,
@@ -78,6 +86,7 @@ contract AttributionLedger {
         if (
             _paymentToken == address(0) ||
             _operator == address(0) ||
+            _agent == address(0) ||
             _ecosystemFund == address(0)
         ) revert ZeroAddress();
         if (_operatorBps + _authorsBps + _ecosystemBps != BPS_DENOMINATOR) {
@@ -85,6 +94,7 @@ contract AttributionLedger {
         }
         paymentToken = IERC20(_paymentToken);
         operator = _operator;
+        agent = _agent;
         ecosystemFund = _ecosystemFund;
         operatorBps = _operatorBps;
         authorsBps = _authorsBps;
@@ -93,16 +103,16 @@ contract AttributionLedger {
 
     /// @notice Settle a query: user already transferred `totalPaid` to this contract.
     ///         Split + attest + emit events in one atomic operation.
-    /// @dev Gated to `operator` so a third party cannot frontrun a fresh
-    ///      x402 deposit by calling attestAndSplit with attacker-controlled
-    ///      citations and draining the contract's authorsShare. Operator
-    ///      is the agent AA (or its relayer) that legitimately settles
-    ///      every query end-to-end.
+    /// @dev Gated to `onlyAuthorized` so a third party cannot frontrun a
+    ///      fresh x402 deposit by calling attestAndSplit with attacker-
+    ///      controlled citations and draining the contract's authorsShare.
+    ///      The agent AA settles live queries; the operator EOA settles
+    ///      admin / seed batches — both legitimate.
     function attestAndSplit(
         bytes32 queryId,
         uint256 totalPaid,
         Citation[] calldata citations
-    ) external onlyOperator {
+    ) external onlyAuthorized {
         if (queries[queryId].timestamp != 0) revert QueryAlreadyAttested();
         if (citations.length == 0) revert EmptyCitations();
 

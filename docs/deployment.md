@@ -6,7 +6,7 @@ Tracks on-chain deployments as they happen.
 
 | Component | Address | TX | Block | Date |
 |---|---|---|---|---|
-| AttributionLedger | [`0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa`](https://testnet.kitescan.ai/address/0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa) | [`0x4ab9bcc2…1c4d9a`](https://testnet.kitescan.ai/tx/0x4ab9bcc2c6928a7212d535252c4ff775c7e7a6ec9087b5da46737df2bd1c4d9a) | 20944832 | 2026-04-19 |
+| AttributionLedger | [`0xbC4eeC2f75a0DCf61509842e1c18Abff7236A338`](https://testnet.kitescan.ai/address/0xbC4eeC2f75a0DCf61509842e1c18Abff7236A338) | [`0x1681bae9…b0a221`](https://testnet.kitescan.ai/tx/0x1681bae9fd0b250e0db5e9dfe7063da017eb0c53a3a119a784e190ebedb0a221) | 21421528 | 2026-05-15 |
 | Deployer EOA | [`0x5C91B851…bF40c`](https://testnet.kitescan.ai/address/0x5C91B851D9Aa20172e6067d9236920A6CBabf40c) | — | — | — |
 | Agent AA | [`0x4da7f4cF…1776`](https://testnet.kitescan.ai/address/0x4da7f4cFd443084027a39cc0f7c41466d9511776) | pending first UserOp | — | — |
 
