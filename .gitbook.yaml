@@ -1,0 +1,14 @@
+# GitBook configuration — when this repo is imported into GitBook the
+# service will mount the `docs/` folder as the documentation root and
+# read SUMMARY.md for the sidebar.
+#
+# Honkit / mdBook reuse the same convention so the docs render in any
+# of those tools without further config.
+root: ./docs/
+
+structure:
+  readme: README.md
+  summary: SUMMARY.md
+
+redirects:
+  intro: README.md

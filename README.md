@@ -343,6 +343,31 @@ ABIs are in [`contracts/abi/`](contracts/abi/) (auto-exported from Foundry build
 
 ---
 
+## Documentation
+
+Long-form docs live under [`docs/`](docs/README.md) — organised as a
+GitBook-shaped book (read [`SUMMARY.md`](docs/SUMMARY.md) for the
+sidebar). Highlights:
+
+- [**Architecture**](docs/architecture.md) — money flow, identity
+  binding, contract addresses
+- [**Security model**](docs/security.md) — threat model + every audit
+  finding (14 patched across 3 rounds) and how to verify each fix
+- [**Testing guide**](docs/testing.md) — 55 Foundry tests + 144 Vitest
+  cases, conventions for adding more
+- [**Deployment**](docs/deployment.md) — contract deploy order +
+  Vercel setup
+- [**Agent Passport**](docs/agent-passport.md) — EIP-712 session
+  delegation deeper dive
+- [**Demo script**](docs/demo-script.md) — the 90-second walkthrough
+
+Import into [GitBook](https://gitbook.com), [Honkit](https://github.com/honkit/honkit),
+or [mdBook](https://rust-lang.github.io/mdBook/) — all read
+`docs/SUMMARY.md` for the sidebar. The repo ships a `.gitbook.yaml`
+at the root for direct GitBook hosting.
+
+---
+
 ## Links
 
 - Live demo: <https://kutip-zeta.vercel.app>
