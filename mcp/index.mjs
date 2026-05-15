@@ -29,6 +29,17 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 const BASE = process.env.KUTIP_BASE_URL ?? "https://kutip-zeta.vercel.app";
+// Optional API key forwarded to /api/query. Required only when the
+// upstream Kutip deployment has KUTIP_API_KEY set. Local clones running
+// without auth leave this unset.
+const API_KEY = process.env.KUTIP_API_KEY ?? null;
+
+/** Build fetch headers with optional API key. */
+function kutipHeaders(extra = {}) {
+  const h = { ...extra };
+  if (API_KEY) h["X-Kutip-API-Key"] = API_KEY;
+  return h;
+}
 
 const server = new Server(
   { name: "kutip", version: "0.1.0" },
@@ -96,7 +107,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
 async function runResearch({ query, budgetUSDC = 0.1 }) {
   const res = await fetch(`${BASE}/api/query`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: kutipHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({ query, budgetUSDC })
   });
   if (!res.body) throw new Error("No response body from Kutip");
@@ -154,7 +165,9 @@ async function runResearch({ query, budgetUSDC = 0.1 }) {
 }
 
 async function getSummary({ queryId }) {
-  const res = await fetch(`${BASE}/api/summaries/${queryId}`);
+  const res = await fetch(`${BASE}/api/summaries/${queryId}`, {
+    headers: kutipHeaders()
+  });
   const body = await res.json();
   if (res.status === 402) {
     return {
@@ -187,7 +200,7 @@ async function getSummary({ queryId }) {
 }
 
 async function listAuthors({ limit = 50, onlyClaimed = false }) {
-  const res = await fetch(`${BASE}/api/claim`);
+  const res = await fetch(`${BASE}/api/claim`, { headers: kutipHeaders() });
   const body = await res.json();
   let claims = body.claims ?? [];
   if (onlyClaimed) claims = claims.filter((c) => c.wallet);

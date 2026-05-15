@@ -63,11 +63,42 @@ function originAllowed(req: NextRequest): boolean {
   return allowList.some((u) => origin === u);
 }
 
+/**
+ * Optional API key gate for non-browser callers (MCP, curl).
+ *
+ * - If KUTIP_API_KEY is unset, no gate is applied — anonymous browser
+ *   traffic + MCP both work, useful for hackathon convenience.
+ * - If KUTIP_API_KEY is set, any caller without `Origin` header (MCP,
+ *   curl, server-to-server) MUST send X-Kutip-API-Key matching it.
+ *   Browser callers (with Origin) skip this — they go through the
+ *   origin allowlist instead.
+ *
+ * This lets you flip on a key in production without breaking the
+ * landing page demo and without making MCP setup harder than necessary.
+ */
+function apiKeyAllowed(req: NextRequest): boolean {
+  const required = process.env.KUTIP_API_KEY;
+  if (!required) return true;
+  if (req.headers.get("origin")) return true; // browser → gated by origin
+  const supplied = req.headers.get("x-kutip-api-key");
+  return supplied === required;
+}
+
 export async function POST(req: NextRequest) {
   if (!originAllowed(req)) {
     return NextResponse.json(
       { error: "Origin not allowed", hint: "Browser CORS calls must come from kutip-zeta.vercel.app." },
       { status: 403 }
+    );
+  }
+  if (!apiKeyAllowed(req)) {
+    return NextResponse.json(
+      {
+        error: "API key required",
+        hint:
+          "Set X-Kutip-API-Key header. MCP clients: add KUTIP_API_KEY to claude_desktop_config.json env."
+      },
+      { status: 401 }
     );
   }
 

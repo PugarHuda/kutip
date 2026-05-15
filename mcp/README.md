@@ -88,14 +88,17 @@ Add (replace `<path-to-repo>` with the absolute path to your Kutip clone):
       "command": "node",
       "args": ["<path-to-repo>/mcp/index.mjs"],
       "env": {
-        "KUTIP_BASE_URL": "https://kutip-zeta.vercel.app"
+        "KUTIP_BASE_URL": "https://kutip-zeta.vercel.app",
+        "KUTIP_API_KEY": "optional — required only if the upstream Kutip deployment gates /api/query"
       }
     }
   }
 }
 ```
 
-Point `KUTIP_BASE_URL` at your own deployment if you forked.
+Point `KUTIP_BASE_URL` at your own deployment if you forked. The
+`KUTIP_API_KEY` is only required when the target deployment has its
+own `KUTIP_API_KEY` env set — otherwise leave it unset.
 
 Restart Claude Desktop. The Kutip tools should appear when you type `/`
 or ask something research-oriented. The agent decides when to call

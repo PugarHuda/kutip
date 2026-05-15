@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { Address } from "viem";
+import { verifyMessage, type Address, type Hex } from "viem";
 import {
   getSession,
   latestSessionFor,
@@ -8,6 +8,10 @@ import {
   verifyAndStore,
   type SpendingIntent
 } from "@/lib/session";
+
+function buildRevokeMessage(sessionId: string, validUntil: number): string {
+  return `Kutip session revoke\nv1\n\nrevoke session ${sessionId}\nvalidUntil: ${validUntil}`;
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -85,13 +89,53 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const body = (await req.json()) as { id?: string; caller?: string };
-    if (!body.id || !body.caller?.startsWith("0x")) {
+    const body = (await req.json()) as {
+      id?: string;
+      caller?: string;
+      signature?: string;
+      validUntil?: number;
+    };
+    if (
+      !body.id ||
+      !body.caller?.startsWith("0x") ||
+      !body.signature?.startsWith("0x") ||
+      typeof body.validUntil !== "number"
+    ) {
       return NextResponse.json(
-        { error: "Body must include { id, caller }" },
+        {
+          error: "Body must include { id, caller, signature, validUntil }",
+          hint:
+            "Sign the message: \"Kutip session revoke\\nv1\\n\\nrevoke session <id>\\nvalidUntil: <unix>\""
+        },
         { status: 400 }
       );
     }
+
+    // Reject expired or far-future signatures (10-min window).
+    const now = Math.floor(Date.now() / 1000);
+    if (body.validUntil < now - 15 || body.validUntil > now + 3600) {
+      return NextResponse.json(
+        { error: "Revoke signature outside valid window" },
+        { status: 400 }
+      );
+    }
+
+    // The signature MUST recover to `caller`. This is the only thing
+    // distinguishing a real owner-initiated revoke from a stranger
+    // sending the user's address as `caller`.
+    const message = buildRevokeMessage(body.id, body.validUntil);
+    const valid = await verifyMessage({
+      address: body.caller as Address,
+      message,
+      signature: body.signature as Hex
+    });
+    if (!valid) {
+      return NextResponse.json(
+        { error: "Revoke signature does not match caller wallet" },
+        { status: 401 }
+      );
+    }
+
     const delegation = revokeSession(body.id, body.caller as Address);
     return NextResponse.json({ session: toDto(delegation) });
   } catch (err) {

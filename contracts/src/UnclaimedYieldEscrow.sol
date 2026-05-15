@@ -4,6 +4,10 @@ pragma solidity ^0.8.24;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+interface INameRegistry {
+    function walletOf(bytes32 orcidHash) external view returns (address);
+}
+
 /// @title UnclaimedYieldEscrow — author earnings accrue yield until they claim
 ///
 /// @notice When AttributionLedger pays an author whose ORCID hasn't been bound
@@ -27,6 +31,14 @@ contract UnclaimedYieldEscrow {
     uint16 public immutable apyBps;
     uint16 public constant BPS_DENOMINATOR = 10_000;
     uint256 internal constant SECONDS_PER_YEAR = 365 days;
+
+    /// Optional NameRegistry — when set, claim() requires the on-chain
+    /// ORCID→wallet binding to match the supplied claimer address. This
+    /// reduces operator authority from "send escrow to anyone" to "execute
+    /// the user's pre-bound ORCID claim." Zero address = legacy mode
+    /// (operator-only authority, used during early hackathon deploys
+    /// before NameRegistry was wired).
+    INameRegistry public immutable nameRegistry;
 
     struct Deposit {
         uint256 principal;
@@ -59,6 +71,7 @@ contract UnclaimedYieldEscrow {
     error ZeroAmount();
     error AlreadyClaimed();
     error NotFound();
+    error ClaimerNotBound();
 
     modifier onlyOperator() {
         if (msg.sender != operator) revert NotOperator();
@@ -68,11 +81,13 @@ contract UnclaimedYieldEscrow {
     constructor(
         address _paymentToken,
         address _operator,
-        uint16 _apyBps
+        uint16 _apyBps,
+        address _nameRegistry
     ) {
         paymentToken = IERC20(_paymentToken);
         operator = _operator;
         apyBps = _apyBps;
+        nameRegistry = INameRegistry(_nameRegistry);
     }
 
     /// @notice Deposit WITH funds transfer. Operator pre-approves, escrow
@@ -121,10 +136,22 @@ contract UnclaimedYieldEscrow {
     /// @notice Authorised claim — verified by the operator off-chain (ORCID
     /// + signature) then finalised here. Operator pays yield out of its
     /// own pocket so contract doesn't need liquidity for simulated rate.
+    ///
+    /// When `nameRegistry` is configured, the claimer MUST match the
+    /// wallet pre-bound on-chain via NameRegistry. This locks operator
+    /// authority to "execute pre-bound intention" rather than "send to
+    /// any address I want," neutralising operator key compromise as an
+    /// escrow drain vector.
     function claim(bytes32 orcidHash, address claimer) external onlyOperator {
         Deposit storage d = deposits[orcidHash];
         if (d.principal == 0) revert NotFound();
         if (d.claimer != address(0)) revert AlreadyClaimed();
+
+        if (address(nameRegistry) != address(0)) {
+            address bound = nameRegistry.walletOf(orcidHash);
+            // Bound MUST exist (non-zero) AND match the requested claimer.
+            if (bound == address(0) || bound != claimer) revert ClaimerNotBound();
+        }
 
         uint256 principal = d.principal;
         uint256 yieldAmount = accruedYield(orcidHash);

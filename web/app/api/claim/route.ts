@@ -27,7 +27,10 @@ function normalize(orcid: string): string {
 const ClaimSchema = z.object({
   orcid: z.string().min(5).max(30),
   wallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
-  signature: z.string().regex(/^0x[a-fA-F0-9]{130}$/)
+  signature: z.string().regex(/^0x[a-fA-F0-9]{130}$/),
+  // Required so the server can deterministically reconstruct the signed
+  // message. Client emits Math.floor(Date.now()/1000)+600 by default.
+  validUntil: z.number().int().positive()
 });
 
 export async function POST(req: NextRequest) {
@@ -40,9 +43,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { orcid, wallet, signature } = parsed.data;
+  const { orcid, wallet, signature, validUntil } = parsed.data;
   const addr = wallet as Address;
   const normalizedOrcid = normalize(orcid);
+
+  // Reject obviously stale or far-future signatures.
+  const now = Math.floor(Date.now() / 1000);
+  if (validUntil < now - 15) {
+    return NextResponse.json(
+      {
+        error: "Claim signature expired",
+        hint: "Re-sign the binding — signatures are valid for 10 minutes."
+      },
+      { status: 400 }
+    );
+  }
+  if (validUntil > now + 3600) {
+    // 1-hour ceiling — stops a long-window pre-signed bomb.
+    return NextResponse.json(
+      { error: "Claim signature validity window too long (max 1 hour)" },
+      { status: 400 }
+    );
+  }
 
   // OAuth gate: if ORCID OAuth is enabled, require a verified cookie
   // whose orcid matches the claimed orcid. This proves the user logged
@@ -93,7 +115,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const message = buildClaimMessage(orcid, addr);
+  const message = buildClaimMessage(orcid, addr, validUntil);
   const valid = await verifyMessage({
     address: addr,
     message,

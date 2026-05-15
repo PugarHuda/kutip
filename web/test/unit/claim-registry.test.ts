@@ -64,24 +64,38 @@ describe("normalizeOrcid", () => {
 });
 
 describe("buildClaimMessage", () => {
+  const FIXED_VALID_UNTIL = 1_700_000_000;
   describe("positive", () => {
     it("produces deterministic message for same inputs", () => {
-      const a = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET);
-      const b = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET);
+      const a = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET, FIXED_VALID_UNTIL);
+      const b = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET, FIXED_VALID_UNTIL);
       expect(a).toBe(b);
     });
 
     it("normalizes ORCID to uppercase + lowercases wallet", () => {
-      const msg = buildClaimMessage(" 0009-0002-8864-090x ", ALICE_WALLET);
+      const msg = buildClaimMessage(" 0009-0002-8864-090x ", ALICE_WALLET, FIXED_VALID_UNTIL);
       expect(msg).toContain("0009-0002-8864-090X");
       expect(msg).toContain(ALICE_WALLET.toLowerCase());
     });
 
     it("includes both ORCID and wallet identifiers", () => {
-      const msg = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET);
+      const msg = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET, FIXED_VALID_UNTIL);
       expect(msg).toContain("0009-0002-8864-0901");
       expect(msg).toContain(ALICE_WALLET.toLowerCase());
       expect(msg).toContain("Kutip claim");
+    });
+
+    it("embeds chainId + validUntil for replay protection", () => {
+      const msg = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET, FIXED_VALID_UNTIL);
+      expect(msg).toContain("chainId: 2368");
+      expect(msg).toContain(`validUntil: ${FIXED_VALID_UNTIL}`);
+      expect(msg).toContain("\nv1\n");
+    });
+
+    it("changes message when validUntil changes (sig replay defense)", () => {
+      const a = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET, FIXED_VALID_UNTIL);
+      const b = buildClaimMessage("0009-0002-8864-0901", ALICE_WALLET, FIXED_VALID_UNTIL + 1);
+      expect(a).not.toBe(b);
     });
   });
 });

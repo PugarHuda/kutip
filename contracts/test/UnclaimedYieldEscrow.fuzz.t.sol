@@ -26,7 +26,7 @@ contract UnclaimedYieldEscrowFuzzTest is Test {
 
     function setUp() public {
         usdc = new MockUSDC();
-        escrow = new UnclaimedYieldEscrow(address(usdc), operator, 500); // 5% APY
+        escrow = new UnclaimedYieldEscrow(address(usdc), operator, 500, address(0)); // 5% APY, no registry
         usdc.mint(operator, 1e30); // operator funds yield payouts
         vm.prank(operator);
         usdc.approve(address(escrow), type(uint256).max);
@@ -130,5 +130,77 @@ contract UnclaimedYieldEscrowFuzzTest is Test {
         vm.prank(operator);
         escrow.claim(ORCID, makeAddr("claimer"));
         assertEq(escrow.totalPrincipalOutstanding(), 0);
+    }
+}
+
+/// Minimal NameRegistry stub for testing the new escrow gate.
+contract MockNameRegistry {
+    mapping(bytes32 => address) public walletOf;
+
+    function bind(bytes32 orcidHash, address wallet) external {
+        walletOf[orcidHash] = wallet;
+    }
+}
+
+/**
+ * Tests the new claim() gate: when NameRegistry is configured, the
+ * caller MUST match the on-chain binding. Operator authority alone is
+ * no longer enough to drain escrow to an arbitrary address.
+ */
+contract UnclaimedYieldEscrowGatedTest is Test {
+    UnclaimedYieldEscrow escrow;
+    MockUSDC usdc;
+    MockNameRegistry registry;
+    address operator = makeAddr("operator");
+    address realAuthor = makeAddr("realAuthor");
+    bytes32 constant ORCID = keccak256("0009-0002-8864-0901");
+
+    function setUp() public {
+        usdc = new MockUSDC();
+        registry = new MockNameRegistry();
+        escrow = new UnclaimedYieldEscrow(
+            address(usdc), operator, 500, address(registry)
+        );
+        usdc.mint(operator, 1e30);
+        vm.prank(operator);
+        usdc.approve(address(escrow), type(uint256).max);
+    }
+
+    function test_ClaimSucceedsWhenBindingMatches() public {
+        registry.bind(ORCID, realAuthor);
+        usdc.mint(address(escrow), 1 ether);
+        vm.prank(operator);
+        escrow.depositFor(ORCID, 1 ether);
+
+        vm.prank(operator);
+        escrow.claim(ORCID, realAuthor);
+
+        assertEq(usdc.balanceOf(realAuthor), 1 ether);
+    }
+
+    function test_RevertWhenClaimerNotBound() public {
+        // NameRegistry has no binding for ORCID; operator tries to claim
+        // for an arbitrary attacker address.
+        usdc.mint(address(escrow), 1 ether);
+        vm.prank(operator);
+        escrow.depositFor(ORCID, 1 ether);
+
+        address attacker = makeAddr("attacker");
+        vm.prank(operator);
+        vm.expectRevert(UnclaimedYieldEscrow.ClaimerNotBound.selector);
+        escrow.claim(ORCID, attacker);
+    }
+
+    function test_RevertWhenClaimerDoesntMatchBinding() public {
+        // ORCID is bound to realAuthor, but operator submits attacker.
+        registry.bind(ORCID, realAuthor);
+        usdc.mint(address(escrow), 1 ether);
+        vm.prank(operator);
+        escrow.depositFor(ORCID, 1 ether);
+
+        address attacker = makeAddr("attacker");
+        vm.prank(operator);
+        vm.expectRevert(UnclaimedYieldEscrow.ClaimerNotBound.selector);
+        escrow.claim(ORCID, attacker);
     }
 }

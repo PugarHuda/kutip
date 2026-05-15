@@ -158,7 +158,11 @@ function ClaimPage() {
     const provider = eth();
     if (!provider || status.kind !== "connected") return;
     const wallet = status.address;
-    const message = buildMessage(orcid, wallet);
+    // 10-minute signing window — long enough for slow networks and
+    // wallet confirmation, short enough that a leaked signature can't
+    // be replayed by an attacker hours later.
+    const validUntil = Math.floor(Date.now() / 1000) + 600;
+    const message = buildMessage(orcid, wallet, validUntil);
 
     setStatus({ kind: "signing", address: wallet });
     try {
@@ -171,7 +175,7 @@ function ClaimPage() {
       const res = await fetch("/api/claim", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orcid, wallet, signature })
+        body: JSON.stringify({ orcid, wallet, signature, validUntil })
       });
       const data = (await res.json()) as {
         ok?: boolean;
@@ -474,7 +478,21 @@ function OrcidPreview({ preview }: { preview: Preview }) {
   );
 }
 
-function buildMessage(orcid: string, wallet: string) {
+// Mirror of server-side buildClaimMessage in lib/claim-registry.ts.
+// Kept inline to avoid pulling node-only deps (ethers, RPC client) into
+// the client bundle. Format MUST stay byte-identical to the server's
+// reconstruction — any divergence will produce signature-mismatch 401s.
+function buildMessage(orcid: string, wallet: string, validUntil: number) {
   const norm = orcid.replace(/\s+/g, "").toUpperCase();
-  return `Kutip claim\n\nI verify that I, ORCID ${norm}, own wallet ${wallet.toLowerCase()}.\n\nThis binding controls future USDC payouts from the Kutip attribution ledger.`;
+  return [
+    "Kutip claim",
+    "v1",
+    "",
+    `I verify that I, ORCID ${norm}, own wallet ${wallet.toLowerCase()}.`,
+    "",
+    `chainId: 2368`,
+    `validUntil: ${validUntil}`,
+    "",
+    "This binding controls future USDC payouts from the Kutip attribution ledger."
+  ].join("\n");
 }

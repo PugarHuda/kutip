@@ -21,7 +21,7 @@ contract UnclaimedYieldEscrowTest is Test {
 
     function setUp() public {
         usdc = new MockUSDC();
-        escrow = new UnclaimedYieldEscrow(address(usdc), operator, APY_BPS);
+        escrow = new UnclaimedYieldEscrow(address(usdc), operator, APY_BPS, address(0));
     }
 
     function test_DepositBuildsPrincipal() public {

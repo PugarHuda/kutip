@@ -50,8 +50,52 @@ export function normalizeOrcid(raw: string): string {
   return raw.replace(/\s+/g, "").toUpperCase();
 }
 
-export function buildClaimMessage(orcid: string, wallet: Address): string {
-  return `Kutip claim\n\nI verify that I, ORCID ${normalizeOrcid(orcid)}, own wallet ${wallet.toLowerCase()}.\n\nThis binding controls future USDC payouts from the Kutip attribution ledger.`;
+/**
+ * Hardened claim message: includes chainId and an expiry timestamp.
+ *
+ * - chainId pins the signature to Kite testnet (2368) so a wallet's
+ *   signature can't be replayed on a clone deployment or different chain.
+ * - validUntil (unix seconds) gives the user a ~10-minute window between
+ *   signing and submitting. Stops a leaked old signature from being
+ *   replayable forever.
+ *
+ * Format kept as readable EIP-191 text (not EIP-712) so wallets show the
+ * binding context in their signature prompt. Wallets that pre-bound under
+ * v0 (no expiry) won't re-sign; their existing on-chain binding stays
+ * valid on NameRegistry — we just can't re-issue the in-memory cache from
+ * the signature alone. Acceptable since recordClaim now happens AFTER
+ * bindOnChain succeeds.
+ */
+const CLAIM_CHAIN_ID = 2368;
+export const CLAIM_MESSAGE_TTL_SEC = 600;
+export const CLAIM_MESSAGE_VERSION = "v1";
+
+export function buildClaimMessage(
+  orcid: string,
+  wallet: Address,
+  validUntilSec: number
+): string {
+  const validUntil = validUntilSec;
+  return [
+    "Kutip claim",
+    CLAIM_MESSAGE_VERSION,
+    "",
+    `I verify that I, ORCID ${normalizeOrcid(orcid)}, own wallet ${wallet.toLowerCase()}.`,
+    "",
+    `chainId: ${CLAIM_CHAIN_ID}`,
+    `validUntil: ${validUntil}`,
+    "",
+    "This binding controls future USDC payouts from the Kutip attribution ledger."
+  ].join("\n");
+}
+
+/** Parse the validUntil out of a v1 message; null if not v1 or malformed. */
+export function parseClaimMessageExpiry(message: string): number | null {
+  if (!message.startsWith(`Kutip claim\n${CLAIM_MESSAGE_VERSION}\n`)) return null;
+  const match = message.match(/^validUntil: (\d+)$/m);
+  if (!match) return null;
+  const v = Number(match[1]);
+  return Number.isFinite(v) && v > 0 ? v : null;
 }
 
 export function orcidHash(orcid: string): Hex {

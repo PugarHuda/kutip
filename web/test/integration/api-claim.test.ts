@@ -56,19 +56,23 @@ async function buildRequest(opts: {
   wallet: string;
   signature: string;
   cookie?: string;
+  validUntil?: number;
 }): Promise<NextRequest> {
   const headers = new Headers();
   if (opts.cookie) {
     headers.set("cookie", `kutip_orcid_verified=${opts.cookie}`);
   }
   headers.set("content-type", "application/json");
+  const validUntil =
+    opts.validUntil ?? Math.floor(Date.now() / 1000) + 1800;
   return new NextRequest("https://test.kutip.local/api/claim", {
     method: "POST",
     headers,
     body: JSON.stringify({
       orcid: opts.orcid,
       wallet: opts.wallet,
-      signature: opts.signature
+      signature: opts.signature,
+      validUntil
     })
   });
 }
@@ -84,7 +88,8 @@ describe("POST /api/claim", () => {
       });
 
       const wallet = ethers.Wallet.createRandom();
-      const message = buildClaimMessage(ORCID_REAL, wallet.address);
+      const validUntil = Math.floor(Date.now() / 1000) + 1800;
+      const message = buildClaimMessage(ORCID_REAL, wallet.address, validUntil);
       const signature = await wallet.signMessage(message);
       const cookie = await signCookieFor(ORCID_REAL);
 
@@ -92,7 +97,8 @@ describe("POST /api/claim", () => {
         orcid: ORCID_REAL,
         wallet: wallet.address,
         signature,
-        cookie
+        cookie,
+        validUntil
       });
 
       const res = await POST(req);
@@ -112,12 +118,14 @@ describe("POST /api/claim", () => {
       });
 
       const wallet = ethers.Wallet.createRandom();
-      const sig = await wallet.signMessage(buildClaimMessage(ORCID_REAL, wallet.address));
+      const validUntil = Math.floor(Date.now() / 1000) + 1800;
+      const sig = await wallet.signMessage(buildClaimMessage(ORCID_REAL, wallet.address, validUntil));
 
       const req = await buildRequest({
         orcid: ORCID_REAL,
         wallet: wallet.address,
-        signature: sig
+        signature: sig,
+        validUntil
         // no cookie
       });
       const res = await POST(req);
@@ -131,14 +139,16 @@ describe("POST /api/claim", () => {
       });
 
       const wallet = ethers.Wallet.createRandom();
-      const sig = await wallet.signMessage(buildClaimMessage(ORCID_REAL, wallet.address));
+      const validUntil = Math.floor(Date.now() / 1000) + 1800;
+      const sig = await wallet.signMessage(buildClaimMessage(ORCID_REAL, wallet.address, validUntil));
       const cookie = await signCookieFor("0000-0001-0000-0000"); // mismatched
 
       const req = await buildRequest({
         orcid: ORCID_REAL,
         wallet: wallet.address,
         signature: sig,
-        cookie
+        cookie,
+        validUntil
       });
       const res = await POST(req);
       expect(res.status).toBe(403);
@@ -166,15 +176,17 @@ describe("POST /api/claim", () => {
 
       const wallet = ethers.Wallet.createRandom();
       const otherWallet = ethers.Wallet.createRandom();
+      const validUntil = Math.floor(Date.now() / 1000) + 1800;
       // Sign with wallet A but claim wallet B
-      const sig = await wallet.signMessage(buildClaimMessage(ORCID_REAL, otherWallet.address));
+      const sig = await wallet.signMessage(buildClaimMessage(ORCID_REAL, otherWallet.address, validUntil));
       const cookie = await signCookieFor(ORCID_REAL);
 
       const req = await buildRequest({
         orcid: ORCID_REAL,
         wallet: otherWallet.address,
         signature: sig,
-        cookie
+        cookie,
+        validUntil
       });
       const res = await POST(req);
       expect(res.status).toBe(401);
@@ -184,14 +196,16 @@ describe("POST /api/claim", () => {
       mockOrcidApi(ORCID_NOT_FOUND, { error: "not found" }, 404);
 
       const wallet = ethers.Wallet.createRandom();
-      const sig = await wallet.signMessage(buildClaimMessage(ORCID_NOT_FOUND, wallet.address));
+      const validUntil = Math.floor(Date.now() / 1000) + 1800;
+      const sig = await wallet.signMessage(buildClaimMessage(ORCID_NOT_FOUND, wallet.address, validUntil));
       const cookie = await signCookieFor(ORCID_NOT_FOUND);
 
       const req = await buildRequest({
         orcid: ORCID_NOT_FOUND,
         wallet: wallet.address,
         signature: sig,
-        cookie
+        cookie,
+        validUntil
       });
       const res = await POST(req);
       expect(res.status).toBe(404);
