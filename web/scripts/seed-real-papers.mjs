@@ -1,23 +1,58 @@
 #!/usr/bin/env node
 /**
- * Seed papers.json + authors.json from the Semantic Scholar Graph API.
+ * Seed papers.json + authors.json from the OpenAlex Works API.
  *
- * Replaces the hand-written placeholder catalog with real papers — real
- * DOIs that resolve, real titles + authors, real abstracts. Wallets stay
- * mock because we obviously can't bind crypto wallets to authors who
- * never claimed; ORCIDs stay mostly synthetic except for Josiah Carberry
- * (real public test ORCID, used by the demo claim flow).
+ * Generates REAL wallet addresses per author via ethers.Wallet.createRandom():
+ *   - Real ECDSA keypairs (we know the private keys)
+ *   - All addresses are unique (cryptographic randomness)
+ *   - Stored in data/authors.json (public) + data/authors-keys.json
+ *     (private — gitignored, never committed)
+ *
+ * To make these addresses "on-chain visible" after seeding, run
+ *   scripts/seed-on-chain-authors.mjs
+ * which calls AttributionLedger.attestAndSplit with real USDC, populating
+ * CitationPaid events that link these authors to queries on Kite testnet.
  *
  * Usage (from web/):
  *   node scripts/seed-real-papers.mjs
  */
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { keccak256, toBytes } from "viem";
+import { Wallet } from "ethers";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "../data");
+const KEYS_FILE = resolve(DATA_DIR, "authors-keys.json");
+
+/**
+ * Stable wallet generation: re-runs preserve existing (address, key)
+ * pairs by name. Only NEW author names get fresh wallets. This keeps
+ * the diff minimal across seed runs and lets on-chain attestations stay
+ * valid (you don't want to invalidate every prior CitationPaid event by
+ * regenerating addresses).
+ */
+function loadExistingKeys() {
+  if (!existsSync(KEYS_FILE)) return new Map();
+  try {
+    const raw = JSON.parse(readFileSync(KEYS_FILE, "utf-8"));
+    return new Map(Object.entries(raw));
+  } catch {
+    return new Map();
+  }
+}
+
+function realWalletFor(name, existing) {
+  const hit = existing.get(name);
+  if (hit) return { address: hit.address, privateKey: hit.privateKey };
+  const w = Wallet.createRandom();
+  const rec = { address: w.address, privateKey: w.privateKey };
+  // Mutate the map so subsequent realWalletFor(name) calls within the
+  // same script run return the SAME wallet — otherwise authors.json
+  // and authors-keys.json would diverge.
+  existing.set(name, rec);
+  return rec;
+}
 
 const QUERIES = [
   "direct air capture",
@@ -78,11 +113,6 @@ async function searchOpenAlex(query) {
   }));
 }
 
-function mockWalletFor(name) {
-  const hash = keccak256(toBytes(name.toLowerCase().trim()));
-  return hash.slice(0, 42);
-}
-
 function syntheticOrcid(idx) {
   const padded = String(idx).padStart(7, "0");
   const a = padded.slice(0, 4);
@@ -95,6 +125,8 @@ function syntheticOrcid(idx) {
 
 async function main() {
   console.log("Searching OpenAlex across", QUERIES.length, "queries…");
+  const existingKeys = loadExistingKeys();
+  console.log(`  → ${existingKeys.size} existing author keys loaded (stable re-run)`);
   const papers = [];
   const authors = new Map(); // name → record
 
@@ -121,7 +153,7 @@ async function main() {
               id: aid,
               name: key,
               affiliation: a.affiliation ?? "Independent researcher",
-              wallet: mockWalletFor(key),
+              wallet: realWalletFor(key, existingKeys).address,
               orcid: a.orcid ?? syntheticOrcid(authors.size + 1)
             };
             authors.set(key, rec);
@@ -172,7 +204,7 @@ async function main() {
       id: aid,
       name: "Josiah Carberry",
       affiliation: "Brown University (test record)",
-      wallet: mockWalletFor("Josiah Carberry"),
+      wallet: realWalletFor("Josiah Carberry", existingKeys).address,
       orcid: "0000-0002-1825-0097"
     };
     authors.set("Josiah Carberry", carberry);
@@ -204,9 +236,16 @@ async function main() {
     "utf-8"
   );
 
+  // existingKeys is the source of truth — realWalletFor() mutates it
+  // for every new author it encounters during the run, so the map now
+  // covers all 109+ authors. Persist it as the key file.
+  const keysOut = Object.fromEntries(existingKeys.entries());
+  writeFileSync(KEYS_FILE, JSON.stringify(keysOut, null, 2) + "\n", "utf-8");
+
   console.log(
     `\n✓ Seeded ${papers.length} papers · ${authors.size} authors → ${DATA_DIR}`
   );
+  console.log(`  → private keys saved to ${KEYS_FILE} (GITIGNORED)`);
 }
 
 main().catch((err) => {
