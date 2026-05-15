@@ -59,19 +59,27 @@ export default async function DashboardEarningsPage() {
 
   let rows: AuthorRow[] = [];
   if (isSubgraphEnabled()) {
-    const leaderboard = (await fetchLeaderboardFromGoldsky(20)) ?? [];
-    rows = leaderboard.map((g: GoldskyAuthor) => {
-      const meta = walletToMeta.get(g.id.toLowerCase());
-      return {
-        id: meta?.id ?? g.id,
-        name: meta?.name ?? `${g.id.slice(0, 8)}…${g.id.slice(-4)}`,
-        affiliation: meta?.affiliation ?? "unknown",
-        wallet: g.id,
-        orcid: meta?.orcid ?? "",
-        earnings: BigInt(g.totalEarnings),
-        citations: g.citationCount
-      };
-    });
+    // Pull a wide window then keep only wallets that resolve to a real
+    // catalogued author. Early-development test attestations paid vanity
+    // addresses (0x1111…, 0xcbab…) that have no name — those pollute a
+    // "who got paid" leaderboard, so they're filtered out here. The
+    // on-chain events still exist; we just don't surface anonymous
+    // test noise on the researcher-facing board.
+    const leaderboard = (await fetchLeaderboardFromGoldsky(120)) ?? [];
+    rows = leaderboard
+      .filter((g: GoldskyAuthor) => walletToMeta.has(g.id.toLowerCase()))
+      .map((g: GoldskyAuthor) => {
+        const meta = walletToMeta.get(g.id.toLowerCase())!;
+        return {
+          id: meta.id,
+          name: meta.name,
+          affiliation: meta.affiliation,
+          wallet: g.id,
+          orcid: meta.orcid,
+          earnings: BigInt(g.totalEarnings),
+          citations: g.citationCount
+        };
+      });
   } else {
     const wallets = authors.map((a) => a.wallet as Address);
     const stats = await getAuthorStats(wallets);
