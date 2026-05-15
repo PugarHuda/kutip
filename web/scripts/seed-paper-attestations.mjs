@@ -49,6 +49,17 @@ const USDC = process.env.KITE_TESTNET_USDC;
 // more operator-side USDC needed.
 const PAYMENT_PER_PAPER = ethers.parseUnits("0.02", 18);
 
+// Summarizer AA — the sub-agent that does the LLM reading. In the live
+// Kutip flow the Researcher pays it 5% per query before settling the
+// attestation. This script mirrors that: a 5%-of-payment transfer to
+// the Summarizer so the agent-to-agent fee has on-chain proof too.
+// Address is deterministic (operator EOA + AA salt 1n); env overrides.
+const SUMMARIZER_AA =
+  process.env.SUMMARIZER_AA_ADDRESS ??
+  "0xA6C36bA2BC8E84fCF276721F30FC79ceD609ef5c";
+const SUB_AGENT_BPS = 500n; // 5%
+const SUB_AGENT_FEE = (PAYMENT_PER_PAPER * SUB_AGENT_BPS) / 10_000n;
+
 const LEDGER_ABI = [
   "function attestAndSplit(bytes32 queryId, uint256 totalPaid, tuple(address author, uint16 weightBps)[] citations) external",
   "function operator() external view returns (address)",
@@ -106,11 +117,20 @@ async function main() {
   const authors = JSON.parse(readFileSync(AUTHORS_PATH, "utf-8"));
   const authorsById = new Map(authors.map((a) => [a.id, a]));
 
-  console.log(`Operator: ${wallet.address}`);
-  console.log(`Papers:   ${papers.length}`);
-  console.log(`Per paper: ${ethers.formatUnits(PAYMENT_PER_PAPER, 18)} USDC`);
+  console.log(`Operator:   ${wallet.address}`);
+  console.log(`Summarizer: ${SUMMARIZER_AA}`);
+  console.log(`Papers:     ${papers.length}`);
+  console.log(
+    `Per paper:  ${ethers.formatUnits(PAYMENT_PER_PAPER, 18)} USDC attestation + ` +
+      `${ethers.formatUnits(SUB_AGENT_FEE, 18)} USDC sub-agent fee`
+  );
 
-  const totalNeeded = PAYMENT_PER_PAPER * BigInt(papers.length);
+  // Worst case: every paper is fresh → pay both attestation + fee. The
+  // fee transfer runs even for already-attested papers (backfill), so
+  // budget for fee × all papers regardless.
+  const totalNeeded =
+    PAYMENT_PER_PAPER * BigInt(papers.length) +
+    SUB_AGENT_FEE * BigInt(papers.length);
   const opBal = await usdc.balanceOf(wallet.address);
   console.log(
     `Operator USDC balance: ${ethers.formatUnits(opBal, 18)} · needed ${ethers.formatUnits(totalNeeded, 18)}\n`
@@ -123,22 +143,24 @@ async function main() {
 
   let skipped = 0;
   let attested = 0;
+  let feesPaid = 0;
   for (const [idx, paper] of papers.entries()) {
     const queryId = queryIdForPaper(paper.id);
     process.stdout.write(
-      `  ${String(idx + 1).padStart(2, "0")}/${papers.length} ${paper.id} ${paper.title.slice(0, 50).padEnd(52)}`
+      `  ${String(idx + 1).padStart(2, "0")}/${papers.length} ${paper.id} ${paper.title.slice(0, 46).padEnd(48)}`
     );
 
-    // Skip already-attested queryIds — attestAndSplit reverts on dup.
+    // attestAndSplit reverts on a duplicate queryId, so skip the
+    // attestation if this paper is already on-chain — but STILL pay the
+    // sub-agent fee below (backfills papers attested before fee logic
+    // existed). Note: the fee transfer is not idempotent — this is a
+    // one-shot seed script, don't loop it.
+    let alreadyAttested = false;
     try {
       const existing = await ledger.getQuery(queryId);
-      if (Number(existing.timestamp) > 0) {
-        console.log("→ already attested, skipped");
-        skipped++;
-        continue;
-      }
+      alreadyAttested = Number(existing.timestamp) > 0;
     } catch {
-      /* getQuery on a missing key returns empty struct on viem, not a throw */
+      /* missing key → empty struct, treat as not attested */
     }
 
     const citations = buildCitations(paper, authorsById);
@@ -149,24 +171,42 @@ async function main() {
     }
 
     try {
-      const fundTx = await usdc.transfer(LEDGER, PAYMENT_PER_PAPER);
-      await fundTx.wait();
-      const tx = await ledger.attestAndSplit(
-        queryId,
-        PAYMENT_PER_PAPER,
-        citations
-      );
-      const receipt = await tx.wait();
-      console.log(`→ ✓ ${tx.hash.slice(0, 12)}… (gas ${receipt.gasUsed})`);
-      attested++;
+      if (alreadyAttested) {
+        process.stdout.write("→ attested (skip)");
+        skipped++;
+      } else {
+        const fundTx = await usdc.transfer(LEDGER, PAYMENT_PER_PAPER);
+        await fundTx.wait();
+        const tx = await ledger.attestAndSplit(
+          queryId,
+          PAYMENT_PER_PAPER,
+          citations
+        );
+        const receipt = await tx.wait();
+        process.stdout.write(`→ ✓ attest ${tx.hash.slice(0, 10)}… (gas ${receipt.gasUsed})`);
+        attested++;
+      }
+
+      // Sub-agent fee — Researcher pays Summarizer 5%. Real agent-to-
+      // agent transfer, gives the "AI got paid" leg of the flow an
+      // on-chain receipt.
+      const feeTx = await usdc.transfer(SUMMARIZER_AA, SUB_AGENT_FEE);
+      await feeTx.wait();
+      console.log(` · fee ${feeTx.hash.slice(0, 10)}…`);
+      feesPaid++;
     } catch (err) {
       console.log(`→ ✗ ${err.shortMessage ?? err.message?.slice(0, 60)}`);
     }
   }
 
-  console.log(`\nDone · ${attested} attested · ${skipped} skipped.`);
   console.log(
-    `Browse: https://testnet.kitescan.ai/address/${LEDGER}#events`
+    `\nDone · ${attested} attested · ${skipped} skipped · ${feesPaid} sub-agent fees paid.`
+  );
+  console.log(
+    `Ledger events:    https://testnet.kitescan.ai/address/${LEDGER}#events`
+  );
+  console.log(
+    `Summarizer fees:  https://testnet.kitescan.ai/address/${SUMMARIZER_AA}`
   );
 }
 
