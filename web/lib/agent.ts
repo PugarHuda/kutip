@@ -133,6 +133,28 @@ export async function runResearchAgent(opts: {
 
   const purchased = await purchasePapers(candidates, budgetUSDC);
 
+  // Fail fast + clearly if the budget couldn't afford a single paper.
+  // Otherwise the flow would carry 0 papers all the way to step 5,
+  // where attestAndSplit reverts on EmptyCitations with an opaque
+  // "execution reverted".
+  if (purchased.length === 0) {
+    const cheapest = Math.min(...candidates.map((p) => p.priceUSDC));
+    emit({
+      type: "step",
+      step: {
+        step: 2,
+        label: "Purchasing papers via x402",
+        status: "error",
+        detail: "Budget too small — no papers affordable"
+      }
+    });
+    throw new Error(
+      `Budget of ${budgetUSDC} USDC is too small — the cheapest matching ` +
+        `paper costs ${(cheapest / 1_000_000).toFixed(2)} USDC. Raise the ` +
+        `budget and try again.`
+    );
+  }
+
   emit({
     type: "step",
     step: {
