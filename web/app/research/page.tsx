@@ -10,7 +10,7 @@ import {
   type SessionEnvelope
 } from "@/components/session-manager";
 import { useAccount } from "wagmi";
-import { papersForBudget } from "@/lib/kite";
+import { papersForBudget, SPLIT } from "@/lib/kite";
 
 interface WalletBalance {
   address: string;
@@ -366,7 +366,7 @@ function ResearchSidebar({
 
       {/* A bigger budget is tangibly worth more: it funds a broader
           literature review and a larger payout pool for cited authors
-          (40% of the budget). 0.4 mirrors AUTHORS_BPS in the ledger. */}
+          (SPLIT.authors of the budget — see AUTHORS_BPS in the ledger). */}
       <div
         className="mt-2.5 p-2.5 rounded-lg t-mono-sm flex items-center justify-between gap-2"
         style={{
@@ -376,8 +376,8 @@ function ResearchSidebar({
       >
         <span className="ink-3">This budget funds</span>
         <span className="font-semibold text-kite-700">
-          ≈ {papersForBudget(budget)} papers · {(budget * 0.4).toFixed(2)} USDC
-          to authors
+          ≈ {papersForBudget(budget)} papers ·{" "}
+          {(budget * SPLIT.authors).toFixed(2)} USDC to authors
         </span>
       </div>
 
@@ -1101,7 +1101,7 @@ function ResultView({
                 aIdx;
               const top = globalIdx === 0;
               const amount = (
-                (result.totalPaidUSDC * 0.4 * (a.share / 10000)) /
+                (result.totalPaidUSDC * SPLIT.authors * (a.share / 10000)) /
                 1e18
               ).toFixed(4);
               return (
@@ -1122,9 +1122,11 @@ function ResultView({
             })
           )}
           <div className="flex justify-between items-center px-5 py-3.5 border-t border-token surface-raised">
-            <span className="t-small ink-2">Authors share (40%)</span>
+            <span className="t-small ink-2">
+              Authors share ({Math.round(SPLIT.authors * 100)}%)
+            </span>
             <span className="t-mono font-bold text-[15px]">
-              {(result.totalPaidUSDC * 0.4 / 1e18).toFixed(4)} USDC
+              {((result.totalPaidUSDC * SPLIT.authors) / 1e18).toFixed(4)} USDC
             </span>
           </div>
           {result.sessionId && (

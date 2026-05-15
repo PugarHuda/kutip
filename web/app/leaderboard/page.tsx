@@ -69,8 +69,8 @@ type Range = "all" | "week" | "month";
 type Sort = "earnings" | "citations";
 
 /**
- * 4-decimal USDC formatter. Per-paper attestations split 40% across
- * multiple authors, so individual cuts land in the 0.001-0.05 range —
+ * 4-decimal USDC formatter. Per-paper attestations split the authors
+ * share across multiple authors, so individual cuts land small —
  * the 2-decimal formatUSDC would render all of them as a misleading
  * "0.00". 4 decimals shows the real (small but non-zero) micro-payment.
  */
@@ -229,7 +229,7 @@ export default async function LeaderboardPage({
           <StatTile
             label="USDC paid out"
             value={formatUSDC4(totalEarnings)}
-            delta={totalEarnings > 0n ? "authors share only (40%)" : "awaiting first attestation"}
+            delta={totalEarnings > 0n ? "authors share only (80%)" : "awaiting first attestation"}
             accent="emerald"
           />
         </div>

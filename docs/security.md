@@ -113,7 +113,7 @@ the first round missed:
 
 | # | Severity | Fix |
 |---|---|---|
-| C1 | Critical | **`AttributionLedger.attestAndSplit` is now `onlyOperator`.** Was unauthenticated — any attacker could call with attacker-controlled citations and drain ~40% of any pre-funded balance. The fix is one modifier; the regression is locked in by `test_RevertOnNonOperator`. |
+| C1 | Critical | **`AttributionLedger.attestAndSplit` is now `onlyOperator`.** Was unauthenticated — any attacker could call with attacker-controlled citations and drain the full authors share of any pre-funded balance. The fix is one modifier; the regression is locked in by `test_RevertOnNonOperator`. |
 | H1 | High | CEI ordering in citation loop — bookkeeping before transfer |
 | H2 | High | Author-side dust forwarded to ecosystem (conservation invariant tightens) |
 | H3 | High | Bounty-side dust forwarded to first author |

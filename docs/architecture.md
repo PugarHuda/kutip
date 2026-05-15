@@ -22,9 +22,9 @@ boundaries: identity, payment, attestation, and mirror.
                           │  AttributionLedger   │
                           │  (smart contract)    │
                           │                      │
-                          │  50% operator        │
-                          │  40% authors         │
-                          │  10% ecosystem       │
+                          │  80% authors         │
+                          │  15% operator        │
+                          │  5% ecosystem        │
                           └──────────────────────┘
 ```
 
@@ -62,9 +62,9 @@ flowchart TB
     Passport -. gates .-> Researcher
     Researcher -- 5% atomic --> Summarizer
     Researcher -- totalPaid --> Ledger
-    Ledger -- 40% split --> Authors
-    Ledger -- 50% --> Operator
-    Ledger -- 10% --> Eco
+    Ledger -- 80% split --> Authors
+    Ledger -- 15% --> Operator
+    Ledger -- 5% --> Eco
     Authors -. unclaimed share .-> Escrow
     Ledger -. event mirror .-> Mirror
 ```
@@ -78,8 +78,8 @@ For each query:
 3. Researcher fetches papers from Semantic Scholar / OpenAlex,
    summarises via OpenRouter LLM, ranks citations.
 4. Researcher calls `attestAndSplit(queryId, totalPaid, citations[])`.
-   Contract pays operator (50%), authors (40% split per weights),
-   ecosystem (10%). Authors whose ORCID isn't yet bound have their
+   Contract pays authors (80% split per weights), operator (15%),
+   ecosystem (5%). Authors whose ORCID isn't yet bound have their
    cut deposited to `UnclaimedYieldEscrow` instead — accruing yield
    at 5% APY until they claim via ORCID OAuth.
 5. **Off-chain relayer** mirrors the `QueryAttested` event to

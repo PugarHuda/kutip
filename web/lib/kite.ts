@@ -34,6 +34,14 @@ export function explorerAddress(addr: string): string {
   return `${kiteTestnet.blockExplorers.default.url}/address/${addr}`;
 }
 
+/**
+ * Revenue split baked into AttributionLedger at deploy (OPERATOR_BPS /
+ * AUTHORS_BPS / ECOSYSTEM_BPS). Authors-majority by design — the cited
+ * humans take the largest cut. Single source of truth for UI display;
+ * the contract itself is the authority on-chain.
+ */
+export const SPLIT = { authors: 0.8, operator: 0.15, ecosystem: 0.05 } as const;
+
 export function parseUSDC(amount: number): bigint {
   return BigInt(Math.round(amount * 100)) * (USDC_UNIT / 100n);
 }

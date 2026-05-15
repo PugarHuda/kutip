@@ -47,8 +47,8 @@ Required keys:
 | Key | Value |
 |---|---|
 | `PRIVATE_KEY` | Deployer EOA, `0x` + 64 hex chars |
-| `NEXT_PUBLIC_AGENT_OPERATOR_ADDRESS` | Wallet that receives 50% of each query |
-| `NEXT_PUBLIC_ECOSYSTEM_FUND_ADDRESS` | Wallet that receives 10% of each query |
+| `NEXT_PUBLIC_AGENT_OPERATOR_ADDRESS` | Wallet that receives 15% of each query |
+| `NEXT_PUBLIC_ECOSYSTEM_FUND_ADDRESS` | Wallet that receives 5% of each query |
 | `OPENROUTER_API_KEY` | LLM access (free tier OK for hackathon) |
 | `OPENROUTER_MODEL` | e.g. `z-ai/glm-4.5-air:free` (primary) |
 | `OPENROUTER_FALLBACK_MODEL` | e.g. `openai/gpt-oss-120b:free` (retry) |
@@ -123,8 +123,8 @@ progress → confirm step 5 lands a real tx on KiteScan.
 | Role | Address | Purpose |
 |---|---|---|
 | Deployer | — | Deploys contracts, holds initial KITE |
-| Operator | — | Receives 50% of each query revenue |
-| Ecosystem Fund | — | Receives 10% of each query revenue |
+| Operator | — | Receives 15% of each query revenue |
+| Ecosystem Fund | — | Receives 5% of each query revenue |
 
 Fill these in after step 2.
 

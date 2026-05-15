@@ -18,8 +18,8 @@
 > a Kite Passport vault (`0xe2c4e9…ebc4c`) deployed live on Kite
 > testnet — 10 USDC daily, 2 USDC per-tx, on-chain enforcement, auditable
 > by anyone. Every query pays a Summarizer sub-agent 5%, settles the
-> rest through AttributionLedger (50% operator / 40% cited authors /
-> 10% Kite ecosystem), then replicates the receipt to Avalanche Fuji
+> rest through AttributionLedger (80% cited authors / 15% operator /
+> 5% Kite ecosystem), then replicates the receipt to Avalanche Fuji
 > within seconds. Gas sponsored by Kite's paymaster in Test USD — user
 > pays zero gas in any currency.
 >
@@ -152,9 +152,9 @@ flowchart TB
     Passport -.gates.-> Researcher
     Researcher --5% atomic--> Summarizer
     Researcher --totalPaid--> Ledger
-    Ledger --40% split--> Authors[Cited Authors]
-    Ledger --50%--> Operator[Operator EOA]
-    Ledger --10%--> Eco[Kite Ecosystem]
+    Ledger --80% split--> Authors[Cited Authors]
+    Ledger --15%--> Operator[Operator EOA]
+    Ledger --5%--> Eco[Kite Ecosystem]
     Authors -.claim via.-> NameReg
     Ledger --unbound--> Escrow
     Ledger -.mirror.-> Mirror

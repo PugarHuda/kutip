@@ -15,9 +15,9 @@ flowchart TB
     Passport -.gates.-> Researcher
     Researcher --5% atomic--> Summarizer
     Researcher --totalPaid--> Ledger
-    Ledger --40% split--> Authors[Cited Authors]
-    Ledger --50%--> Operator[Operator EOA]
-    Ledger --10%--> Eco[Kite Ecosystem]
+    Ledger --80% split--> Authors[Cited Authors]
+    Ledger --15%--> Operator[Operator EOA]
+    Ledger --5%--> Eco[Kite Ecosystem]
     Authors -.claim via.-> NameReg
     Ledger --unbound--> Escrow
     Ledger -.mirror.-> Mirror
