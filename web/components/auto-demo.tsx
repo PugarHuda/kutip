@@ -2,6 +2,18 @@
 
 import { useEffect, useState } from "react";
 
+export interface AutoDemoAuthor {
+  name: string;
+  amt: string;
+}
+
+const DEFAULT_AUTHORS: AutoDemoAuthor[] = [
+  { name: "Mahdi Fasihi", amt: "0.0200" },
+  { name: "Christian Breyer", amt: "0.0200" },
+  { name: "Olga Efimova", amt: "0.0000" },
+  { name: "Colin D. Bailie", amt: "0.0000" }
+];
+
 /**
  * Self-running visual demo that cycles through Kutip's main flow:
  *   typing → paying → searching → reading → ledger → settled → receipt → reset.
@@ -56,7 +68,11 @@ function stateAt(elapsed: number): DemoState {
   };
 }
 
-export function AutoDemo() {
+export function AutoDemo({
+  authors = DEFAULT_AUTHORS
+}: {
+  authors?: AutoDemoAuthor[];
+}) {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -200,10 +216,14 @@ export function AutoDemo() {
               </span>
             </div>
             <div className="mt-2 flex flex-col gap-1 text-sm">
-              <ReceiptRow name="Dr. Sarah Chen" amt="0.0200" delay="40ms" />
-              <ReceiptRow name="Dr. Marcus Hoffmann" amt="0.0200" delay="120ms" />
-              <ReceiptRow name="Dr. Lucia Fernandez" amt="0.0000" delay="200ms" />
-              <ReceiptRow name="Dr. Arjun Mehta" amt="0.0000" delay="280ms" />
+              {authors.slice(0, 4).map((a, i) => (
+                <ReceiptRow
+                  key={a.name}
+                  name={a.name}
+                  amt={a.amt}
+                  delay={`${40 + i * 80}ms`}
+                />
+              ))}
             </div>
             <div className="mt-2.5 flex gap-1.5 flex-wrap">
               <span className="chip chip--success" style={{ fontSize: 10 }}>

@@ -55,42 +55,77 @@ export default async function DashboardActivityPage() {
           </div>
         ) : (
           <div className="card p-0 overflow-hidden mt-6">
+            {/* Header row — explicit column labels so the table reads
+                without guessing which value is the queryId vs payer. */}
+            <div
+              className="grid gap-4 px-5 py-2.5 t-caption ink-3"
+              style={{
+                gridTemplateColumns: "44px 110px 1.4fr 1fr 90px 110px 100px",
+                borderBottom: "1px solid var(--border)",
+                background: "color-mix(in srgb, var(--ink) 3%, transparent)"
+              }}
+            >
+              <span>#</span>
+              <span>When</span>
+              <span>Query ID</span>
+              <span>Payer</span>
+              <span className="text-right">Cites</span>
+              <span className="text-right">USDC</span>
+              <span className="text-right">Tx</span>
+            </div>
+
             {attestations.map((a, i) => {
               const payerName =
                 walletToName.get(a.payer.toLowerCase()) ??
                 `${a.payer.slice(0, 6)}…${a.payer.slice(-4)}`;
+              // Pad to 2 digits so #01/#10 align visually. Use total
+              // length so the most-recent row gets the highest number
+              // (visual feed-as-history rather than feed-as-newest).
+              const seq = String(attestations.length - i).padStart(2, "0");
               return (
                 <Link
                   key={a.id}
-                  href={`/verify/${a.id}`}
+                  href={`/dashboard/verify/${a.id}`}
                   className="no-underline text-inherit block"
                 >
                   <div
                     className="grid gap-4 px-5 py-3.5 items-center transition-colors hover:surface-raised"
                     style={{
-                      gridTemplateColumns: "140px 1fr 110px 130px 120px",
+                      gridTemplateColumns: "44px 110px 1.4fr 1fr 90px 110px 100px",
                       borderBottom:
                         i < attestations.length - 1
                           ? "1px solid var(--border)"
                           : "none"
                     }}
                   >
+                    <span className="t-mono-sm ink-3 font-semibold">
+                      #{seq}
+                    </span>
                     <span className="t-mono-sm ink-3">
                       {timeAgo(a.timestamp)}
+                    </span>
+                    <span
+                      className="t-mono-sm ink-2 truncate"
+                      title={a.id}
+                    >
+                      {a.id.slice(0, 10)}…{a.id.slice(-6)}
                     </span>
                     <span className="t-serif text-[14px] truncate ink-2">
                       {payerName}
                     </span>
                     <span className="t-mono-sm ink-3 text-right">
-                      {a.citationCount} cite
-                      {a.citationCount === 1 ? "" : "s"}
+                      {a.citationCount}
                     </span>
                     <span className="t-mono text-right text-[14px] font-semibold text-emerald-700">
-                      + {formatUSDC(BigInt(a.totalPaid))} USDC
+                      + {formatUSDC(BigInt(a.totalPaid))}
                     </span>
                     <span className="flex justify-end">
-                      <span className="chip chip--success" style={{ padding: "2px 10px", fontSize: 10 }}>
-                        <CheckIcon size={10} /> {a.tx.slice(0, 8)}…
+                      <span
+                        className="chip chip--success"
+                        style={{ padding: "2px 10px", fontSize: 10 }}
+                        title={a.tx}
+                      >
+                        <CheckIcon size={10} /> {a.tx.slice(0, 6)}…
                       </span>
                     </span>
                   </div>

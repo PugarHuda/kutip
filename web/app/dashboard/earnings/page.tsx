@@ -10,6 +10,7 @@ import { listAuthors } from "@/lib/papers";
 import { formatUSDC, explorerAddress } from "@/lib/kite";
 import { ArrowRightIcon } from "@/components/icons";
 import { StatTile } from "@/components/ui";
+import { MyEarningsCard } from "@/components/my-earnings-card";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -96,6 +97,18 @@ export default async function DashboardEarningsPage() {
           Authors whose papers Kutip cited. Rankings reflect cumulative USDC
           earned across all attested queries.
         </p>
+
+        <MyEarningsCard
+          rows={rows.map((r) => ({
+            id: r.id,
+            name: r.name,
+            wallet: r.wallet,
+            // bigint can't cross the client boundary — serialise.
+            earnings: r.earnings.toString(),
+            citations: r.citations,
+            orcid: r.orcid
+          }))}
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-7">
           <StatTile

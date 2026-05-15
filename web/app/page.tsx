@@ -94,7 +94,15 @@ export default async function HomePage() {
                 auto-demo · 16s loop
               </span>
             </div>
-            <AutoDemo />
+            <AutoDemo
+              authors={authors.slice(0, 4).map((a, i) => ({
+                name: a.name,
+                // First two cited heavier weight → "paid"; last two get
+                // 0.00 → "escrowed" so the demo also shows the
+                // unclaimed-share narrative honestly.
+                amt: i < 2 ? "0.0200" : "0.0000"
+              }))}
+            />
           </div>
 
           {(aaAddress || ledgerAddress) && (
