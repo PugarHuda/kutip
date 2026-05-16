@@ -13,6 +13,7 @@ import {
   lookupClaim,
   normalizeOrcid,
   orcidHash,
+  parseClaimMessageExpiry,
   recordClaim,
   resolveWalletForOrcid,
   isOnChainClaimEnabled
@@ -238,5 +239,28 @@ describe("isOnChainClaimEnabled", () => {
       if (orig1) process.env.NEXT_PUBLIC_NAME_REGISTRY = orig1;
       if (orig2) process.env.KUTIP_NAME_REGISTRY = orig2;
     });
+  });
+});
+
+describe("parseClaimMessageExpiry", () => {
+  it("round-trips the validUntil from a freshly built v1 message", () => {
+    const msg = buildClaimMessage("0000-0001-2345-6789", ALICE_WALLET, 1893456000);
+    expect(parseClaimMessageExpiry(msg)).toBe(1893456000);
+  });
+
+  it("returns null for a message that is not a v1 Kutip claim", () => {
+    expect(parseClaimMessageExpiry("some other signed message")).toBeNull();
+  });
+
+  it("returns null when the validUntil line is absent", () => {
+    const msg = buildClaimMessage("0000-0001-2345-6789", ALICE_WALLET, 1893456000)
+      .replace(/^validUntil: \d+$/m, "");
+    expect(parseClaimMessageExpiry(msg)).toBeNull();
+  });
+
+  it("returns null for a non-positive validUntil", () => {
+    const msg = buildClaimMessage("0000-0001-2345-6789", ALICE_WALLET, 1893456000)
+      .replace(/^validUntil: \d+$/m, "validUntil: 0");
+    expect(parseClaimMessageExpiry(msg)).toBeNull();
   });
 });

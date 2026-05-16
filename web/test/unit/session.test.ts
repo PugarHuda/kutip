@@ -6,7 +6,7 @@
  * tampering / expiry / cap-overshoot all reject.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { ethers } from "ethers";
 import {
   SESSION_DOMAIN,
@@ -258,5 +258,35 @@ describe("financial precision", () => {
     expect(r.newSpentToday).toBe(usdc(999.99));
     // Critical: the output must be a bigint, not coerced to Number with loss
     expect(typeof r.newSpentToday).toBe("bigint");
+  });
+});
+
+describe("daily reset", () => {
+  it("zeroes the server-side spend counter when the UTC day rolls over", async () => {
+    vi.useFakeTimers();
+    try {
+      // Day 1 — spend 4 of a 10 cap. freshIntent + checkSpendStateless run
+      // under the faked clock so validUntil and the spend record's
+      // dayAnchor both anchor to 2030-03-01.
+      vi.setSystemTime(new Date("2030-03-01T10:00:00Z"));
+      const { intent, signature } = await freshIntent({
+        dailyCap: usdc(10),
+        perQueryCap: usdc(10),
+        ttlSec: 86_400n * 30n
+      });
+      const day1: SessionEnvelope = { intent, signature, spentToday: 0n };
+      const r1 = await checkSpendStateless(day1, usdc(4));
+      expect(r1.newSpentToday).toBe(usdc(4));
+
+      // Day 2 — same signature, so the same server record. Its dayAnchor
+      // is now stale, so the counter must reset: spending 4 again totals
+      // 4, not 8. Without the reset branch this would throw on the cap.
+      vi.setSystemTime(new Date("2030-03-02T10:00:00Z"));
+      const day2: SessionEnvelope = { intent, signature, spentToday: 0n };
+      const r2 = await checkSpendStateless(day2, usdc(4));
+      expect(r2.newSpentToday).toBe(usdc(4));
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
