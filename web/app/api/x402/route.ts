@@ -1,10 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { verifyOnChainPayment } from "@/lib/x402";
-import { KITE_TESTNET_USDC } from "@/lib/kite";
-import type { Hex } from "viem";
+import { createPublicClient, http, parseEventLogs, type Hex } from "viem";
+import { KITE_TESTNET_USDC, kiteTestnet } from "@/lib/kite";
 
 export const runtime = "nodejs";
+
+const TRANSFER_EVENT_ABI = [
+  {
+    type: "event",
+    name: "Transfer",
+    inputs: [
+      { name: "from", type: "address", indexed: true },
+      { name: "to", type: "address", indexed: true },
+      { name: "value", type: "uint256", indexed: false }
+    ]
+  }
+] as const;
+
+/**
+ * Verify a real on-chain x402 payment — no facilitator. The tx must have
+ * succeeded and carry a USDT `Transfer` to `payTo` of at least
+ * `minAmount` (18-dp wei). The merchant proves the payment itself by
+ * reading the Kite chain, so settlement is deterministic and auditable.
+ */
+async function verifyOnChainPayment(
+  txHash: Hex,
+  payTo: string,
+  minAmount: bigint
+): Promise<{ ok: boolean; paid: bigint }> {
+  const client = createPublicClient({ chain: kiteTestnet, transport: http() });
+  const receipt = await client.getTransactionReceipt({ hash: txHash });
+  if (receipt.status !== "success") return { ok: false, paid: 0n };
+
+  const transfers = parseEventLogs({
+    abi: TRANSFER_EVENT_ABI,
+    eventName: "Transfer",
+    logs: receipt.logs.filter(
+      (l) => l.address.toLowerCase() === KITE_TESTNET_USDC.toLowerCase()
+    )
+  });
+
+  let paid = 0n;
+  for (const t of transfers) {
+    if (t.args.to?.toLowerCase() === payTo.toLowerCase()) {
+      paid += t.args.value ?? 0n;
+    }
+  }
+  return { ok: paid >= minAmount, paid };
+}
 
 /**
  * Real x402 corpus-access endpoint.
