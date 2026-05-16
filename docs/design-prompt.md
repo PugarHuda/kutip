@@ -25,11 +25,11 @@ Every design decision should reinforce one of three emotions, in order of priori
 - Tech: Next.js 14 App Router, Tailwind, wagmi + viem. On-chain settlement on Kite testnet (Chain ID 2368, block time 1s, gas ≈ free).
 - Primary user flow:
   1. Land on `/`
-  2. Go to `/research` → type a question → set a USDC budget → click pay
+  2. Go to `/research` → type a question → set a USDT budget → click pay
   3. Watch the agent progress live (5 steps)
   4. Read the summary + see the on-chain attribution receipt
   5. Click a citation → land on the author's wallet on KiteScan
-  6. Separately: `/leaderboard` ranks authors by USDC earned
+  6. Separately: `/leaderboard` ranks authors by USDT earned
   7. Public `/verify/[queryId]` shows cryptographic proof of any past query
 
 - The demo video is 90 seconds. The UI must hit a visual climax at 0:40 when the "revenue split" panel reveals. Design for that frame.
@@ -75,7 +75,7 @@ precise, tabular, monospaced-where-it-counts, warm-where-it-matters. Think:
 
 | Token | Hex | Use |
 |---|---|---|
-| `emerald-400` | `#34d399` | Successful attestation tx, author payout chip, +USDC delta |
+| `emerald-400` | `#34d399` | Successful attestation tx, author payout chip, +USDT delta |
 | `emerald-50` | `#ecfdf5` | Payout row bg on hover |
 
 > Emerald never appears on CTAs or navigation. It appears **only** in
@@ -130,7 +130,7 @@ Three typefaces, no more:
 ### Typographic rules
 
 - Paper titles render in Newsreader 18/26 italic — one rule, consistent across /research result view + /leaderboard + /verify.
-- USDC amounts are **always** in JetBrains Mono with `tabular-nums`. Ever.
+- USDT amounts are **always** in JetBrains Mono with `tabular-nums`. Ever.
 - Wallet addresses render as `0x5c91…bf40c` (first 6, ellipsis `…` not `...`, last 5). Full address on hover via tooltip with a copy icon inside.
 - Never justify paragraphs. Ragged right only.
 
@@ -144,7 +144,7 @@ Each page gets: **archetype · grid · key moment · must-have · don't**.
 
 - **Archetype:** Editorial hero + a single visual diagram — no 3-up feature grid.
 - **Grid:** max-w-6xl, 12-col. Hero left (7 cols), live "agent in action" diagram right (5 cols).
-- **Key moment:** The diagram animates once, slowly, on first scroll into view — showing USDC flowing from the user's wallet into papers, through the agent, out to authors. It loops every 12s with a subtle idle state between loops.
+- **Key moment:** The diagram animates once, slowly, on first scroll into view — showing USDT flowing from the user's wallet into papers, through the agent, out to authors. It loops every 12s with a subtle idle state between loops.
 - **Must-have:**
   - Hero headline: **"The research agent that pays its sources."**
   - Subhead: one sentence, no marketing hype. `"Every citation triggers a payment to the author, attested on Kite chain."`
@@ -163,8 +163,8 @@ This is the hero page. Design for 1280px desktop first, reflow at 768 / 480.
 - **Phase 1 — idle (form):**
   - Textarea, 3 lines, placeholder: "e.g., What are the top carbon capture methods in 2024?"
   - 3 suggestion chips below, mono-small, horizontally scrollable on mobile.
-  - Budget: **not a slider**. Use a stepper with preset pills: `1 · 2 · 5 · 10 USDC` and a "custom" option. Show cost-per-paper estimate inline: `~5 papers × 0.40 USDC avg`.
-  - Primary button: `Pay 2 USDC & research`. On hover, subtle translate-y -1px, no glow, no shadow change.
+  - Budget: **not a slider**. Use a stepper with preset pills: `1 · 2 · 5 · 10 USDT` and a "custom" option. Show cost-per-paper estimate inline: `~5 papers × 0.40 USDT avg`.
+  - Primary button: `Pay 2 USDT & research`. On hover, subtle translate-y -1px, no glow, no shadow change.
 - **Phase 2 — running (agent progress):**
   - Right panel turns into a vertical log with 5 steps. Each step is a row: icon · label · timing · detail.
   - The currently-running step has a subtle 1px kite-500 left border and a breathing opacity animation (0.6 → 1.0 over 1.6s, ease-in-out).
@@ -185,9 +185,9 @@ This is the hero page. Design for 1280px desktop first, reflow at 768 / 480.
 
 - **Archetype:** Data-dense table, Dune Analytics-like.
 - **Grid:** max-w-6xl. Three top-of-page stat tiles (authors tracked / total citations / total paid), then the table.
-- **Table columns:** `#` rank · Author · Affiliation · Citations · USDC earned · Wallet · Trend (tiny 7-day sparkline, stone-600).
+- **Table columns:** `#` rank · Author · Affiliation · Citations · USDT earned · Wallet · Trend (tiny 7-day sparkline, stone-600).
 - **Top earner row:** subtle emerald-50 bg, left border emerald-400 1px. No crown icons, no medals.
-- **Sort affordance:** sortable columns have a small `↕` that becomes `↑` or `↓` when active. Default sort: USDC earned DESC.
+- **Sort affordance:** sortable columns have a small `↕` that becomes `↑` or `↓` when active. Default sort: USDT earned DESC.
 - **Must-have:**
   - Row hover: kite-50 bg, cursor default (not pointer — row itself doesn't click, only explicit links do).
   - Wallet column is a button: click to copy, hover shows explorer icon.
@@ -279,9 +279,9 @@ Reserved icons:
 
 - Tone: plainspoken, slightly dry, no hype. **"Fair" over "revolutionary".**
 - Active voice always.
-- Numbers win over adjectives: say `2.00 USDC` not `two bucks`, say `95% of authors reached` not `nearly every author`.
+- Numbers win over adjectives: say `2.00 USDT` not `two bucks`, say `95% of authors reached` not `nearly every author`.
 - Zero words to strip from copy: "seamless", "powerful", "robust", "next-generation", "cutting-edge", "journey", "unleash", "AI-powered" (we know it's AI).
-- Error messages: say what happened + what the user can do. `"Your wallet doesn't have enough USDC. Need 2.00, found 0.45. [Get testnet USDC →]"`
+- Error messages: say what happened + what the user can do. `"Your wallet doesn't have enough USDT. Need 2.00, found 0.45. [Get testnet USDT →]"`
 
 ### Specific strings
 
@@ -289,7 +289,7 @@ Reserved icons:
 |---|---|
 | Landing hero | `The research agent that pays its sources.` |
 | Landing sub | `Every citation triggers a payment to the author, attested on Kite chain.` |
-| Research CTA idle | `Pay 2 USDC & research →` |
+| Research CTA idle | `Pay 2 USDT & research →` |
 | Research CTA running | `Paying…` (then per-step label in log panel) |
 | Agent step 5 label | `Settling on Kite chain` |
 | Receipt panel title | `Attribution receipt` |
@@ -307,7 +307,7 @@ Reserved icons:
 - All copy buttons, chips, and sortable column headers must be keyboard-operable (`button`, not `div onclick`).
 - Textarea has a visible character counter at 500 chars (warning at 450).
 - `prefers-reduced-motion`: disable all pulse/stagger/translate animations. Instant state change.
-- Every icon button has `aria-label`. Every amount has an invisible full-word alternative (`aria-label="2.00 USDC"`).
+- Every icon button has `aria-label`. Every amount has an invisible full-word alternative (`aria-label="2.00 USDT"`).
 - Color is never the only signal: the "top earner" row also has a subtle left border, not just emerald bg.
 
 ---

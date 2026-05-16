@@ -111,12 +111,12 @@ export default async function VerifyPage({ params }: { params: { queryId: string
             </Fact>
             <Fact label="Total paid">
               <span className="t-mono text-[15px] font-semibold">
-                {formatUSDC(record.totalPaid)} USDC
+                {formatUSDC(record.totalPaid)} USDT
               </span>
             </Fact>
             <Fact label="Authors share">
               <span className="t-small">
-                {formatUSDC(record.authorsShare)} USDC · 40% of total
+                {formatUSDC(record.authorsShare)} USDT · 40% of total
               </span>
             </Fact>
             <Fact label="Citation count">
@@ -164,7 +164,7 @@ export default async function VerifyPage({ params }: { params: { queryId: string
                     wallet={walletShort}
                     walletFull={c.author}
                     walletHref={explorerAddress(c.author)}
-                    amount={`${formatUSDC(c.amount)} USDC`}
+                    amount={`${formatUSDC(c.amount)} USDT`}
                     tx={`${c.txHash.slice(0, 10)}…`}
                     txHref={explorerTx(c.txHash)}
                   />
@@ -173,7 +173,7 @@ export default async function VerifyPage({ params }: { params: { queryId: string
               <div className="flex justify-between items-center px-5 py-3.5 surface-raised">
                 <span className="t-small ink-2">Total authors share</span>
                 <span className="t-mono font-bold text-[15px]">
-                  {record ? formatUSDC(record.authorsShare) : "—"} USDC
+                  {record ? formatUSDC(record.authorsShare) : "—"} USDT
                 </span>
               </div>
             </div>
@@ -194,7 +194,7 @@ export default async function VerifyPage({ params }: { params: { queryId: string
                 className="chip"
                 style={{ padding: "1px 8px", fontSize: 10 }}
               >
-                0.10 USDC / cite
+                0.10 USDT / cite
               </span>
             </div>
             <div className="t-small ink-2 mb-3 max-w-[620px]">
@@ -213,7 +213,7 @@ export default async function VerifyPage({ params }: { params: { queryId: string
                 <div>
                   <div className="t-caption">Revenue earned</div>
                   <div className="t-mono font-semibold text-[15px] mt-0.5 text-emerald-700">
-                    {(Number(paywallMetrics.revenueEarned) / 1e18).toFixed(2)} USDC
+                    {(Number(paywallMetrics.revenueEarned) / 1e18).toFixed(2)} USDT
                   </div>
                 </div>
                 {paywallMetrics.lastAccessAt && (

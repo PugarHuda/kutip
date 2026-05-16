@@ -47,7 +47,7 @@ on KiteScan without grepping a key custodian's database.
 flowchart TB
     User[User Wallet]
     Passport[Session Delegation<br/>EIP-712]
-    Vault[Kite Passport vault<br/>10 USDC/day · 2 USDC/tx]
+    Vault[Kite Passport vault<br/>10 USDT/day · 2 USDT/tx]
     Researcher[Researcher AA]
     Summarizer[Summarizer AA<br/>+ 5% sub-agent fee]
     Ledger[AttributionLedger]
@@ -73,7 +73,7 @@ For each query:
 
 1. **User** signs a SpendingIntent (EIP-712) capping spend per query +
    per day. Server keeps the floor; client value can only ratchet up.
-2. **Researcher AA** receives 2 USDC via the x402 paywall flow. Funds
+2. **Researcher AA** receives 2 USDT via the x402 paywall flow. Funds
    land in `AttributionLedger`.
 3. Researcher fetches papers from Semantic Scholar / OpenAlex,
    summarises via OpenRouter LLM, ranks citations.

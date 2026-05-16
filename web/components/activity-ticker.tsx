@@ -76,7 +76,7 @@ export function ActivityTicker() {
   const tooltip = items
     .map(
       (it) =>
-        `${timeAgo(it.timestamp)} ago · ${it.citationCount} cites · +${formatUSDC(it.totalPaid)} USDC`
+        `${timeAgo(it.timestamp)} ago · ${it.citationCount} cites · +${formatUSDC(it.totalPaid)} USDT`
     )
     .join("\n");
 

@@ -237,7 +237,7 @@ function ClaimPage() {
         <div className="t-caption">Claim your earnings</div>
         <h1 className="t-display-xl mt-1.5 mb-2">Bind your ORCID.</h1>
         <p className="t-body ink-2 max-w-[560px]">
-          Every paper Kutip cites routes a share of USDC to the author&apos;s wallet.
+          Every paper Kutip cites routes a share of USDT to the author&apos;s wallet.
           If that&apos;s you, bind your wallet to your ORCID below — from the next
           query onwards, your cut lands in <em>your</em> wallet, not the unclaimed
           placeholder.
@@ -498,6 +498,6 @@ function buildMessage(orcid: string, wallet: string, validUntil: number) {
     `chainId: 2368`,
     `validUntil: ${validUntil}`,
     "",
-    "This binding controls future USDC payouts from the Kutip attribution ledger."
+    "This binding controls future USDT payouts from the Kutip attribution ledger."
   ].join("\n");
 }

@@ -4,6 +4,14 @@ export interface Citation {
   weightBps: number;
 }
 
+/** Publication-year window for paper discovery. Either bound is
+ *  optional — `{from: 2020}` means 2020-onward, `{to: 2015}` means
+ *  up to 2015, `{from, to}` a closed range, `undefined` all years. */
+export interface YearRange {
+  from?: number;
+  to?: number;
+}
+
 export interface ResearchResult {
   queryId: string;
   query: string;

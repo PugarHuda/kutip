@@ -20,6 +20,7 @@
 
 import { keccak256, toBytes, type Address } from "viem";
 import type { Author, Paper } from "./papers";
+import type { YearRange } from "./types";
 
 const OA_URL = "https://api.openalex.org/works";
 const OA_SELECT =
@@ -71,12 +72,19 @@ function synthWallet(name: string): Address {
 
 export async function searchOpenAlex(
   query: string,
-  limit = 8
+  limit = 8,
+  years?: YearRange
 ): Promise<{ papers: Paper[]; authors: Author[] }> {
+  // from_publication_date / to_publication_date are date-range filter
+  // keys — chained into the comma-separated `filter=` clause.
+  let dateFilter = "";
+  if (years?.from) dateFilter += `,from_publication_date:${years.from}-01-01`;
+  if (years?.to) dateFilter += `,to_publication_date:${years.to}-12-31`;
+
   const url =
     `${OA_URL}?search=${encodeURIComponent(query)}` +
     `&per-page=${limit}` +
-    `&filter=type:article,has_abstract:true` +
+    `&filter=type:article,has_abstract:true${dateFilter}` +
     `&select=${OA_SELECT}` +
     `&mailto=agent@kutip.app`;
 
@@ -126,9 +134,9 @@ export async function searchOpenAlex(
       year: w.publication_year ?? new Date().getFullYear(),
       journal: w.primary_location?.source?.display_name ?? "Preprint",
       keywords: [],
-      // micro-USDC (6 dp). Matches the seeded catalog's 0.03-0.05 band
-      // so a default 0.1-USDC budget can afford 2-3 papers. The old
-      // 400000 (0.4 USDC) priced every runtime paper out of reach →
+      // micro-USDT (6 dp). Matches the seeded catalog's 0.03-0.05 band
+      // so a default 0.1-USDT budget can afford 2-3 papers. The old
+      // 400000 (0.4 USDT) priced every runtime paper out of reach →
       // 0 purchased → 0 citations → attestation reverted on
       // EmptyCitations.
       priceUSDC: 40000,

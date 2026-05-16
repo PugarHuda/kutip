@@ -77,6 +77,8 @@ type Phase = "idle" | "running" | "result";
 export default function ResearchPage() {
   const [query, setQuery] = useState("");
   const [budget, setBudget] = useState(0.1);
+  const [yearFrom, setYearFrom] = useState("");
+  const [yearTo, setYearTo] = useState("");
   const [steps, setSteps] = useState<AgentStep[]>([]);
   const [result, setResult] = useState<ResearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +105,8 @@ export default function ResearchPage() {
         body: JSON.stringify({
           query: q,
           budgetUSDC: budget,
+          yearFrom: yearFrom ? Number(yearFrom) : undefined,
+          yearTo: yearTo ? Number(yearTo) : undefined,
           session: session
             ? {
                 intent: session.intent,
@@ -167,6 +171,10 @@ export default function ResearchPage() {
         setQuery={setQuery}
         budget={budget}
         setBudget={setBudget}
+        yearFrom={yearFrom}
+        setYearFrom={setYearFrom}
+        yearTo={yearTo}
+        setYearTo={setYearTo}
         onSubmit={runQuery}
         disabled={running || query.trim().length < 5}
         steps={steps}
@@ -196,6 +204,10 @@ function ResearchSidebar({
   setQuery,
   budget,
   setBudget,
+  yearFrom,
+  setYearFrom,
+  yearTo,
+  setYearTo,
   onSubmit,
   disabled,
   steps,
@@ -206,6 +218,10 @@ function ResearchSidebar({
   setQuery: (q: string) => void;
   budget: number;
   setBudget: (b: number) => void;
+  yearFrom: string;
+  setYearFrom: (y: string) => void;
+  yearTo: string;
+  setYearTo: (y: string) => void;
   onSubmit: () => void;
   disabled: boolean;
   steps: AgentStep[];
@@ -353,15 +369,15 @@ function ResearchSidebar({
               className="card w-full h-10 px-3 pr-14 font-mono text-[13px] font-semibold bg-transparent focus:outline-none focus:border-kite-500 transition-colors"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 t-mono-sm ink-3 pointer-events-none">
-              USDC
+              USDT
             </span>
           </div>
         </div>
       )}
       <div className="t-small ink-3 mt-2">
         {customMode
-          ? "Between 0.10 and 20 USDC · paid by agent smart account"
-          : "USDC · paid by agent smart account"}
+          ? "Between 0.10 and 20 USDT · paid by agent smart account"
+          : "USDT · paid by agent smart account"}
       </div>
 
       {/* A bigger budget is tangibly worth more: it funds a broader
@@ -377,8 +393,39 @@ function ResearchSidebar({
         <span className="ink-3">This budget funds</span>
         <span className="font-semibold text-kite-700">
           ≈ {papersForBudget(budget)} papers ·{" "}
-          {(budget * SPLIT.authors).toFixed(2)} USDC to authors
+          {(budget * SPLIT.authors).toFixed(2)} USDT to authors
         </span>
+      </div>
+
+      <div className="t-caption mt-6">Publication years</div>
+      <div className="flex items-center gap-2 mt-2">
+        <input
+          type="number"
+          inputMode="numeric"
+          min="1900"
+          max="2030"
+          value={yearFrom}
+          onChange={(e) => setYearFrom(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          placeholder="From"
+          aria-label="Earliest publication year"
+          className="card flex-1 h-10 px-3 font-mono text-[13px] bg-transparent focus:outline-none focus:border-kite-500 transition-colors"
+        />
+        <span className="t-mono-sm ink-3">→</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          min="1900"
+          max="2030"
+          value={yearTo}
+          onChange={(e) => setYearTo(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          placeholder="To"
+          aria-label="Latest publication year"
+          className="card flex-1 h-10 px-3 font-mono text-[13px] bg-transparent focus:outline-none focus:border-kite-500 transition-colors"
+        />
+      </div>
+      <div className="t-small ink-3 mt-2">
+        Optional · blank = all years. One side works — e.g. From 2020 means
+        2020-onward.
       </div>
 
       <button
@@ -390,7 +437,7 @@ function ResearchSidebar({
         {phase === "idle" && insufficient && <>Insufficient balance</>}
         {phase === "idle" && !insufficient && (
           <>
-            Pay {budget} USDC &amp; research <ArrowRightIcon />
+            Pay {budget} USDT &amp; research <ArrowRightIcon />
           </>
         )}
         {phase === "running" && (
@@ -449,7 +496,7 @@ function ResearchSidebar({
             />
           </div>
           <div className="t-mono-sm ink-3 mt-1.5">
-            Paying {budget} USDC · attestation fail-closed
+            Paying {budget} USDT · attestation fail-closed
           </div>
         </div>
       )}
@@ -487,7 +534,7 @@ function ResearchSidebar({
                 insufficient ? "text-rose-500" : ""
               }`}
             >
-              {formatBalance(balances.researcher.balance)} USDC
+              {formatBalance(balances.researcher.balance)} USDT
             </span>
           </div>
         )}
@@ -506,7 +553,7 @@ function ResearchSidebar({
               {formatBalance(
                 (requiredTotal - (researcherBal ?? 0n)).toString()
               )}{" "}
-              USDC
+              USDT
             </div>
             <div className="t-mono-sm ink-3 mt-1">
               Top up Researcher AA via MetaMask
@@ -518,7 +565,7 @@ function ResearchSidebar({
       <SessionManager onSessionChange={onSessionChange} />
 
       <div className="t-small ink-3 mt-4 pt-4 border-t border-token">
-        Your USDC splits to authors only if citations land. Attestation is fail-closed.
+        Your USDT splits to authors only if citations land. Attestation is fail-closed.
       </div>
     </aside>
   );
@@ -559,7 +606,7 @@ function IdleView({ setQuery }: { setQuery: (q: string) => void }) {
         Pay the humans you learn from.
       </h2>
       <p className="t-body ink-2 max-w-[460px] mt-3">
-        Type your question on the left and set a USDC budget. The agent&apos;s
+        Type your question on the left and set a USDT budget. The agent&apos;s
         work streams live, receipts land on Kite chain, and cited authors get
         paid — all in one transaction.
       </p>
@@ -1050,7 +1097,7 @@ function ResultView({
                 color: "var(--emerald-600)"
               }}
             >
-              <CountUp value={totalPaid} /> USDC
+              <CountUp value={totalPaid} /> USDT
             </div>
             <div className="t-small ink-2 mt-1.5">
               paid to {authorCount} author{authorCount === 1 ? "" : "s"} ·{" "}
@@ -1114,7 +1161,7 @@ function ResultView({
                   wallet={`${a.wallet.slice(0, 6)}…${a.wallet.slice(-4)}`}
                   walletFull={a.wallet}
                   walletHref={KITESCAN_ADDR + a.wallet}
-                  amount={`${amount} USDC`}
+                  amount={`${amount} USDT`}
                   tx={txShort ?? "demo"}
                   txHref={result.attestationTx ? KITESCAN_TX + result.attestationTx : undefined}
                 />
@@ -1126,7 +1173,7 @@ function ResultView({
               Authors share ({Math.round(SPLIT.authors * 100)}%)
             </span>
             <span className="t-mono font-bold text-[15px]">
-              {((result.totalPaidUSDC * SPLIT.authors) / 1e18).toFixed(4)} USDC
+              {((result.totalPaidUSDC * SPLIT.authors) / 1e18).toFixed(4)} USDT
             </span>
           </div>
           {result.sessionId && (
@@ -1181,7 +1228,7 @@ function ResultView({
                 </div>
               </div>
               <span className="t-mono font-semibold text-[15px] text-kite-700">
-                + {result.subAgentFeeUSDC} USDC
+                + {result.subAgentFeeUSDC} USDT
               </span>
             </div>
           )}

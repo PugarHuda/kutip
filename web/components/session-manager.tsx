@@ -276,7 +276,7 @@ export function SessionManager({
         <div className="flex justify-between items-baseline mb-1">
           <span className="t-small ink-3">Daily usage</span>
           <span className="t-mono-sm font-semibold">
-            {formatUSDC(envelope.spentToday)} / {formatUSDC(envelope.intent.dailyCapUSDC)} USDC
+            {formatUSDC(envelope.spentToday)} / {formatUSDC(envelope.intent.dailyCapUSDC)} USDT
           </span>
         </div>
         <div
@@ -290,7 +290,7 @@ export function SessionManager({
         </div>
         <div className="flex justify-between items-center mt-2.5">
           <span className="t-mono-sm ink-3">
-            Max per query · {formatUSDC(envelope.intent.maxPerQueryUSDC)} USDC
+            Max per query · {formatUSDC(envelope.intent.maxPerQueryUSDC)} USDT
           </span>
           <button
             type="button"

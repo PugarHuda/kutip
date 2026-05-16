@@ -85,7 +85,7 @@ export function buildClaimMessage(
     `chainId: ${CLAIM_CHAIN_ID}`,
     `validUntil: ${validUntil}`,
     "",
-    "This binding controls future USDC payouts from the Kutip attribution ledger."
+    "This binding controls future USDT payouts from the Kutip attribution ledger."
   ].join("\n");
 }
 

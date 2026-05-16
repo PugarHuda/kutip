@@ -81,7 +81,7 @@ export default function GaslessPage() {
         <p className="t-body ink-2 max-w-[680px] m-0">
           Kutip&apos;s Researcher never holds KITE native tokens. When it submits an
           attestation, the Kite paymaster fronts the gas in KITE, then pulls its
-          cost back in USDC from the agent&apos;s own smart account — in the same
+          cost back in USDT from the agent&apos;s own smart account — in the same
           UserOperation, atomically. You, the user, pay zero gas in any currency.
         </p>
 
@@ -102,7 +102,7 @@ export default function GaslessPage() {
               0
             </div>
             <div className="t-small ink-3 mt-1">
-              not KITE, not USDC, not anything. zero.
+              not KITE, not USDT, not anything. zero.
             </div>
           </div>
           <div className="card p-5">
@@ -117,7 +117,7 @@ export default function GaslessPage() {
           <div className="card p-5">
             <div className="t-caption">Agent pays paymaster in</div>
             <div className="t-mono font-bold mt-1 text-[30px] leading-[36px]">
-              USDC
+              USDT
             </div>
             <div className="t-small ink-3 mt-1">
               via approve + transferFrom in postOp, live every query
@@ -200,8 +200,8 @@ export default function GaslessPage() {
               ],
               [
                 "4",
-                "Paymaster postOp pulls USDC",
-                "transferFrom(Researcher AA → paymaster, ~0.02 USDC) · gas reimbursed"
+                "Paymaster postOp pulls USDT",
+                "transferFrom(Researcher AA → paymaster, ~0.02 USDT) · gas reimbursed"
               ],
               [
                 "5",
@@ -292,7 +292,7 @@ function WalletCard({
             {formatKite(w.kiteBalance)} <span className="t-small ink-3">KITE</span>
           </div>
           <div className="t-mono ink-2 text-[14px] mt-0.5">
-            {formatUSDC(w.usdcBalance)} <span className="t-small ink-3">USDC</span>
+            {formatUSDC(w.usdcBalance)} <span className="t-small ink-3">USDT</span>
           </div>
         </div>
       </div>

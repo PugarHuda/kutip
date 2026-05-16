@@ -1,6 +1,6 @@
 # Kutip Documentation
 
-> An autonomous AI research agent that pays cited authors in USDC, attested on Kite chain.
+> An autonomous AI research agent that pays cited authors in USDT, attested on Kite chain.
 
 Welcome. These pages cover everything from "click this and run a query" to "audit the on-chain conservation invariants in our fuzz suite."
 

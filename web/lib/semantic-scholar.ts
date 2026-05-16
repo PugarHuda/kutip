@@ -13,6 +13,7 @@
 
 import { keccak256, toBytes, type Address } from "viem";
 import type { Author, Paper } from "./papers";
+import type { YearRange } from "./types";
 
 interface SSAuthor {
   name: string;
@@ -44,12 +45,17 @@ export function isSemanticScholarEnabled(): boolean {
 
 export async function searchSemanticScholar(
   query: string,
-  limit = 8
+  limit = 8,
+  years?: YearRange
 ): Promise<{ papers: Paper[]; authors: Author[] }> {
   const url = new URL(SS_URL);
   url.searchParams.set("query", query);
   url.searchParams.set("limit", String(limit));
   url.searchParams.set("fields", FIELDS);
+  // SS `year` accepts open ranges: "2016-2020", "2010-", "-2015".
+  if (years?.from || years?.to) {
+    url.searchParams.set("year", `${years.from ?? ""}-${years.to ?? ""}`);
+  }
 
   const res = await fetch(url.toString(), {
     headers: { Accept: "application/json" },
@@ -94,8 +100,8 @@ export async function searchSemanticScholar(
       year: p.year ?? 2024,
       journal: p.venue ?? "arXiv preprint",
       keywords: [],
-      // micro-USDC (6 dp) — matches the seeded catalog's 0.03-0.05 band
-      // so a default 0.1-USDC budget can afford a couple of papers.
+      // micro-USDT (6 dp) — matches the seeded catalog's 0.03-0.05 band
+      // so a default 0.1-USDT budget can afford a couple of papers.
       priceUSDC: 40000,
       authors: paperAuthorIds
     });

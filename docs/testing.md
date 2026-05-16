@@ -73,7 +73,7 @@ Output goes to `web/coverage/index.html`.
 | `AttributionLedger.t.sol` | `AttributionLedgerTest` | 5 | Split correctness, dup query revert, weight mismatch, empty cites, stats |
 | `AttributionLedger.fuzz.t.sol` | `AttributionLedgerFuzzTest` | 7 + 2×256 fuzz | **Conservation property** · two-author split fuzz · dust payment · weight boundary 9999/10001 · constructor InvalidSplit · zero-weight allowed |
 | `UnclaimedYieldEscrow.t.sol` | `UnclaimedYieldEscrowTest` | 8 | Existing |
-| `UnclaimedYieldEscrow.fuzz.t.sol` | `UnclaimedYieldEscrowFuzzTest` | 7 + 2×256 fuzz | **Yield linearity** fuzz · dust principal yield=0 · 1 USDC × 5% yields exactly 5e16 wei · post-claim freeze · double-claim revert · operator gating |
+| `UnclaimedYieldEscrow.fuzz.t.sol` | `UnclaimedYieldEscrowFuzzTest` | 7 + 2×256 fuzz | **Yield linearity** fuzz · dust principal yield=0 · 1 USDT × 5% yields exactly 5e16 wei · post-claim freeze · double-claim revert · operator gating |
 | `BountyMarket.t.sol` | `BountyMarketTest` | 7 | Existing |
 | `AgentReputation.t.sol` | `AgentReputationTest` | 7 | Existing |
 | `AgentRegistry8004.t.sol` | `AgentRegistry8004Test` | 6 | Existing |

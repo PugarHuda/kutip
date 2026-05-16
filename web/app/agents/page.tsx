@@ -138,7 +138,7 @@ export default async function AgentsPage() {
           </h1>
           <p className="t-body ink-2 max-w-[640px] m-0">
             Every agent in the Kutip fleet holds a reputation NFT. Citations
-            paid, attestations landed, USDC routed — all accumulate on-chain
+            paid, attestations landed, USDT routed — all accumulate on-chain
             and travel with the wallet. Transferrable identity, auditable
             history, production-ready for ERC-6551 token-bound accounts.
           </p>
@@ -158,7 +158,7 @@ export default async function AgentsPage() {
             delta="across all agents"
           />
           <StatTile
-            label="USDC routed (total)"
+            label="USDT routed (total)"
             value={formatUSDC(totalEarned)}
             delta="sum of on-chain attestations"
             accent="emerald"
@@ -274,7 +274,7 @@ export default async function AgentsPage() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="ink-3">Total USDC routed</span>
+                    <span className="ink-3">Total USDT routed</span>
                     <span className="t-mono font-semibold text-emerald-700">
                       {formatUSDC(a.totalEarnedWei)}
                     </span>

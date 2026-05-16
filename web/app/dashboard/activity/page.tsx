@@ -38,7 +38,7 @@ export default async function DashboardActivityPage() {
         <h1 className="t-h1-tight mt-1 mb-3">Recent attestations</h1>
         <p className="t-body ink-2 max-w-[620px] m-0">
           Live feed of every query settled on Kite testnet, indexed by Goldsky.
-          Each row is a citation that actually moved USDC — click through for
+          Each row is a citation that actually moved USDT — click through for
           the tx on KiteScan.
         </p>
 
@@ -70,7 +70,7 @@ export default async function DashboardActivityPage() {
               <span>Query ID</span>
               <span>Payer</span>
               <span className="text-right">Cites</span>
-              <span className="text-right">USDC</span>
+              <span className="text-right">USDT</span>
               <span className="text-right">Tx</span>
             </div>
 

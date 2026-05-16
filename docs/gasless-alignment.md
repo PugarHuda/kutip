@@ -4,13 +4,13 @@
 
 The Researcher AA batches every attestation as a single UserOperation:
 
-1. `USDC.approve(paymaster, MAX_UINT)` — idempotent, one-time in practice
-2. `USDC.transfer(summarizerAA, subFee)` — 5% sub-agent cut
-3. `USDC.transfer(ledger, totalPaid)` — authors + ecosystem share
+1. `USDT.approve(paymaster, MAX_UINT)` — idempotent, one-time in practice
+2. `USDT.transfer(summarizerAA, subFee)` — 5% sub-agent cut
+3. `USDT.transfer(ledger, totalPaid)` — authors + ecosystem share
 4. `AttributionLedger.attestAndSplit(queryId, totalPaid, citations)` — distributes
 
 The Kite paymaster pre-approves in `validatePaymasterUserOp`, then in
-`postOp` pulls USDC from the AA via `transferFrom` to reimburse itself
+`postOp` pulls USDT from the AA via `transferFrom` to reimburse itself
 for the KITE it spent on gas. The approval in step (1) is what lets
 step `postOp` not revert with `ERC20InsufficientAllowance`.
 
@@ -23,7 +23,7 @@ User signs an EIP-3009 `TransferWithAuthorization` off-chain. A backend
 relayer submits the authorization on-chain, paying KITE gas on the
 user's behalf. The signature is single-use (nonce-bound).
 
-**Use case:** A user who holds USDC but no KITE wants to send USDC to
+**Use case:** A user who holds USDT but no KITE wants to send USDT to
 another wallet. They sign, the relayer submits.
 
 ### 2. Account Abstraction SDK (EIP-4337)
@@ -58,7 +58,7 @@ its own signing ceremony. The AA pattern collapses it to one UserOp.
 ## Could we add EIP-3009?
 
 Yes, but as a separate feature:
-- A "user tops up agent" flow where a user who has USDC but no KITE
+- A "user tops up agent" flow where a user who has USDT but no KITE
   funds the Researcher AA with a single EIP-3009 signature.
 - Useful for the first-time user experience (agent gets funded without
   the user needing KITE from a faucet).

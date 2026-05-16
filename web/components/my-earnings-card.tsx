@@ -44,7 +44,7 @@ export function MyEarningsCard({ rows }: { rows: PassthroughRow[] }) {
           <div className="t-small ink-3 mt-0.5">
             Connect a wallet in the topbar — if Kutip has ever cited a paper
             you authored, your row appears here with citation count and total
-            USDC accrued.
+            USDT accrued.
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ export function MyEarningsCard({ rows }: { rows: PassthroughRow[] }) {
         </div>
         <div className="flex items-baseline gap-2 mt-1.5">
           <span className="t-mono font-bold text-[22px] text-emerald-700">
-            {formatBigUSDC(earnings)} USDC
+            {formatBigUSDC(earnings)} USDT
           </span>
           {mine && earnings > 0n && (
             <span className="t-small ink-3">

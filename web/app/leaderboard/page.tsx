@@ -69,7 +69,7 @@ type Range = "all" | "week" | "month";
 type Sort = "earnings" | "citations";
 
 /**
- * 4-decimal USDC formatter. Per-paper attestations split the authors
+ * 4-decimal USDT formatter. Per-paper attestations split the authors
  * share across multiple authors, so individual cuts land small —
  * the 2-decimal formatUSDC would render all of them as a misleading
  * "0.00". 4 decimals shows the real (small but non-zero) micro-payment.
@@ -227,7 +227,7 @@ export default async function LeaderboardPage({
             delta={totalCitations > 0 ? "live-updated" : "no queries yet"}
           />
           <StatTile
-            label="USDC paid out"
+            label="USDT paid out"
             value={formatUSDC4(totalEarnings)}
             delta={totalEarnings > 0n ? "authors share only (80%)" : "awaiting first attestation"}
             accent="emerald"
@@ -240,7 +240,7 @@ export default async function LeaderboardPage({
               <div className="t-h3">No earnings yet.</div>
               <div className="t-small ink-2 mt-1 max-w-[560px]">
                 Run your first research query and every cited author on the list below
-                will receive a USDC payout the moment the attestation lands on chain.
+                will receive a USDT payout the moment the attestation lands on chain.
               </div>
             </div>
             <a href="/research" className="btn btn--primary">
@@ -282,7 +282,7 @@ export default async function LeaderboardPage({
             Sort:{" "}
             {(
               [
-                ["earnings", "USDC earned ↓"],
+                ["earnings", "USDT earned ↓"],
                 ["citations", "Citations ↓"]
               ] as const
             ).map(([s, label], i) => {
@@ -316,7 +316,7 @@ export default async function LeaderboardPage({
             className="grid gap-4 px-5 py-3 surface-raised border-b border-token min-w-[760px]"
             style={{ gridTemplateColumns: "54px 1.6fr 1.5fr 100px 130px 160px 80px" }}
           >
-            {["#", "Author", "Affiliation", "Citations ↕", "USDC earned ↓", "Wallet", "7-day"].map(
+            {["#", "Author", "Affiliation", "Citations ↕", "USDT earned ↓", "Wallet", "7-day"].map(
               (h, i) => (
                 <span
                   key={i}

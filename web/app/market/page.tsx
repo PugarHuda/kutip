@@ -112,7 +112,7 @@ export default async function MarketPage() {
             </span>
           </div>
           <div className="t-h2 mb-2">
-            {formatUSDC(escrow.total)} USDC held
+            {formatUSDC(escrow.total)} USDT held
           </div>
           <div className="t-body ink-2 mb-5 max-w-[420px]">
             Unclaimed author shares accrue here until a researcher binds their
@@ -153,7 +153,7 @@ export default async function MarketPage() {
             </div>
             <div className="t-mono text-right">
               <div className="font-semibold">
-                {formatUSDC(bounties.totalActive)} USDC
+                {formatUSDC(bounties.totalActive)} USDT
               </div>
               <div className="t-mono-sm ink-3">committed</div>
             </div>

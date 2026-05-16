@@ -12,8 +12,8 @@ Run through this **30 minutes before record** so nothing surprises you mid-take.
 
 ### Wallet state
 ```
-EOA  0x5C91B851D9Aa20172e6067d9236920A6CBabf40c   ≥ 1 USDC + ≥ 0.5 KITE
-AA   0x4da7f4cFd443084027a39cc0f7c41466d9511776   ≥ 1.5 USDC
+EOA  0x5C91B851D9Aa20172e6067d9236920A6CBabf40c   ≥ 1 USDT + ≥ 0.5 KITE
+AA   0x4da7f4cFd443084027a39cc0f7c41466d9511776   ≥ 1.5 USDT
 ```
 
 Quick check:
@@ -21,7 +21,7 @@ Quick check:
 cd web && node -e "const {createPublicClient,http,formatUnits}=require('viem');const c=createPublicClient({transport:http('https://rpc-testnet.gokite.ai')});const abi=[{name:'balanceOf',type:'function',stateMutability:'view',inputs:[{type:'address'}],outputs:[{type:'uint256'}]}];const USD='0x0fF5393387ad2f9f691FD6Fd28e07E3969e27e63';(async()=>{console.log('EOA:',formatUnits(await c.readContract({address:USD,abi,functionName:'balanceOf',args:['0x5C91B851D9Aa20172e6067d9236920A6CBabf40c']}),18));console.log('AA :',formatUnits(await c.readContract({address:USD,abi,functionName:'balanceOf',args:['0x4da7f4cFd443084027a39cc0f7c41466d9511776']}),18));})()"
 ```
 
-If AA <1.5 USDC: `node web/scripts/fund-aa.mjs 0x4da7f4cFd443084027a39cc0f7c41466d9511776 1.0`
+If AA <1.5 USDT: `node web/scripts/fund-aa.mjs 0x4da7f4cFd443084027a39cc0f7c41466d9511776 1.0`
 
 ### Browser tabs (open in this order, **left to right**)
 1. https://kutip-zeta.vercel.app — landing
@@ -63,11 +63,11 @@ Then fire **one throwaway query** in the browser so the LLM warms up:
 ## 2. Shot List (90 seconds total)
 
 ### Shot 1 — Hook (0:00 → 0:08) · 8s
-**Frame:** KiteScan tab on the KitePass vault address. Show the spending rules section with `amountUsed: X / 10 USDC daily`.
+**Frame:** KiteScan tab on the KitePass vault address. Show the spending rules section with `amountUsed: X / 10 USDT daily`.
 
 **Voice (steady, no rush):**
 > "Three days ago, an AI agent paid four researchers — and none of them
-> asked. It cited their papers, then sent them USDC."
+> asked. It cited their papers, then sent them USDT."
 
 ### Shot 2 — Landing (0:08 → 0:18) · 10s
 **Action:** Cmd-click landing tab. Cursor follows down the hero, then "Enter Dashboard" button glows on hover.
@@ -85,24 +85,24 @@ Then fire **one throwaway query** in the browser so the LLM warms up:
 **Action sequence:**
 1. Cursor lingers on "Research" (active)
 2. Slow scroll the right side showing query input + budget
-3. Cursor moves down the sidebar — point to AgentStateFooter ("Researcher AA · 1.04 USDC", "KitePass on-chain · 0.0/10.0 daily")
+3. Cursor moves down the sidebar — point to AgentStateFooter ("Researcher AA · 1.04 USDT", "KitePass on-chain · 0.0/10.0 daily")
 4. Cursor hovers the "↗" next to KitePass on-chain — KiteScan opens in new tab in the corner of the screen briefly
 
 **Voice:**
 > "On the left — the agent's wallet, balance, and Kite Passport vault
-> with live spending rules pulled straight from chain. Two USDC per query
-> max. Ten USDC per day. Anyone can verify."
+> with live spending rules pulled straight from chain. Two USDT per query
+> max. Ten USDT per day. Anyone can verify."
 
 ### Shot 4 — Run query (0:30 → 0:55) · 25s
 **Action:**
 1. Click query input
 2. Type **"Compare mineralization vs biochar for long-term carbon storage"** (don't paste — typing reads more genuine on camera, and you'll want autocomplete suggestions OFF)
 3. Budget click `0.5` (2nd preset chip)
-4. Click big "Pay 0.50 USDC & research" button
+4. Click big "Pay 0.50 USDT & research" button
 5. Step ticker animates — DON'T cut camera. Each step shows themed icon.
 
 **Voice (timed to the steps):**
-> "I ask. I authorize 0.5 USDC. The agent searches Semantic Scholar.
+> "I ask. I authorize 0.5 USDT. The agent searches Semantic Scholar.
 > Pays for each paper via x402. Reads them with an LLM. Builds the
 > citation ledger." *(pause for last step)*  "And settles atomically
 > on Kite — sub-agent fee, ledger transfer, and revenue split — in one
@@ -110,11 +110,11 @@ Then fire **one throwaway query** in the browser so the LLM warms up:
 
 ### Shot 5 — Receipt + KitePass + mirror (0:55 → 1:15) · 20s
 **Action:**
-1. Receipt animates in. Big emerald number shows USDC paid.
+1. Receipt animates in. Big emerald number shows USDT paid.
 2. Scroll past summary text (1s), past authors paid table (3s)
 3. Land on **"Spending bounded by Kite Passport vault"** row — `Kite Passport ✓` chip glows
 4. **CLICK the vault address** — KiteScan tab opens
-5. Show the spending rules — point at the `amountUsed` field which now reads `0.5 USDC` (just spent)
+5. Show the spending rules — point at the `amountUsed` field which now reads `0.5 USDT` (just spent)
 6. Cmd-Tab back, scroll one more row to **"Mirrored on Avalanche Fuji"**
 7. Click the Fuji tx hash — SnowTrace shows `AttestationMirrored` event
 

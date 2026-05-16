@@ -26,6 +26,9 @@ const SessionBody = z.object({
 const QuerySchema = z.object({
   query: z.string().min(5).max(500),
   budgetUSDC: z.number().min(0.1).max(20),
+  // Optional publication-year window for paper discovery.
+  yearFrom: z.number().int().min(1900).max(2100).optional(),
+  yearTo: z.number().int().min(1900).max(2100).optional(),
   session: SessionBody.optional()
 });
 
@@ -107,8 +110,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { query, budgetUSDC, session } = parsed.data;
+  const { query, budgetUSDC, yearFrom, yearTo, session } = parsed.data;
   const envelope = session ? toEnvelope(session) : null;
+
+  // Normalise the optional year window — swap if the user inverted it.
+  let years: { from?: number; to?: number } | undefined;
+  if (yearFrom || yearTo) {
+    years =
+      yearFrom && yearTo && yearFrom > yearTo
+        ? { from: yearTo, to: yearFrom }
+        : { from: yearFrom, to: yearTo };
+  }
 
   // Anonymous abuse fence: without a signed delegation, cap the budget
   // hard regardless of what Zod allowed. Session path stays at full
@@ -116,7 +128,7 @@ export async function POST(req: NextRequest) {
   if (!envelope && budgetUSDC > ANON_MAX_BUDGET_USDC) {
     return NextResponse.json(
       {
-        error: "Anonymous queries are capped at 0.5 USDC.",
+        error: "Anonymous queries are capped at 0.5 USDT.",
         hint: "Connect a wallet and sign a session delegation to use the full per-query budget."
       },
       { status: 402 }
@@ -152,6 +164,7 @@ export async function POST(req: NextRequest) {
         const result = await runResearchAgent({
           query,
           budgetUSDC,
+          years,
           sessionInfo: sessionInfo
             ? { sessionId: sessionInfo.sessionId, userLabel: sessionInfo.userLabel }
             : undefined,

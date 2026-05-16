@@ -151,7 +151,7 @@ export default async function RegistryPage() {
             {leaderboardSummary.totalAuthors} authors paid
           </div>
           <div className="t-body ink-2 mb-5 max-w-[420px]">
-            Live stats per researcher: total USDC earned, citation count,
+            Live stats per researcher: total USDT earned, citation count,
             7-day trend. Unclaimed authors accrue yield in escrow until they
             bind an ORCID.
           </div>
@@ -161,7 +161,7 @@ export default async function RegistryPage() {
             </div>
             <div className="t-mono text-right">
               <div className="text-emerald-700 font-semibold">
-                {formatUSDC(leaderboardSummary.totalEarnings)} USDC
+                {formatUSDC(leaderboardSummary.totalEarnings)} USDT
               </div>
               <div className="t-mono-sm ink-3">total paid out</div>
             </div>

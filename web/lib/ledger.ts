@@ -242,7 +242,7 @@ async function submitViaAA(
 
   const calls: { target: Address; value: bigint; data: Hex }[] = [];
 
-  // Paymaster pulls gas-in-USDC from AA via transferFrom in postOp.
+  // Paymaster pulls gas-in-USDT from AA via transferFrom in postOp.
   // Without approval the whole userOp PostOpReverts with
   // ERC20InsufficientAllowance. Prepend a MAX_UINT approve when the
   // current allowance is low. Idempotent — one approve lasts forever.

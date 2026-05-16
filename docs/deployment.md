@@ -27,10 +27,10 @@ Tracks on-chain deployments as they happen.
    - Currency: `KITE`
    - Explorer: `https://testnet.kitescan.ai/`
 3. Visit `https://faucet.gokite.ai` → claim KITE (gas).
-4. Acquire mock USDC (address `0x0fF5393387ad2f9f691FD6Fd28e07E3969e27e63`). Options:
+4. Acquire mock USDT (address `0x0fF5393387ad2f9f691FD6Fd28e07E3969e27e63`). Options:
    - Mint via the contract's public mint on KiteScan (if exposed).
    - Ask in Kite Discord `#testnet-support` for a drip.
-   You need roughly `DEFAULT_QUERY_PRICE × demo queries ≈ 10 USDC` for the service wallet.
+   You need roughly `DEFAULT_QUERY_PRICE × demo queries ≈ 10 USDT` for the service wallet.
 
 ### 2. Fill `Kutip/.env`
 
@@ -92,16 +92,16 @@ Sync into the web app:
 pnpm run env:sync
 ```
 
-### 5. Fund the ledger's operator with USDC
+### 5. Fund the ledger's operator with USDT
 
-The service wallet (= `PRIVATE_KEY`) must hold enough mock USDC to cover each query's
+The service wallet (= `PRIVATE_KEY`) must hold enough mock USDT to cover each query's
 `totalPaid`. Every `attestAndSplit` call:
 
 1. `transfer` the full query fee to the ledger.
 2. Ledger fans out 50 / 40 / 10 to operator / authors / ecosystem.
 
-For a 2-USDC query the service wallet spends 2 USDC and receives 1 USDC back (operator share),
-so budget at least `~5 × queries × 2 USDC` to run a smooth demo.
+For a 2-USDT query the service wallet spends 2 USDT and receives 1 USDT back (operator share),
+so budget at least `~5 × queries × 2 USDT` to run a smooth demo.
 
 ### 6. Verify on KiteScan
 
@@ -140,5 +140,5 @@ Fill these in after step 2.
 
 - **`InvalidSplit` revert at deploy** — `OPERATOR_BPS + AUTHORS_BPS + ECOSYSTEM_BPS` must equal `10000`.
 - **`WeightMismatch` revert at attestAndSplit** — agent sends malformed citation weights. Check `flattenCitationsForContract` output sums to `10000`.
-- **`ERC20: insufficient balance`** — service wallet hasn't been pre-funded with mock USDC (step 5).
+- **`ERC20: insufficient balance`** — service wallet hasn't been pre-funded with mock USDT (step 5).
 - **Frontend says "not deployed"** — `NEXT_PUBLIC_ATTRIBUTION_LEDGER` empty in `web/.env.local`. Run `pnpm run env:sync` after editing root `.env`.

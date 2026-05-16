@@ -27,7 +27,7 @@ import { getEscrowAddress } from "./escrow";
 import { KITE_TESTNET_USDC, papersForBudget, parseUSDC, formatUSDC } from "./kite";
 import { saveSummary } from "./summary-store";
 import { isMirrorEnabled, mirrorToFuji } from "./cross-chain";
-import type { AgentEvent, Citation, ResearchResult } from "./types";
+import type { AgentEvent, Citation, ResearchResult, YearRange } from "./types";
 
 /** 5% sub-agent fee cap at 0.05 Test USD — mirrored in ledger.ts. */
 const SUB_AGENT_FEE_BPS = 500n;
@@ -82,10 +82,11 @@ type Emit = (event: AgentEvent) => void;
 export async function runResearchAgent(opts: {
   query: string;
   budgetUSDC: number;
+  years?: YearRange;
   sessionInfo?: { sessionId: string; userLabel: string };
   emit: Emit;
 }): Promise<ResearchResult> {
-  const { query, budgetUSDC, sessionInfo, emit } = opts;
+  const { query, budgetUSDC, years, sessionInfo, emit } = opts;
 
   const searchLabel =
     isOpenAlexEnabled() || isSemanticScholarEnabled()
@@ -100,7 +101,10 @@ export async function runResearchAgent(opts: {
   // Normalize first — translates non-English / tool-flavoured queries
   // into English academic keywords so live discovery actually hits.
   const searchQuery = await normalizeSearchQuery(query);
-  const candidates = await discoverPapers(searchQuery);
+  const candidates = await discoverPapers(searchQuery, {
+    limit: papersForBudget(budgetUSDC),
+    years
+  });
 
   if (candidates.length === 0) {
     throw new Error(
@@ -333,7 +337,7 @@ async function attestOnChain(opts: {
         : `eoa ${result.payer.slice(0, 8)}…${result.payer.slice(-4)}`;
 
     const subAgentNote = result.subAgent
-      ? ` · sub-agent fee ${(Number(result.subAgent.fee) / 1e18).toFixed(4)} USDC`
+      ? ` · sub-agent fee ${(Number(result.subAgent.fee) / 1e18).toFixed(4)} USDT`
       : "";
 
     opts.emit({
@@ -400,10 +404,21 @@ async function normalizeSearchQuery(query: string): Promise<string> {
   }
 }
 
-async function discoverPapers(query: string): Promise<Paper[]> {
-  // Fetch up to the ceiling `papersForBudget` can ask for, so a
-  // large-budget query has enough candidates to actually spend on.
-  const mockCandidates = searchPapers(query, 10);
+async function discoverPapers(
+  query: string,
+  opts: { limit: number; years?: YearRange }
+): Promise<Paper[]> {
+  const { limit, years } = opts;
+  // `limit` tracks papersForBudget so a large-budget query gets enough
+  // candidates to spend on. The mock catalog is a fallback — apply the
+  // same year window to it so results stay consistent.
+  let mockCandidates = searchPapers(query, limit);
+  if (years?.from) {
+    mockCandidates = mockCandidates.filter((p) => p.year >= years.from!);
+  }
+  if (years?.to) {
+    mockCandidates = mockCandidates.filter((p) => p.year <= years.to!);
+  }
 
   // Live discovery: OpenAlex first (no key, any discipline, polite-pool
   // rate limit comfortable for interactive traffic), Semantic Scholar
@@ -414,14 +429,14 @@ async function discoverPapers(query: string): Promise<Paper[]> {
 
   if (isOpenAlexEnabled()) {
     try {
-      live = await searchOpenAlex(query, 10);
+      live = await searchOpenAlex(query, limit, years);
     } catch (err) {
       console.warn("[kutip] OpenAlex discovery failed:", err);
     }
   }
   if ((!live || live.papers.length === 0) && isSemanticScholarEnabled()) {
     try {
-      live = await searchSemanticScholar(query, 10);
+      live = await searchSemanticScholar(query, limit, years);
     } catch (err) {
       console.warn("[kutip] Semantic Scholar discovery failed:", err);
     }
@@ -439,7 +454,7 @@ async function discoverPapers(query: string): Promise<Paper[]> {
       seen.add(key);
       return true;
     })
-    .slice(0, 10);
+    .slice(0, limit);
 }
 
 /**

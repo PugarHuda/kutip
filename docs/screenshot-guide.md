@@ -9,7 +9,7 @@
 ## Pre-shoot setup
 
 Same as demo recording (see `demo-script.md` Section 1):
-- Wallets funded (AA ≥1.5 USDC)
+- Wallets funded (AA ≥1.5 USDT)
 - Pre-warm Vercel
 - Browser at 110% zoom (110% renders thicker text — looks more "designed")
 - Hide bookmarks bar, dev tools closed, notifications muted
@@ -59,7 +59,7 @@ Capture tool: **Chrome DevTools → Run command → "Capture full size screensho
 ## Shot 4 — `04-receipt-with-kitepass.png` ★
 **Trigger:** Receipt after a successful query.
 **Viewport:** Scroll to full receipt panel showing:
-- Big emerald **Total USDC paid** number
+- Big emerald **Total USDT paid** number
 - Authors paid table (3+ rows)
 - "Authorized under session" row with `Passport ✓` chip
 - **"Spending bounded by Kite Passport vault" row with `Kite Passport ✓` chip** — STAR OF THE SHOW
@@ -72,7 +72,7 @@ Capture tool: **Chrome DevTools → Run command → "Capture full size screensho
 ## Shot 5 — `05-kitescan-vault.png`
 **URL:** https://testnet.kitescan.ai/address/0xe2c4e97738884fd6db2fbb62c1cd672ef1debc4c
 **Action:** Click **Read Contract** tab, expand `getSpendingRules`.
-- Show 2 rules: daily (10 USDC, X used) + per-tx (2 USDC, Y used)
+- Show 2 rules: daily (10 USDT, X used) + per-tx (2 USDT, Y used)
 - Address bar visible with the vault checksum
 
 **Why:** On-chain proof that the receipt's claim is real. Pair with Shot 4 in slides.
@@ -103,7 +103,7 @@ Capture tool: **Chrome DevTools → Run command → "Capture full size screensho
 ## Shot 8 — `08-leaderboard-podium.png`
 **URL:** https://kutip-zeta.vercel.app/dashboard/earnings
 **Viewport:** Top of page showing:
-- Stat tiles (Authors paid · Citations · USDC distributed)
+- Stat tiles (Authors paid · Citations · USDT distributed)
 - Top-3 podium cards (gold/silver/bronze with medal emojis)
 - "Are you one of these authors?" CTA banner
 
@@ -177,11 +177,11 @@ Or use https://mermaid.live → paste → export PNG.
 | 3 | Dashboard running | **NEEDS USER** | run a query mid-flow + capture step ticker |
 | 4 | Receipt + KitePass | **NEEDS USER** | run fresh query → scroll receipt → capture KitePass chip |
 | 4a | Attestation verify | ✓ captured (substitute) | full attestation proof with payouts table |
-| 5 | KiteScan vault rules | ✓ captured | both spending rules visible (10 USDC daily / 2 USDC tx) |
+| 5 | KiteScan vault rules | ✓ captured | both spending rules visible (10 USDT daily / 2 USDT tx) |
 | 6 | SnowTrace mirror | ✓ captured (Events tab) | 4 AttestationMirrored events with topic[2]=2368 |
 | 7 | Claim verified | partial (idle state) | wallet not connected; user runs OAuth → recapture for `verified` state |
 | 7a | Claim page idle | ✓ captured | shows ORCID lookup + 4-step flow before OAuth |
-| 8 | Leaderboard podium | ✓ captured | 6/6 authors, 68 citations, 2.44 USDC, gold/silver/bronze |
+| 8 | Leaderboard podium | ✓ captured | 6/6 authors, 68 citations, 2.44 USDT, gold/silver/bronze |
 | 9 | Governance Safe | ✓ captured | 2/3 signers + 3 owner cards |
 | 10 | Architecture diagram | ✓ rendered | clean mermaid PNG, color-coded contracts |
 

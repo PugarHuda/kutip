@@ -32,8 +32,8 @@ export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
 
   // Verify the decoded payment authorization actually targets THIS paper
   // for at LEAST this paper's price, and the recipient is our merchant.
-  // Without this, an attacker could pay 0.01 USDC for a cheap paper and
-  // replay the same payment header against a 1 USDC paper — the
+  // Without this, an attacker could pay 0.01 USDT for a cheap paper and
+  // replay the same payment header against a 1 USDT paper — the
   // facilitator might happily settle (it has no concept of our prices).
   const auth = decoded.authorization as
     | { value?: string | number; to?: string; payTo?: string }
