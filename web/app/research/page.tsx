@@ -1007,10 +1007,8 @@ function ResultView({
     ? `${result.attestationTx.slice(0, 10)}…${result.attestationTx.slice(-4)}`
     : null;
   const totalPaid = (result.totalPaidUSDC / 1e18).toFixed(2);
-  const citationCount = result.paperDetails.reduce(
-    (acc, p) => acc + p.authors.length,
-    0
-  );
+  // A paper is one citation; each paper carries several authors, so the
+  // payout count (authors) is normally larger than the citation count.
   const authorCount = new Set(
     result.paperDetails.flatMap((p) => p.authors.map((a) => a.wallet))
   ).size;
@@ -1023,8 +1021,10 @@ function ResultView({
             <CheckIcon size={13} />
           </div>
           <span className="t-small">
-            <strong>{Math.min(steps.length, 5)} steps complete</strong> · {result.paperDetails.length}{" "}
-            papers · {citationCount} citations
+            <strong>{Math.min(steps.length, 5)} steps complete</strong> ·{" "}
+            {result.paperDetails.length} paper
+            {result.paperDetails.length === 1 ? "" : "s"} cited · {authorCount}{" "}
+            author{authorCount === 1 ? "" : "s"} paid
           </span>
         </div>
         <button

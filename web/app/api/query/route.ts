@@ -139,6 +139,14 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       const encoder = new TextEncoder();
 
+      // Prime the browser's fetch-streaming buffer. Chrome/Safari withhold
+      // a streamed response from JS until ~1KB has arrived, so the first
+      // few tiny SSE events sit buffered and the step animation looks
+      // frozen. This 2KB comment line (ignored by the SSE parser — it
+      // doesn't start with "data: ") crosses that threshold up front, so
+      // every subsequent event flushes to the UI in real time.
+      controller.enqueue(encoder.encode(`:${" ".repeat(2048)}\n\n`));
+
       const emit = (event: AgentEvent) => {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
       };
