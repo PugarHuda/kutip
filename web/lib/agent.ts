@@ -27,7 +27,16 @@ import { getEscrowAddress } from "./escrow";
 import { KITE_TESTNET_USDC, papersForBudget, parseUSDC, formatUSDC } from "./kite";
 import { saveSummary } from "./summary-store";
 import { isMirrorEnabled, mirrorToFuji } from "./cross-chain";
+import { settleX402 } from "./x402-client";
 import type { AgentEvent, Citation, ResearchResult, YearRange } from "./types";
+
+/** Absolute base URL for the agent's own /api/x402 self-call. The
+ *  production alias is never deployment-protected, so it's reliable
+ *  from inside a Vercel function. */
+function baseUrlForSelfCall(): string {
+  if (process.env.VERCEL) return "https://kutip-zeta.vercel.app";
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+}
 
 /** 5% sub-agent fee cap at 0.05 Test USD — mirrored in ledger.ts. */
 const SUB_AGENT_FEE_BPS = 500n;
@@ -137,13 +146,32 @@ export async function runResearchAgent(opts: {
 
   const purchased = await purchasePapers(candidates, budgetUSDC);
 
+  // Real x402 handshake — the agent settles corpus access on-chain
+  // before reading: HTTP 402 → USDT transfer on Kite → retry with the
+  // txHash as proof. Fail-soft: a transient RPC/HTTP blip degrades the
+  // detail line but never kills the query (the authoritative payment is
+  // the attestation in step 5).
+  let x402Tx: string | undefined;
+  let x402Detail = "";
+  try {
+    const settlement = await settleX402(
+      `${baseUrlForSelfCall()}/api/x402`,
+      `q-${Date.now()}`
+    );
+    x402Tx = settlement.txHash;
+    x402Detail = ` · x402 settled ${settlement.txHash.slice(0, 10)}…`;
+  } catch (err) {
+    console.warn("[x402] live settlement skipped:", err);
+    x402Detail = " · x402 settlement skipped (non-fatal)";
+  }
+
   emit({
     type: "step",
     step: {
       step: 2,
       label: "Purchasing papers via x402",
       status: "done",
-      detail: `Paid for ${purchased.length} papers`
+      detail: `Paid for ${purchased.length} papers${x402Detail}`
     }
   });
 
@@ -265,6 +293,7 @@ export async function runResearchAgent(opts: {
     mirrorTx,
     mirrorChain,
     mirrorExplorer,
+    x402Tx,
     paperDetails
   };
 

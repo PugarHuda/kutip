@@ -29,6 +29,8 @@ export interface ResearchResult {
   mirrorTx?: string;
   mirrorChain?: number;
   mirrorExplorer?: string;
+  /** Real x402 corpus-access settlement tx (step 2), if it succeeded. */
+  x402Tx?: string;
   paperDetails: {
     id: string;
     title: string;

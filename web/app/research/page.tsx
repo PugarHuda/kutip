@@ -1232,6 +1232,24 @@ function ResultView({
               </span>
             </div>
           )}
+          {result.x402Tx && (
+            <div className="flex justify-between items-center px-5 py-3 border-t border-token">
+              <div>
+                <div className="t-small ink-2">x402 corpus-access settlement</div>
+                <div className="t-mono-sm ink-3 mt-0.5">
+                  HTTP 402 → on-chain pay → verified
+                </div>
+              </div>
+              <a
+                href={KITESCAN_TX + result.x402Tx}
+                target="_blank"
+                rel="noreferrer"
+                className="chip chip--success rounded-full"
+              >
+                <CheckIcon size={11} /> {result.x402Tx.slice(0, 10)}…
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
