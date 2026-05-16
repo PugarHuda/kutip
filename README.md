@@ -1,6 +1,6 @@
 # Kutip — The research agent that pays its sources.
 
-> An autonomous AI research agent that attests every citation on-chain and splits USDC back to the cited authors, in real-time, on the first AI-payments blockchain.
+> An autonomous AI research agent that attests every citation on-chain and splits USDT back to the cited authors, in real-time, on the first AI-payments blockchain.
 
 **Built for:** Kite AI Global Hackathon 2026 — **Novel track**
 **Team:** Pugar Huda Mantoro ([@PugarHuda](https://github.com/PugarHuda))
@@ -12,14 +12,14 @@
 
 ## What it does in one sentence
 
-A user asks a research question. The agent pays for source papers via x402, reads them with an LLM, submits an on-chain attestation that splits USDC across the cited authors — all without the user signing a single wallet transaction, and without the agent ever holding a KITE token.
+A user asks a research question. The agent pays for source papers via x402, reads them with an LLM, submits an on-chain attestation that splits USDT across the cited authors — all without the user signing a single wallet transaction, and without the agent ever holding a KITE token.
 
 ## Demo flow (90 seconds)
 
 ```
 1. User opens /research, connects wallet, signs one EIP-712 delegation
-     "Agent may spend max 2 USDC/query, 10 USDC/day, 24h expiry"
-2. User types a question, clicks "Pay 0.5 USDC & research"
+     "Agent may spend max 2 USDT/query, 10 USDT/day, 24h expiry"
+2. User types a question, clicks "Pay 0.5 USDT & research"
      Zero gas prompts after this point.
 3. Agent (Researcher AA) runs 5 steps — each with live ticker:
      Search → Purchase via x402 → Read with LLM → Attribute → Settle on-chain
@@ -27,13 +27,13 @@ A user asks a research question. The agent pays for source papers via x402, read
      • transfer sub-agent fee (5%) to Summarizer AA
      • transfer totalPaid to AttributionLedger
      • call attestAndSplit(queryId, citations)
-     • paymaster postOp pulls ~0.02 USDC from AA for gas
+     • paymaster postOp pulls ~0.02 USDT from AA for gas
 5. Same query is mirrored to Avalanche Fuji within seconds
      via operator relayer — LayerZero-pattern cross-chain proof.
 6. Receipt shows:
      • Tx hash on KiteScan + SnowTrace
      • Session id + delegator (Passport ✓ chip)
-     • Authors paid (40% of spend, split by citation weight)
+     • Authors paid (80% of spend, split by citation weight)
      • Sub-agent fee to Summarizer (5%)
 ```
 
@@ -45,7 +45,7 @@ A user asks a research question. The agent pays for source papers via x402, read
 |---|---|---|
 | **EIP-4337 AA via gokite-aa-sdk** | Agent has its own on-chain identity. KiteScan shows AA address as payer, not user. | [`lib/agent-passport.ts`](web/lib/agent-passport.ts) |
 | **Agent Passport session delegation** | User signs one EIP-712 SpendingIntent, agent operates within cap without per-query prompts. Drop-in-ready for Kite Passport public launch. | [`lib/session.ts`](web/lib/session.ts) |
-| **Kite paymaster gasless UX** | Agent never holds KITE. Paymaster fronts gas, pulls USDC back in postOp. User pays zero in any currency. | [`lib/ledger.ts:submitViaAA`](web/lib/ledger.ts) |
+| **Kite paymaster gasless UX** | Agent never holds KITE. Paymaster fronts gas, pulls USDT back in postOp. User pays zero in any currency. | [`lib/ledger.ts:submitViaAA`](web/lib/ledger.ts) |
 | **Multi-agent composition** | Researcher AA + Summarizer AA (different salts of same EOA). Sub-agent receives 5% per query automatically. | [`getSummarizerAAAddress()`](web/lib/agent-passport.ts) |
 | **ORCID OAuth ownership proof** | Authors prove ORCID via real OAuth2 flow (not just knowing the number). HMAC-signed session cookie enforced at API gate. | [`lib/orcid-oauth.ts`](web/lib/orcid-oauth.ts) |
 | **On-chain NameRegistry** | ORCID → wallet bindings persisted on Kite via operator AA. Claim survives Lambda cold starts, verifiable via KiteScan. | [`contracts/src/NameRegistry.sol`](contracts/src/NameRegistry.sol) |
@@ -108,7 +108,7 @@ A user asks a research question. The agent pays for source papers via x402, read
 
 | Contract | Address | Purpose |
 |---|---|---|
-| AttributionLedger | [`0x99359DaF…E5Fa`](https://testnet.kitescan.ai/address/0x99359DaF4f2504dF3da042cd38B8d01B8589E5Fa) | Atomic settle — split fee + emit citation events |
+| AttributionLedger | [`0xbC4eeC2f…2D36`](https://testnet.kitescan.ai/address/0xbC4eeC2f75a0DCf61509842e1c18Abff7236A338) | Atomic settle — split fee (80/15/5) + emit citation events |
 | UnclaimedYieldEscrow | [`0xcbab887d…547b40`](https://testnet.kitescan.ai/address/0xcbab887da9c2a16612a9120b4170e74c50547b40) | Holds payouts for un-bound authors at 5% APY target |
 | BountyMarket | [`0x1ba00a38…b3f72`](https://testnet.kitescan.ai/address/0x1ba00a38b25adf68ac599cd25094e2aa923b3f72) | Sponsored research questions, operator-settled |
 | AgentReputation (ERC-721) | [`0x8f53EB5C…db15`](https://testnet.kitescan.ai/address/0x8f53EB5C04B773F0F31FE41623EA19d2Fd84db15) | Soul-bound agent reputation NFTs |
@@ -135,7 +135,7 @@ A user asks a research question. The agent pays for source papers via x402, read
 
 ## Performance (April 2026, production deployment)
 
-Sequential stress test, 5 queries at 0.5 USDC each, measured end-to-end from `POST /api/query` to attestation confirmation:
+Sequential stress test, 5 queries at 0.5 USDT each, measured end-to-end from `POST /api/query` to attestation confirmation:
 
 | Metric | Value | Note |
 |---|---|---|
@@ -178,7 +178,7 @@ QA suite (`scripts/qa-test.mjs`): **50 / 50 automated checks green** on every pu
 | Frontend | Next.js 14 App Router · wagmi + viem · Tailwind |
 | Agent LLM | OpenRouter · `z-ai/glm-4.5-air:free` primary, `openai/gpt-oss-120b:free` fallback |
 | Agent identity | EIP-4337 via `gokite-aa-sdk@1.0.15` · Kite staging bundler · Kite paymaster |
-| Corpus | Static mock catalog (30+ carbon papers) + Semantic Scholar live search |
+| Corpus | OpenAlex + Semantic Scholar live search, with a static catalog fallback |
 | Payments | x402 via Pieverse facilitator (`facilitator.pieverse.io`) |
 | Contracts | Solidity 0.8.24 · Foundry · OpenZeppelin 5.x |
 | Chain | Kite testnet (2368) + Avalanche Fuji (43113) |
@@ -260,13 +260,13 @@ Kutip/
 
 ## Testing
 
-**Foundry — 50/50 passing** (`cd contracts && forge test`):
+**Foundry — 56/56 passing** (`cd contracts && forge test`):
 - Includes 4× 256-run fuzz suites (1024 random scenarios)
 - Property-based: fund conservation invariant, yield linearity
 - Boundary cases: weight 9999/10001, dust payment, dust principal, double-claim revert
 
-**Vitest — 142 cases across 7 files** (`cd web && pnpm test`):
-- 136 unit (6 suites) + 6 integration (`/api/claim` full flow with nock)
+**Vitest — 149 cases across 7 files** (`cd web && pnpm test`):
+- 143 unit (6 suites) + 6 integration (`/api/claim` full flow with nock)
 - London-school isolation, real `ethers.Wallet` for crypto primitives
 - `fast-check` property-based tests on financial invariants (weight sum=10000)
 - Coverage gates: **100% on `lib/x402.ts`**, 100% branches on `session.ts` + `claim-registry.ts`, 90%+ branches on `orcid-oauth.ts`
@@ -277,8 +277,8 @@ Convention: `describe(method) → describe(positive|negative|edge) → it`. See 
 
 ```bash
 # Reproduce local test run
-cd contracts && forge test            # 50 contract tests
-cd ../web && pnpm test                # 142 TypeScript tests
+cd contracts && forge test            # 56 contract tests
+cd ../web && pnpm test                # 149 TypeScript tests
 pnpm test:coverage                    # HTML report at web/coverage/
 ```
 
@@ -335,7 +335,7 @@ subgraph. No HTTP layer, no rate limits.
 | Source | Use for |
 |---|---|
 | `AttributionLedger.attestAndSplit` event | Watch every paid query, indexer-friendly |
-| `AttributionLedger.authorEarnings(addr)` | Lifetime USDC earned for a wallet |
+| `AttributionLedger.authorEarnings(addr)` | Lifetime USDT earned for a wallet |
 | Goldsky subgraph | Pre-aggregated leaderboard + recent attestations |
 | `CitationMirror` (Fuji) | Cross-chain proof reachable from Avalanche-native apps |
 
@@ -353,7 +353,11 @@ sidebar). Highlights:
   binding, contract addresses
 - [**Security model**](docs/security.md) — threat model + every audit
   finding (14 patched across 3 rounds) and how to verify each fix
-- [**Testing guide**](docs/testing.md) — 55 Foundry tests + 144 Vitest
+- [**Usage guide**](docs/usage.md) — run a query, sign a session,
+  claim author earnings
+- [**Integrate / API**](docs/integrate.md) — call Kutip from your own
+  app, an MCP client, or directly on-chain
+- [**Testing guide**](docs/testing.md) — 56 Foundry tests + 149 Vitest
   cases, conventions for adding more
 - [**Deployment**](docs/deployment.md) — contract deploy order +
   Vercel setup
@@ -371,6 +375,8 @@ at the root for direct GitBook hosting.
 ## Links
 
 - Live demo: <https://kutip-zeta.vercel.app>
+- Pitch deck: <https://kutip-zeta.vercel.app/slides>
+- Docs: <https://kutip-zeta.vercel.app/docs>
 - GitHub: <https://github.com/PugarHuda/kutip>
 - Kite Block Explorer: <https://testnet.kitescan.ai>
 - SnowTrace (Fuji): <https://testnet.snowtrace.io>

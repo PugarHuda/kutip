@@ -27,6 +27,13 @@ const NAV: { section: string; items: { slug: string; file: string; label: string
     ]
   },
   {
+    section: "Using Kutip",
+    items: [
+      { slug: "usage", file: "usage.md", label: "Usage guide" },
+      { slug: "integrate", file: "integrate.md", label: "Integrate / API" }
+    ]
+  },
+  {
     section: "How it works",
     items: [
       { slug: "agent-passport", file: "agent-passport.md", label: "Agent Passport" },

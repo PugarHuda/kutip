@@ -50,7 +50,7 @@ const tools = [
   {
     name: "kutip.research",
     description:
-      "Run a research query through Kutip's autonomous agent. Pays cited authors in USDC on Kite testnet. Returns summary + citations + on-chain attestation tx hash.",
+      "Run a research query through Kutip's autonomous agent. Pays cited authors in USDT on Kite testnet. Returns summary + citations + on-chain attestation tx hash.",
     inputSchema: {
       type: "object",
       properties: {
@@ -159,7 +159,7 @@ async function runResearch({ query, budgetUSDC = 0.1 }) {
     );
   }
   lines.push(
-    `Total paid to authors: ${(result.totalPaidUSDC * 0.4 / 1e18).toFixed(4)} USDC`
+    `Total paid to authors: ${(result.totalPaidUSDC * 0.4 / 1e18).toFixed(4)} USDT`
   );
   return { content: [{ type: "text", text: lines.join("\n") }] };
 }

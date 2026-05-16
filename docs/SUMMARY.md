@@ -9,13 +9,14 @@ tree. GitHub renders it as a normal markdown file.
 ## Getting started
 
 * [Quickstart](README.md#quickstart)
+* [Usage guide](usage.md)
 * [Architecture](architecture.md)
 * [Agent Passport](agent-passport.md)
 * [Gasless flow](gasless-alignment.md)
 
 ## Integration
 
-* [Integrate with Kutip](../README.md#integrate-with-kutip)
+* [Integrate / API](integrate.md)
 * [MCP server](../mcp/README.md)
 
 ## Reference
