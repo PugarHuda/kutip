@@ -7,13 +7,60 @@ import {
   getErc6551AccountImpl,
   getErc6551RegistryAddress
 } from "@/lib/standards";
-import { getPublicClient } from "@/lib/ledger";
+import { getLedgerAddress, getPublicClient } from "@/lib/ledger";
+import { attributionLedgerAbi } from "@/lib/abi";
 import { explorerAddress, formatUSDC } from "@/lib/kite";
 import { StatTile } from "@/components/ui";
 import { ExternalLinkIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+const LEDGER_DEPLOY_BLOCK = process.env.ATTRIBUTION_LEDGER_DEPLOY_BLOCK
+  ? BigInt(process.env.ATTRIBUTION_LEDGER_DEPLOY_BLOCK)
+  : 20944832n;
+
+interface LedgerActivity {
+  attestations: number;
+  citations: number;
+  routed: bigint;
+}
+
+/**
+ * Per-agent activity derived from the AttributionLedger itself.
+ *
+ * The AgentReputation NFT carries citation/attestation counters, but
+ * nothing in the attest flow writes them back yet — so reading the NFT
+ * shows zeros. The ledger's QueryAttested events are the real record:
+ * keyed by `payer`, which is the attesting agent's AA. We aggregate
+ * those and use them whenever the NFT counter is still zero, so the
+ * page reflects on-chain truth without waiting on a contract rewire.
+ */
+async function fetchLedgerActivityByPayer(): Promise<Map<string, LedgerActivity>> {
+  const map = new Map<string, LedgerActivity>();
+  const ledger = getLedgerAddress();
+  if (!ledger) return map;
+  try {
+    const logs = await getPublicClient().getContractEvents({
+      address: ledger,
+      abi: attributionLedgerAbi,
+      eventName: "QueryAttested",
+      fromBlock: LEDGER_DEPLOY_BLOCK,
+      toBlock: "latest"
+    });
+    for (const log of logs) {
+      const payer = (log.args.payer as string).toLowerCase();
+      const cur = map.get(payer) ?? { attestations: 0, citations: 0, routed: 0n };
+      cur.attestations += 1;
+      cur.citations += Number(log.args.citationCount);
+      cur.routed += log.args.totalPaid as bigint;
+      map.set(payer, cur);
+    }
+  } catch (err) {
+    console.error("[agents] fetchLedgerActivityByPayer failed:", err);
+  }
+  return map;
+}
 
 interface AgentCard {
   tokenId: number;
@@ -32,7 +79,10 @@ interface AgentCard {
   tba?: Address;
 }
 
-async function fetchAgents(nft: Address): Promise<AgentCard[]> {
+async function fetchAgents(
+  nft: Address,
+  ledgerActivity: Map<string, LedgerActivity>
+): Promise<AgentCard[]> {
   const client = getPublicClient();
   try {
     const count = (await client.readContract({
@@ -102,15 +152,18 @@ async function fetchAgents(nft: Address): Promise<AgentCard[]> {
           }
         }
 
+        // NFT counters win when populated; otherwise fall back to the
+        // ledger-derived activity so the card never shows a false zero.
+        const led = ledgerActivity.get(agent.toLowerCase());
         return {
           tokenId: Number(tokenId),
           agent,
           role: r[1],
           firstActiveAt: r[2],
           lastActiveAt: r[3],
-          citationCount: r[4],
-          totalEarnedWei: r[5],
-          attestationCount: r[6],
+          citationCount: r[4] > 0n ? r[4] : BigInt(led?.citations ?? 0),
+          totalEarnedWei: r[5] > 0n ? r[5] : led?.routed ?? 0n,
+          attestationCount: r[6] > 0n ? r[6] : BigInt(led?.attestations ?? 0),
           registryCard,
           tba
         };
@@ -124,7 +177,8 @@ async function fetchAgents(nft: Address): Promise<AgentCard[]> {
 
 export default async function AgentsPage() {
   const nft = getReputationAddress();
-  const agents = nft ? await fetchAgents(nft) : [];
+  const ledgerActivity = await fetchLedgerActivityByPayer();
+  const agents = nft ? await fetchAgents(nft, ledgerActivity) : [];
   const totalCitations = agents.reduce((s, a) => s + Number(a.citationCount), 0);
   const totalEarned = agents.reduce((s, a) => s + a.totalEarnedWei, 0n);
 

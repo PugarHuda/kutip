@@ -72,3 +72,19 @@ export function formatUSDC(raw: bigint): string {
   const fracStr = frac.toString().padStart(USDC_DECIMALS, "0").slice(0, 2);
   return `${whole}.${fracStr}`;
 }
+
+/**
+ * Like formatUSDC, but keeps up to 6 significant fractional digits so
+ * sub-cent amounts stay legible. A 0.10-USDC query split across 9
+ * authors pays ~0.0088 each — formatUSDC would round that to "0.00"
+ * and look broken. Per-author payout rows use this; aggregate totals
+ * keep the 2-decimal formatUSDC for a clean headline figure.
+ */
+export function formatUSDCPrecise(raw: bigint): string {
+  const whole = raw / USDC_UNIT;
+  const frac = raw % USDC_UNIT;
+  let fracStr = frac.toString().padStart(USDC_DECIMALS, "0").slice(0, 6);
+  fracStr = fracStr.replace(/0+$/, "");
+  if (fracStr.length < 2) fracStr = fracStr.padEnd(2, "0");
+  return `${whole}.${fracStr}`;
+}

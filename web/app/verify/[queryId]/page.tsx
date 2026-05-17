@@ -5,7 +5,12 @@ import {
   getLedgerAddress,
   getQueryRecord
 } from "@/lib/ledger";
-import { explorerAddress, explorerTx, formatUSDC } from "@/lib/kite";
+import {
+  explorerAddress,
+  explorerTx,
+  formatUSDC,
+  formatUSDCPrecise
+} from "@/lib/kite";
 import { listAuthors } from "@/lib/papers";
 import { getAccessMetrics, loadSummary } from "@/lib/summary-store";
 import { Addr, Breadcrumb, PayoutRow } from "@/components/ui";
@@ -33,6 +38,12 @@ export default async function VerifyPage({ params }: { params: { queryId: string
   const ageMin = record
     ? Math.max(0, Math.round((now / 1000 - Number(record.timestamp)) / 60))
     : 0;
+  // Authors' share of the total, computed from the on-chain record
+  // rather than hardcoded — survives any future split rebalance.
+  const authorsPct =
+    record && record.totalPaid > 0n
+      ? Math.round(Number((record.authorsShare * 10000n) / record.totalPaid) / 100)
+      : 0;
 
   return (
     <main className="min-h-[calc(100vh-60px)] px-6 lg:px-14 py-12 lg:py-14">
@@ -116,7 +127,7 @@ export default async function VerifyPage({ params }: { params: { queryId: string
             </Fact>
             <Fact label="Authors share">
               <span className="t-small">
-                {formatUSDC(record.authorsShare)} USDC · 40% of total
+                {formatUSDC(record.authorsShare)} USDC · {authorsPct}% of total
               </span>
             </Fact>
             <Fact label="Citation count">
@@ -164,7 +175,7 @@ export default async function VerifyPage({ params }: { params: { queryId: string
                     wallet={walletShort}
                     walletFull={c.author}
                     walletHref={explorerAddress(c.author)}
-                    amount={`${formatUSDC(c.amount)} USDC`}
+                    amount={`${formatUSDCPrecise(c.amount)} USDC`}
                     tx={`${c.txHash.slice(0, 10)}…`}
                     txHref={explorerTx(c.txHash)}
                   />

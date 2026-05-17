@@ -1,14 +1,9 @@
 import Link from "next/link";
 import type { Address } from "viem";
-import { getAuthorStats, getLedgerAddress } from "@/lib/ledger";
+import { getAuthorStats, getLedgerAddress, getPublicClient } from "@/lib/ledger";
+import { attributionLedgerAbi } from "@/lib/abi";
 import { listAuthors } from "@/lib/papers";
-import {
-  fetchLeaderboardFromGoldsky,
-  fetchRecentAttestationsFromGoldsky,
-  isSubgraphEnabled,
-  type GoldskyAttestation,
-  type GoldskyAuthor
-} from "@/lib/goldsky";
+import { type GoldskyAttestation } from "@/lib/goldsky";
 import { formatUSDC, explorerAddress, explorerTx } from "@/lib/kite";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 import { StatTile, Breadcrumb } from "@/components/ui";
@@ -19,24 +14,81 @@ export const revalidate = 0;
 const RESEARCHER_AA = "0x4da7f4cFd443084027a39cc0f7c41466d9511776" as const;
 const SUMMARIZER_AA = "0xA6C36bA2BC8E84fCF276721F30FC79ceD609ef5c" as const;
 
+const LEDGER_DEPLOY_BLOCK = process.env.ATTRIBUTION_LEDGER_DEPLOY_BLOCK
+  ? BigInt(process.env.ATTRIBUTION_LEDGER_DEPLOY_BLOCK)
+  : 20944832n;
+
+/**
+ * Recent attestations straight from the AttributionLedger. The Goldsky
+ * subgraph would be the fast path, but it indexes a superseded ledger
+ * deploy — so the dashboard reads the live contract directly, same as
+ * /verify and /dashboard/activity. Shaped as GoldskyAttestation so the
+ * ActivityRow renderer stays source-agnostic.
+ */
+async function fetchRecentOnChain(limit: number): Promise<GoldskyAttestation[]> {
+  const ledger = getLedgerAddress();
+  if (!ledger) return [];
+  try {
+    const client = getPublicClient();
+    const logs = await client.getContractEvents({
+      address: ledger,
+      abi: attributionLedgerAbi,
+      eventName: "QueryAttested",
+      fromBlock: LEDGER_DEPLOY_BLOCK,
+      toBlock: "latest"
+    });
+    const recent = logs.slice(-limit).reverse();
+
+    const uniqueBlocks = [...new Set(recent.map((l) => l.blockNumber as bigint))];
+    const blockTimes = new Map<bigint, bigint>();
+    await Promise.all(
+      uniqueBlocks.map(async (bn) => {
+        const block = await client.getBlock({ blockNumber: bn });
+        blockTimes.set(bn, block.timestamp);
+      })
+    );
+
+    return recent.map((log) => ({
+      id: log.args.queryId as string,
+      payer: log.args.payer as string,
+      totalPaid: (log.args.totalPaid as bigint).toString(),
+      authorsShare: "0",
+      citationCount: Number(log.args.citationCount),
+      block: (log.blockNumber as bigint).toString(),
+      timestamp: String(blockTimes.get(log.blockNumber as bigint) ?? 0n),
+      tx: log.transactionHash as string
+    }));
+  } catch (err) {
+    console.error("[overview] fetchRecentOnChain failed:", err);
+    return [];
+  }
+}
+
 export default async function DashboardPage() {
   const authors = listAuthors();
   const wallets = authors.map((a) => a.wallet as Address);
 
-  const [stats, recent, subgraphAuthors] = await Promise.all([
+  const [stats, recent] = await Promise.all([
     getAuthorStats(wallets),
-    isSubgraphEnabled()
-      ? fetchRecentAttestationsFromGoldsky(10)
-      : Promise.resolve(null),
-    isSubgraphEnabled()
-      ? fetchLeaderboardFromGoldsky(5)
-      : Promise.resolve(null)
+    fetchRecentOnChain(10)
   ]);
 
   const totalPaid = stats.reduce((acc, s) => acc + s.earnings, 0n);
   const totalCitations = stats.reduce((acc, s) => acc + Number(s.citations), 0);
   const authorsPaid = stats.filter((s) => s.citations > 0n).length;
   const ledger = getLedgerAddress();
+
+  // Top earners derived from the same on-chain author stats — one data
+  // source, so the stat strip and this list can never disagree.
+  const topEarners = authors
+    .map((a, i) => ({
+      author: a,
+      earnings: stats[i].earnings,
+      citations: Number(stats[i].citations)
+    }))
+    .filter((e) => e.earnings > 0n)
+    .sort((a, b) => Number(b.earnings - a.earnings))
+    .slice(0, 5);
 
   return (
     <main className="min-h-[calc(100vh-60px)] px-6 lg:px-10 py-8">
@@ -66,7 +118,7 @@ export default async function DashboardPage() {
           <StatTile
             label="Citations attested"
             value={String(totalCitations)}
-            delta={totalCitations > 0 ? "live from subgraph" : "no queries yet"}
+            delta={totalCitations > 0 ? "from AttributionLedger" : "no queries yet"}
           />
           <StatTile
             label="USDC distributed"
@@ -81,11 +133,11 @@ export default async function DashboardPage() {
           />
           <StatTile
             label="Attestations on chain"
-            value={String(recent?.length ?? 0)}
+            value={String(recent.length)}
             delta={
-              recent && recent.length > 0
-                ? "10 most recent shown below"
-                : "subgraph warming up"
+              recent.length > 0
+                ? `${recent.length} most recent shown below`
+                : "no attestations yet"
             }
           />
         </div>
@@ -109,7 +161,7 @@ export default async function DashboardPage() {
                   All attestations →
                 </Link>
               </header>
-              {!recent || recent.length === 0 ? (
+              {recent.length === 0 ? (
                 <div className="p-8 text-center t-small ink-3">
                   No attestations yet.{" "}
                   <Link href="/research" className="text-kite-700">
@@ -141,28 +193,23 @@ export default async function DashboardPage() {
                   Full leaderboard →
                 </Link>
               </header>
-              {!subgraphAuthors || subgraphAuthors.length === 0 ? (
+              {topEarners.length === 0 ? (
                 <div className="p-8 text-center t-small ink-3">
                   No author earnings yet.
                 </div>
               ) : (
                 <ul className="divide-y divide-[color:var(--border)]">
-                  {subgraphAuthors.slice(0, 5).map((a: GoldskyAuthor, i) => {
-                    const meta = authors.find(
-                      (x) => x.wallet.toLowerCase() === a.id.toLowerCase()
-                    );
-                    return (
-                      <AuthorRow
-                        key={a.id}
-                        rank={i + 1}
-                        name={meta?.name ?? `Unclaimed ${a.id.slice(0, 8)}…`}
-                        wallet={a.id}
-                        authorId={meta?.id}
-                        earnings={a.totalEarnings}
-                        citations={a.citationCount}
-                      />
-                    );
-                  })}
+                  {topEarners.map((e, i) => (
+                    <AuthorRow
+                      key={e.author.id}
+                      rank={i + 1}
+                      name={e.author.name}
+                      wallet={e.author.wallet}
+                      authorId={e.author.id}
+                      earnings={e.earnings.toString()}
+                      citations={e.citations}
+                    />
+                  ))}
                 </ul>
               )}
             </section>
