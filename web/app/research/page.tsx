@@ -63,11 +63,37 @@ const SUGGESTIONS = [
 
 const STEP_OUTLINE = [
   ["Search", "Paper catalog retrieval"],
-  ["Purchase", "x402 per-paper settlement"],
+  ["Purchase", "x402 on-chain settlement"],
   ["Read", "LLM synthesis & citations"],
   ["Attribute", "Build citation ledger"],
   ["Settle", "Submit attestation on-chain"]
 ];
+
+// Estimated wall-clock (ms from query start) at which each step becomes
+// the active one. Drives the agent-log animation so it always moves,
+// independent of when the browser actually delivers SSE events — real
+// `step` events only ever fast-forward past these estimates.
+const STEP_SCHEDULE_MS = [0, 4500, 8000, 22000, 24000];
+
+/** Estimated active step (1-5) for a given elapsed time. */
+function stepFromElapsed(ms: number): number {
+  let s = 1;
+  for (let i = 0; i < STEP_SCHEDULE_MS.length; i++) {
+    if (ms >= STEP_SCHEDULE_MS[i]) s = i + 1;
+  }
+  return s;
+}
+
+/** Highest step implied by real SSE events — a `done` step means the
+ *  next one is active. 0 when no events have arrived. */
+function realStepFloor(steps: AgentStep[]): number {
+  let real = 0;
+  for (const s of steps) {
+    const v = s.status === "done" ? Math.min(s.step + 1, 5) : s.step;
+    if (v > real) real = v;
+  }
+  return real;
+}
 
 const KITESCAN_TX = "https://testnet.kitescan.ai/tx/";
 const KITESCAN_ADDR = "https://testnet.kitescan.ai/address/";
@@ -90,10 +116,30 @@ export default function ResearchPage() {
 
   const phase: Phase = result ? "result" : running ? "running" : "idle";
 
+  // Timer-driven step animation. The agent log must never look frozen
+  // even when the browser buffers the SSE stream, so an estimated
+  // schedule advances the visible step; real `step` events, whenever
+  // they arrive, only fast-forward it (never rewind).
+  const [displayStep, setDisplayStep] = useState(1);
+  useEffect(() => {
+    if (!running) return;
+    const startedAt = Date.now();
+    const id = setInterval(() => {
+      const s = stepFromElapsed(Date.now() - startedAt);
+      setDisplayStep((prev) => Math.max(prev, s));
+    }, 200);
+    return () => clearInterval(id);
+  }, [running]);
+  useEffect(() => {
+    const floor = realStepFloor(steps);
+    if (floor > 0) setDisplayStep((prev) => Math.max(prev, floor));
+  }, [steps]);
+
   async function runQuery() {
     const q = query.trim();
     if (!q || running) return;
     setSteps([]);
+    setDisplayStep(1);
     setResult(null);
     setError(null);
     setRunning(true);
@@ -178,11 +224,14 @@ export default function ResearchPage() {
         onSubmit={runQuery}
         disabled={running || query.trim().length < 5}
         steps={steps}
+        displayStep={displayStep}
         onSessionChange={onSessionChange}
       />
       <div className="px-6 lg:px-8 py-8 lg:py-10 lg:border-l border-token">
         {phase === "idle" && !error && <IdleView setQuery={setQuery} />}
-        {phase === "running" && <RunningView steps={steps} />}
+        {phase === "running" && (
+          <RunningView steps={steps} displayStep={displayStep} />
+        )}
         {phase === "result" && result && (
           <ResultView result={result} steps={steps} expandLog={expandLog} setExpandLog={setExpandLog} />
         )}
@@ -211,6 +260,7 @@ function ResearchSidebar({
   onSubmit,
   disabled,
   steps,
+  displayStep,
   onSessionChange
 }: {
   phase: Phase;
@@ -225,6 +275,7 @@ function ResearchSidebar({
   onSubmit: () => void;
   disabled: boolean;
   steps: AgentStep[];
+  displayStep: number;
   onSessionChange: (s: SessionEnvelope | null) => void;
 }) {
   const balances = useBalances();
@@ -260,9 +311,14 @@ function ResearchSidebar({
     return () => clearInterval(t);
   }, [phase]);
 
-  const runningStep = steps.find((s) => s.status === "running");
-  const doneCount = steps.filter((s) => s.status === "done").length;
-  const progressPct = Math.min(100, Math.round((doneCount / 5) * 100));
+  // Driven by the timer-based displayStep so the sidebar progress moves
+  // even if SSE events are buffered. Real labels/details come from
+  // `steps` when available, else the static outline.
+  const realStep = steps.find((s) => s.step === displayStep);
+  const stepLabel = realStep?.label ?? STEP_OUTLINE[displayStep - 1]?.[0];
+  const stepDetail = realStep?.detail;
+  const doneCount = displayStep - 1;
+  const progressPct = Math.round((doneCount / 5) * 100);
 
   return (
     <aside className="p-6 lg:p-7 lg:sticky lg:top-0 self-start">
@@ -475,16 +531,14 @@ function ResearchSidebar({
             <div className="flex items-center gap-2">
               <span className="status-dot status-dot--running animate-pulse-dot" style={{ width: 8, height: 8 }} />
               <span className="t-caption text-kite-700">
-                Processing · step {Math.min(doneCount + 1, 5)} of 5
+                Processing · step {displayStep} of 5
               </span>
             </div>
             <span className="t-mono-sm ink-3">{elapsed}s</span>
           </div>
-          <div className="t-small font-semibold">
-            {runningStep?.label ?? (doneCount === 5 ? "Finalizing" : "Starting…")}
-          </div>
-          {runningStep?.detail && (
-            <div className="t-small ink-3 mt-0.5">{runningStep.detail}</div>
+          <div className="t-small font-semibold">{stepLabel}</div>
+          {stepDetail && (
+            <div className="t-small ink-3 mt-0.5">{stepDetail}</div>
           )}
           <div
             className="mt-2.5 h-1 rounded-full overflow-hidden"
@@ -670,33 +724,25 @@ function IdleView({ setQuery }: { setQuery: (q: string) => void }) {
   );
 }
 
-function RunningView({ steps }: { steps: AgentStep[] }) {
+function RunningView({
+  steps,
+  displayStep
+}: {
+  steps: AgentStep[];
+  displayStep: number;
+}) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 200);
     return () => clearInterval(t);
   }, []);
 
-  const [timings, setTimings] = useState<
-    Record<number, { startedAt: number; endedAt?: number }>
-  >({});
-  useEffect(() => {
-    setTimings((prev) => {
-      const next = { ...prev };
-      for (const s of steps) {
-        const existing = next[s.step];
-        if (s.status === "running" && !existing) {
-          next[s.step] = { startedAt: Date.now() };
-        } else if (s.status === "done" && existing && !existing.endedAt) {
-          next[s.step] = { ...existing, endedAt: Date.now() };
-        }
-      }
-      return next;
-    });
-  }, [steps]);
+  // Restamp whenever the active step advances, so the running row keeps
+  // a live in-step counter even when no SSE event has arrived yet.
+  const [stepStart, setStepStart] = useState(Date.now());
+  useEffect(() => setStepStart(Date.now()), [displayStep]);
 
-  const currentIdx = steps.findIndex((s) => s.status === "running");
-  const doneCount = steps.filter((s) => s.status === "done").length;
+  const doneCount = displayStep - 1;
   const progressPct = Math.round((doneCount / 5) * 100);
 
   return (
@@ -731,24 +777,26 @@ function RunningView({ steps }: { steps: AgentStep[] }) {
         {Array.from({ length: 5 }).map((_, i) => {
           const stepNum = i + 1;
           const s = steps.find((st) => st.step === stepNum);
-          const optimisticRunning = steps.length === 0 && i === 0;
+          // State is driven by the timer-based displayStep; a real SSE
+          // event for this step overrides it (done / error win).
           const state: AgentStep["status"] =
-            s?.status ?? (optimisticRunning ? "running" : "pending");
+            s?.status === "error"
+              ? "error"
+              : s?.status === "done" || stepNum < displayStep
+              ? "done"
+              : stepNum === displayStep
+              ? "running"
+              : "pending";
           const isRunning = state === "running";
           const isDone = state === "done";
           const isPending = state === "pending";
-          const isNextPending = isPending && currentIdx === i - 1;
+          const isNextPending = isPending && stepNum === displayStep + 1;
           const label = s?.label ?? STEP_OUTLINE[i]?.[0] ?? `Step ${stepNum}`;
           const detail = s?.detail ?? STEP_OUTLINE[i]?.[1] ?? "";
 
-          const t = timings[stepNum];
           let timeText = "";
-          if (isRunning && t) {
-            const elapsed = (now - t.startedAt) / 1000;
-            timeText = `${elapsed.toFixed(1)}s`;
-          } else if (isDone && t && t.endedAt) {
-            const dur = (t.endedAt - t.startedAt) / 1000;
-            timeText = `${dur.toFixed(1)}s`;
+          if (isRunning) {
+            timeText = `${((now - stepStart) / 1000).toFixed(1)}s`;
           } else if (isNextPending) {
             timeText = "next";
           } else if (isPending) {
@@ -800,7 +848,7 @@ function RunningView({ steps }: { steps: AgentStep[] }) {
                 {isRunning && (
                   <StepTicker
                     messages={STEP_THEMES[i]?.tickerMessages ?? []}
-                    elapsedMs={t ? now - t.startedAt : 0}
+                    elapsedMs={now - stepStart}
                   />
                 )}
               </div>
