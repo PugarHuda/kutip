@@ -92,10 +92,11 @@ export async function runResearchAgent(opts: {
   query: string;
   budgetUSDC: number;
   years?: YearRange;
+  excludePaperIds?: string[];
   sessionInfo?: { sessionId: string; userLabel: string };
   emit: Emit;
 }): Promise<ResearchResult> {
-  const { query, budgetUSDC, years, sessionInfo, emit } = opts;
+  const { query, budgetUSDC, years, excludePaperIds, sessionInfo, emit } = opts;
 
   const searchLabel =
     isOpenAlexEnabled() || isSemanticScholarEnabled()
@@ -112,7 +113,8 @@ export async function runResearchAgent(opts: {
   const searchQuery = await normalizeSearchQuery(query);
   const candidates = await discoverPapers(searchQuery, {
     limit: papersForBudget(budgetUSDC),
-    years
+    years,
+    exclude: excludePaperIds
   });
 
   if (candidates.length === 0) {
@@ -433,11 +435,26 @@ async function normalizeSearchQuery(query: string): Promise<string> {
   }
 }
 
+/** Explore mode: papers already cited this session go to the back so
+ *  fresh ones surface first — kept as fallback, never dropped, so a
+ *  query can't starve for lack of papers. */
+function prioritizeFresh(
+  papers: Paper[],
+  exclude: string[] | undefined,
+  limit: number
+): Paper[] {
+  if (!exclude || exclude.length === 0) return papers.slice(0, limit);
+  const seen = new Set(exclude);
+  const fresh = papers.filter((p) => !seen.has(p.id));
+  const repeats = papers.filter((p) => seen.has(p.id));
+  return [...fresh, ...repeats].slice(0, limit);
+}
+
 async function discoverPapers(
   query: string,
-  opts: { limit: number; years?: YearRange }
+  opts: { limit: number; years?: YearRange; exclude?: string[] }
 ): Promise<Paper[]> {
-  const { limit, years } = opts;
+  const { limit, years, exclude } = opts;
   // `limit` tracks papersForBudget so a large-budget query gets enough
   // candidates to spend on. The mock catalog is a fallback — apply the
   // same year window to it so results stay consistent.
@@ -471,19 +488,20 @@ async function discoverPapers(
     }
   }
 
-  if (!live || live.papers.length === 0) return mockCandidates;
+  if (!live || live.papers.length === 0) {
+    return prioritizeFresh(mockCandidates, exclude, limit);
+  }
 
   registerRuntimePapers(live.papers, live.authors);
   const merged = [...live.papers, ...mockCandidates];
   const seen = new Set<string>();
-  return merged
-    .filter((p) => {
-      const key = p.title.toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .slice(0, limit);
+  const deduped = merged.filter((p) => {
+    const key = p.title.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  return prioritizeFresh(deduped, exclude, limit);
 }
 
 /**

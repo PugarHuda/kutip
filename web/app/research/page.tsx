@@ -1,6 +1,13 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import type { AgentEvent, AgentStep, ResearchResult } from "@/lib/types";
 import { ArrowRightIcon, CheckIcon, ChevronDownIcon, SearchIcon } from "@/components/icons";
 import { Cite, PayoutRow, Skeleton } from "@/components/ui";
@@ -105,6 +112,11 @@ export default function ResearchPage() {
   const [budget, setBudget] = useState(0.1);
   const [yearFrom, setYearFrom] = useState("");
   const [yearTo, setYearTo] = useState("");
+  // Explore mode — paper ids cited so far this session. The ref is the
+  // source of truth sent to the API; exploredCount mirrors it for the UI.
+  const [exploreMode, setExploreMode] = useState(true);
+  const seenIds = useRef<Set<string>>(new Set());
+  const [exploredCount, setExploredCount] = useState(0);
   const [steps, setSteps] = useState<AgentStep[]>([]);
   const [result, setResult] = useState<ResearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -153,6 +165,9 @@ export default function ResearchPage() {
           budgetUSDC: budget,
           yearFrom: yearFrom ? Number(yearFrom) : undefined,
           yearTo: yearTo ? Number(yearTo) : undefined,
+          excludePaperIds: exploreMode
+            ? Array.from(seenIds.current)
+            : undefined,
           session: session
             ? {
                 intent: session.intent,
@@ -201,6 +216,10 @@ export default function ResearchPage() {
       });
     } else if (event.type === "result") {
       setResult(event.result);
+      // Remember the papers cited so explore mode can surface fresh
+      // ones on the next query of this session.
+      for (const p of event.result.paperDetails) seenIds.current.add(p.id);
+      setExploredCount(seenIds.current.size);
       if (address && event.result.sessionNewSpentToday) {
         updateLocalSpent(address, event.result.sessionNewSpentToday);
       }
@@ -225,6 +244,9 @@ export default function ResearchPage() {
         disabled={running || query.trim().length < 5}
         steps={steps}
         displayStep={displayStep}
+        exploreMode={exploreMode}
+        setExploreMode={setExploreMode}
+        exploredCount={exploredCount}
         onSessionChange={onSessionChange}
       />
       <div className="px-6 lg:px-8 py-8 lg:py-10 lg:border-l border-token">
@@ -261,6 +283,9 @@ function ResearchSidebar({
   disabled,
   steps,
   displayStep,
+  exploreMode,
+  setExploreMode,
+  exploredCount,
   onSessionChange
 }: {
   phase: Phase;
@@ -276,6 +301,9 @@ function ResearchSidebar({
   disabled: boolean;
   steps: AgentStep[];
   displayStep: number;
+  exploreMode: boolean;
+  setExploreMode: (v: boolean) => void;
+  exploredCount: number;
   onSessionChange: (s: SessionEnvelope | null) => void;
 }) {
   const balances = useBalances();
@@ -483,6 +511,45 @@ function ResearchSidebar({
         Optional · blank = all years. One side works — e.g. From 2020 means
         2020-onward.
       </div>
+
+      <button
+        type="button"
+        onClick={() => setExploreMode(!exploreMode)}
+        aria-pressed={exploreMode}
+        className="mt-4 w-full flex items-center gap-2.5 p-2.5 rounded-lg text-left transition-colors"
+        style={{
+          background: exploreMode
+            ? "color-mix(in srgb, var(--kite-500) 8%, transparent)"
+            : "var(--surface-raised)",
+          border: `1px solid ${
+            exploreMode
+              ? "color-mix(in srgb, var(--kite-500) 30%, var(--border))"
+              : "var(--border)"
+          }`
+        }}
+      >
+        <span
+          className="flex-none w-9 h-5 rounded-full relative transition-colors"
+          style={{
+            background: exploreMode
+              ? "var(--kite-500)"
+              : "var(--border-strong)"
+          }}
+        >
+          <span
+            className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all"
+            style={{ left: exploreMode ? "18px" : "2px" }}
+          />
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="t-small font-semibold block">Explore mode</span>
+          <span className="t-mono-sm ink-3">
+            {exploredCount > 0
+              ? `${exploredCount} papers cited this session — surfacing fresh ones`
+              : "Surface papers not yet cited this session"}
+          </span>
+        </span>
+      </button>
 
       <button
         type="button"

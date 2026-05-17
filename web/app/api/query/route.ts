@@ -29,6 +29,9 @@ const QuerySchema = z.object({
   // Optional publication-year window for paper discovery.
   yearFrom: z.number().int().min(1900).max(2100).optional(),
   yearTo: z.number().int().min(1900).max(2100).optional(),
+  // Explore mode: paper ids already cited this session — discovery
+  // pushes them to the back so fresh papers surface first.
+  excludePaperIds: z.array(z.string().max(64)).max(300).optional(),
   session: SessionBody.optional()
 });
 
@@ -110,7 +113,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { query, budgetUSDC, yearFrom, yearTo, session } = parsed.data;
+  const { query, budgetUSDC, yearFrom, yearTo, excludePaperIds, session } =
+    parsed.data;
   const envelope = session ? toEnvelope(session) : null;
 
   // Normalise the optional year window — swap if the user inverted it.
@@ -173,6 +177,7 @@ export async function POST(req: NextRequest) {
           query,
           budgetUSDC,
           years,
+          excludePaperIds,
           sessionInfo: sessionInfo
             ? { sessionId: sessionInfo.sessionId, userLabel: sessionInfo.userLabel }
             : undefined,
