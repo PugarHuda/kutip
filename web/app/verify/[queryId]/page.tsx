@@ -163,6 +163,40 @@ export default async function VerifyPage({ params }: { params: { queryId: string
           </div>
         )}
 
+        {cachedSummary && (
+          <div className="mt-7">
+            <div className="t-caption mb-3">Research summary</div>
+            <div className="card p-6 lg:p-7">
+              <div className="t-small ink-3 mb-1">Query</div>
+              <div className="t-serif text-[17px] mb-5">
+                {cachedSummary.query}
+              </div>
+              <div className="t-small ink-3 mb-1.5">Synthesis</div>
+              <div className="flex flex-col gap-3">
+                {cachedSummary.summary
+                  .split(/\n\n+/)
+                  .map((para) => para.trim())
+                  .filter(Boolean)
+                  .map((para, i) => (
+                    <p
+                      key={i}
+                      className="t-body ink-2 m-0"
+                      style={{ lineHeight: "1.65" }}
+                    >
+                      {para}
+                    </p>
+                  ))}
+              </div>
+              <div className="t-mono-sm ink-3 mt-5 pt-4 border-t border-token">
+                Cached{" "}
+                {new Date(cachedSummary.savedAt).toISOString().slice(0, 16).replace("T", " ")}{" "}
+                UTC · {cachedSummary.totalPaidUSDC} USDC paid across{" "}
+                {cachedSummary.citations.length} citations
+              </div>
+            </div>
+          </div>
+        )}
+
         {citations.length > 0 && (
           <div className="mt-7">
             <div className="t-caption mb-3">Payouts · {citations.length} transfers</div>
