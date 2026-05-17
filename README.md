@@ -75,7 +75,7 @@ A user asks a research question. The agent pays for source papers via x402, read
 │ /research (UI + SSE stream) ── /api/query ── lib/agent.ts            │
 │                                                │                     │
 │                                     1. Search (Semantic Scholar)      │
-│                                     2. Purchase via x402 (Pieverse)   │
+│                                     2. Purchase via x402 (on-chain)   │
 │                                     3. Read with OpenRouter LLM       │
 │                                     4. Warm claim cache from chain    │
 │                                     5. Attest on Kite (batched UserOp)│
@@ -154,7 +154,7 @@ QA suite (`scripts/qa-test.mjs`): **50 / 50 automated checks green** on every pu
 | Requirement | Status |
 |---|---|
 | Agent performs a task and settles on Kite chain | ✅ `attestAndSplit` atomic batch |
-| Executes paid actions (API calls, services, transactions) | ✅ x402 per-paper via Pieverse |
+| Executes paid actions (API calls, services, transactions) | ✅ Real x402 handshake — HTTP 402 → on-chain USDT settle on Kite; plus the `attestAndSplit` payout tx |
 | Works end-to-end in a live demo in production | ✅ https://kutip-zeta.vercel.app |
 | Uses Kite chain for attestations (proof, auditability) | ✅ `AttributionLedger` on chain 2368 |
 | Functional UI (web app) | ✅ Next.js 14 App Router |
@@ -179,7 +179,7 @@ QA suite (`scripts/qa-test.mjs`): **50 / 50 automated checks green** on every pu
 | Agent LLM | OpenRouter · `z-ai/glm-4.5-air:free` primary, `openai/gpt-oss-120b:free` fallback |
 | Agent identity | EIP-4337 via `gokite-aa-sdk@1.0.15` · Kite staging bundler · Kite paymaster |
 | Corpus | OpenAlex + Semantic Scholar live search, with a static catalog fallback |
-| Payments | x402 via Pieverse facilitator (`facilitator.pieverse.io`) |
+| Payments | x402 — real HTTP 402 → on-chain USDT settlement on Kite, verified on-chain (facilitator-free). Pieverse facilitator path also wired. |
 | Contracts | Solidity 0.8.24 · Foundry · OpenZeppelin 5.x |
 | Chain | Kite testnet (2368) + Avalanche Fuji (43113) |
 | Indexer | Goldsky subgraph (AssemblyScript mapping) |
@@ -317,6 +317,11 @@ curl -X POST https://kutip-zeta.vercel.app/api/query \
 # Retrieve a saved summary (reverse-x402: receipt-or-pay).
 curl https://kutip-zeta.vercel.app/api/summaries/<queryId>
 
+# Real x402 corpus-access endpoint — POST with no header returns a
+# genuine HTTP 402 challenge; pay on-chain, retry with X-PAYMENT.
+curl -i -X POST https://kutip-zeta.vercel.app/api/x402 \
+  -H "content-type: application/json" -d '{"queryId":"demo-1"}'
+
 # Bind ORCID → wallet (after OAuth + EIP-712 signature).
 curl -X POST https://kutip-zeta.vercel.app/api/claim \
   -H "content-type: application/json" \
@@ -325,7 +330,7 @@ curl -X POST https://kutip-zeta.vercel.app/api/claim \
 ```
 
 Full request/response shapes live in the route files:
-[`api/query`](web/app/api/query/route.ts) · [`api/summaries/[queryId]`](web/app/api/summaries/[queryId]/route.ts) · [`api/claim`](web/app/api/claim/route.ts).
+[`api/query`](web/app/api/query/route.ts) · [`api/x402`](web/app/api/x402/route.ts) · [`api/summaries/[queryId]`](web/app/api/summaries/[queryId]/route.ts) · [`api/claim`](web/app/api/claim/route.ts).
 
 ### 3. On-chain — for indexers, wallets, settlement bots
 

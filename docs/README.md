@@ -32,7 +32,7 @@ Welcome. These pages cover everything from "click this and run a query" to "audi
 
 **[Security model](security.md)** · Threat model, mitigations, four rounds of audit findings + fixes.
 
-**[Testing guide](testing.md)** · 55 Foundry tests (4 fuzz suites at 256 runs each) + 138 Vitest unit + 6 integration. Conventions for adding new tests.
+**[Testing guide](testing.md)** · 56 Foundry tests (4 fuzz suites at 256 runs each) + 143 Vitest unit + 6 integration. Conventions for adding new tests.
 
 ### I'm shipping a fork or my own deployment
 

@@ -71,6 +71,29 @@ curl -N -X POST https://kutip-zeta.vercel.app/api/query \
   send a matching `X-Kutip-API-Key` header. The public demo runs
   without a key — set one on your own deployment to gate it.
 
+### `POST /api/x402` — the real x402 endpoint
+
+The research flow's "Purchase" step is a genuine x402 handshake against
+this endpoint. It is facilitator-free: the merchant verifies the payment
+by reading the Kite chain itself, so settlement is deterministic and
+auditable. Run it by hand:
+
+```bash
+# 1. Unpaid request → a real HTTP 402 + the payment challenge.
+curl -i -X POST https://kutip-zeta.vercel.app/api/x402 \
+  -H 'Content-Type: application/json' -d '{"queryId":"demo-1"}'
+
+# 2. Transfer `maxAmountRequired` USDT to `payTo` on Kite testnet.
+# 3. Retry with the proof — base64({"txHash":"0x…"}):
+curl -X POST https://kutip-zeta.vercel.app/api/x402 \
+  -H 'Content-Type: application/json' \
+  -H "X-PAYMENT: $(echo -n '{"txHash":"0x…"}' | base64)" \
+  -d '{"queryId":"demo-1"}'
+# → 200 { settled: true, txHash, paid, explorer }
+```
+
+Each settlement tx is single-use (replay-guarded).
+
 ## 2. MCP server
 
 The `mcp/` package bridges Kutip to the **Model Context Protocol**, so

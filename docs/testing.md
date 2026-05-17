@@ -1,6 +1,6 @@
 # Kutip — Testing Guide
 
-> **Last updated:** 2026-05-04 · 50 Foundry passing · 130 Vitest unit + 6 integration green
+> **Last updated:** 2026-05-17 · 56 Foundry passing · 143 Vitest unit + 6 integration green
 
 ---
 
@@ -8,8 +8,8 @@
 
 | Layer | Tests | Coverage |
 |---|---|---|
-| **Solidity (Foundry)** | **50 passing** (units + 4×256 fuzz runs across AttributionLedger + Escrow) | Constructor invariants + bps math + dust + conservation + yield linearity |
-| **TypeScript (Vitest unit)** | **130 passing** across 6 files | 100% on x402 · 100% branches on session + claim-registry · 96% branches on orcid-oauth |
+| **Solidity (Foundry)** | **56 passing** (units + 4×256 fuzz runs across AttributionLedger + Escrow) | Constructor invariants + bps math + dust + conservation + yield linearity + dual-auth |
+| **TypeScript (Vitest unit)** | **143 passing** across 6 files | 100% on x402 · 100% branches on session + claim-registry · 96% branches on orcid-oauth |
 | **Integration** | 6 scenarios for `/api/claim` (real handler + nock + ethers) | Full flow happy + 5 negative paths |
 | **CI** | GitHub Actions workflow | Both jobs gated on PR |
 
@@ -41,7 +41,7 @@ describe("methodName", () => {
 
 ```bash
 cd contracts
-forge test               # all 50 tests
+forge test               # all 56 tests
 forge test -vvv          # with traces
 forge test --match-test testFuzz_      # only fuzz suites
 forge coverage           # coverage report
@@ -70,7 +70,7 @@ Output goes to `web/coverage/index.html`.
 
 | File | Suite | Tests | Highlights |
 |---|---|---|---|
-| `AttributionLedger.t.sol` | `AttributionLedgerTest` | 5 | Split correctness, dup query revert, weight mismatch, empty cites, stats |
+| `AttributionLedger.t.sol` | `AttributionLedgerTest` | 6 | Split correctness, dup query revert, weight mismatch, empty cites, stats, dual-auth (operator + agent) |
 | `AttributionLedger.fuzz.t.sol` | `AttributionLedgerFuzzTest` | 7 + 2×256 fuzz | **Conservation property** · two-author split fuzz · dust payment · weight boundary 9999/10001 · constructor InvalidSplit · zero-weight allowed |
 | `UnclaimedYieldEscrow.t.sol` | `UnclaimedYieldEscrowTest` | 8 | Existing |
 | `UnclaimedYieldEscrow.fuzz.t.sol` | `UnclaimedYieldEscrowFuzzTest` | 7 + 2×256 fuzz | **Yield linearity** fuzz · dust principal yield=0 · 1 USDT × 5% yields exactly 5e16 wei · post-claim freeze · double-claim revert · operator gating |
@@ -83,11 +83,11 @@ Output goes to `web/coverage/index.html`.
 | File | Subject | Test count |
 |---|---|---|
 | `unit/orcid-oauth.test.ts` | HMAC cookie sign/verify, OAuth URL builder, `isOrcidOauthEnabled`, `redirectUrl` | 33 |
-| `unit/x402.test.ts` | Payment header decode (5 negative cases), `buildPaymentRequired`, nock-mocked `settleWithFacilitator`, `isDemoMode` | 19 |
-| `unit/session.test.ts` | Real ethers Wallet + `verifyIntent` + `checkSpendStateless` cap enforcement | 15 |
+| `unit/x402.test.ts` | Payment header decode (5 negative cases), `buildPaymentRequired`, nock-mocked `settleWithFacilitator`, `isDemoMode` | 20 |
+| `unit/session.test.ts` | Real ethers Wallet + `verifyIntent` + `checkSpendStateless` cap enforcement + UTC daily reset | 16 |
 | `unit/kitepass.test.ts` | `buildKutipRules` shape, `KITEPASS_ADDRESSES`, uint160 boundary | 15 |
 | `unit/agent.financial.test.ts` ★ | `evenWeights`, `normalize`, `flattenCitationsForContract`, `buildCitations` — **fast-check property tests** asserting weight conservation invariant (sum=10000) | 24 |
-| `unit/claim-registry.test.ts` | ORCID normalisation, claim message determinism, `orcidHash` collision-resistance, cache lifecycle | 24 |
+| `unit/claim-registry.test.ts` | ORCID normalisation, claim message determinism + `parseClaimMessageExpiry`, `orcidHash` collision-resistance, cache lifecycle | 30 |
 | `integration/api-claim.test.ts` | Full `/api/claim` POST flow with real handler + nock ORCID + ethers signing + signed OAuth cookie | 6 |
 
 ---
@@ -103,12 +103,12 @@ Defined in `web/vitest.config.ts` — per-file thresholds reflecting actually-te
 "lib/claim-registry.ts": { lines: 50, branches: 100, functions: 75 }  // identity binding
 ```
 
-Achieved (verified 2026-05-04):
+Achieved (verified 2026-05-17):
 ```
 x402.ts          100% / 100% / 100% / 100%
 orcid-oauth.ts    71% /  96% /  88% /  71%
-session.ts        56% / 100% /  41% /  56%
-claim-registry.ts 52% / 100% /  76% /  52%
+session.ts        61% / 100% /  46% /  61%
+claim-registry.ts 60% / 100% /  79% /  60%
 kitepass.ts       21% / 100% /  12% /  21%
 ```
 

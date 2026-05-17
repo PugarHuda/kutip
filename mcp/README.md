@@ -8,7 +8,7 @@ Claude Desktop, Cursor, Cline, and any future MCP-compatible LLM app.
 Bridges the Model Context Protocol (stdio) to Kutip's HTTP API, so
 when you ask Claude Desktop "Cari paper carbon capture terbaru" it can
 call `kutip.research()` natively, and the full Kutip flow runs:
-search → x402 per-paper → summarise → attest on Kite → mirror to Fuji
+search → x402 on-chain settle → summarise → attest on Kite → mirror to Fuji
 → return citations + tx hashes straight into the chat.
 
 ## Tools

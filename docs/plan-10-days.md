@@ -38,8 +38,8 @@
 - [x] Snapshots captured
 
 ### D4 (Sun 19 Apr · equivalent) — Identity layer ⚠️
-- [ ] Real Pieverse facilitator settlement (still mock — LOW priority, judges see attestation, not x402 internals)
-- [ ] 402 retry-with-signature (still mock)
+- [x] **Real x402 settlement** — on-chain 402 handshake, facilitator-free (`/api/x402`); shipped 2026-05-17
+- [x] **402 retry-with-proof** — agent retries with `X-PAYMENT: base64({txHash})`, merchant verifies on-chain
 - [x] **Agent Passport equivalent via `gokite-aa-sdk`** — EIP-4337 AA wallet `0x4da7f4cF…1776`
 - [x] Kite paymaster wired — agent pays gas in Test USD, no KITE needed
 - [ ] Full passport signup/session (awaiting testnet invite — code structured for drop-in)
@@ -98,5 +98,4 @@
 **Nice-to-have:**
 - Architecture diagram (1h)
 - Tweet / LinkedIn launch post (30 min)
-- Real Pieverse x402 integration (2-3h, LOW judge visibility)
 - Download-receipt-as-JSON actually working (30 min)

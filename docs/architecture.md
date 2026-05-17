@@ -73,10 +73,12 @@ For each query:
 
 1. **User** signs a SpendingIntent (EIP-712) capping spend per query +
    per day. Server keeps the floor; client value can only ratchet up.
-2. **Researcher AA** receives 2 USDT via the x402 paywall flow. Funds
-   land in `AttributionLedger`.
-3. Researcher fetches papers from Semantic Scholar / OpenAlex,
-   summarises via OpenRouter LLM, ranks citations.
+2. **Researcher AA** discovers real papers (OpenAlex / Semantic Scholar),
+   then settles corpus access through a genuine x402 handshake — an
+   HTTP 402 challenge paid with an on-chain USDT transfer on Kite,
+   verified on-chain (facilitator-free, via `/api/x402`).
+3. Reads the papers with an OpenRouter LLM and ranks per-paper
+   citation weights.
 4. Researcher calls `attestAndSplit(queryId, totalPaid, citations[])`.
    Contract pays authors (80% split per weights), operator (15%),
    ecosystem (5%). Authors whose ORCID isn't yet bound have their
