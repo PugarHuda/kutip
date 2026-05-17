@@ -546,8 +546,8 @@ function ResearchSidebar({
           <span className="t-small font-semibold block">Explore mode</span>
           <span className="t-mono-sm ink-3">
             {exploredCount > 0
-              ? `${exploredCount} papers cited this session — surfacing fresh ones`
-              : "Surface papers not yet cited this session"}
+              ? `${exploredCount} papers cited this session — next search avoids repeats`
+              : "Each search prefers papers not cited yet this session"}
           </span>
         </span>
       </button>
