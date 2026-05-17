@@ -100,8 +100,8 @@ export async function searchSemanticScholar(
       year: p.year ?? 2024,
       journal: p.venue ?? "arXiv preprint",
       keywords: [],
-      // micro-USDT (6 dp) — matches the seeded catalog's 0.03-0.05 band
-      // so a default 0.1-USDT budget can afford a couple of papers.
+      // micro-USDC (6 dp) — matches the seeded catalog's 0.03-0.05 band
+      // so a default 0.1-USDC budget can afford a couple of papers.
       priceUSDC: 40000,
       authors: paperAuthorIds
     });

@@ -10,7 +10,7 @@ export const maxDuration = 15;
  * agent-passport SDK + viem public client stay warm. Prevents the first real
  * research query from paying a ~15s cold-start tax on top of its normal cost.
  *
- * Skips: OpenRouter (rate-limited), contract writes (costs USDT), Semantic
+ * Skips: OpenRouter (rate-limited), contract writes (costs USDC), Semantic
  * Scholar (rate-limited). Only touches modules + one RPC read.
  */
 export async function GET() {

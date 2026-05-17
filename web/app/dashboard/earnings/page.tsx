@@ -14,7 +14,7 @@ import { StatTile } from "@/components/ui";
 import { MyEarningsCard } from "@/components/my-earnings-card";
 
 /**
- * Reads the on-chain "USDT currently held for un-claimed authors" total.
+ * Reads the on-chain "USDC currently held for un-claimed authors" total.
  * Returns 0n on contract-not-configured or RPC failure — page falls
  * back to "no escrow" rather than crashing.
  */
@@ -128,7 +128,7 @@ export default async function DashboardEarningsPage() {
         <div className="t-caption">Dashboard · Earnings</div>
         <h1 className="t-h1-tight mt-1 mb-3">Who got paid</h1>
         <p className="t-body ink-2 max-w-[620px] m-0">
-          Authors whose papers Kutip cited. Rankings reflect cumulative USDT
+          Authors whose papers Kutip cited. Rankings reflect cumulative USDC
           earned across all attested queries.
         </p>
 
@@ -156,7 +156,7 @@ export default async function DashboardEarningsPage() {
             delta={totalCitations > 0 ? "live-updated" : "no queries yet"}
           />
           <StatTile
-            label="USDT distributed"
+            label="USDC distributed"
             value={formatUSDC(totalEarnings)}
             delta={totalEarnings > 0n ? "authors share only" : "awaiting first"}
             accent="emerald"
@@ -211,7 +211,7 @@ export default async function DashboardEarningsPage() {
                       className="t-mono font-bold mt-3 tracking-tight"
                       style={{ color: accent.earn, fontSize: 22 }}
                     >
-                      {formatUSDC(r.earnings)} USDT
+                      {formatUSDC(r.earnings)} USDC
                     </div>
                     <div className="t-mono-sm ink-3 mt-1">
                       {r.citations} citation{r.citations === 1 ? "" : "s"}

@@ -11,11 +11,11 @@ Live app: <https://kutip-zeta.vercel.app>
 
 | To do this | You need |
 |---|---|
-| Run a quick query (budget ≤ 0.5 USDT) | Nothing — anonymous queries work out of the box |
-| Run larger queries (up to 2 USDT/query) | A wallet (MetaMask) + one signed session delegation |
+| Run a quick query (budget ≤ 0.5 USDC) | Nothing — anonymous queries work out of the box |
+| Run larger queries (up to 2 USDC/query) | A wallet (MetaMask) + one signed session delegation |
 | Claim author earnings | A wallet + an ORCID iD |
 
-You never need KITE for gas and you never need to hold USDT yourself —
+You never need KITE for gas and you never need to hold USDC yourself —
 the agent's smart account funds every query. The wallet is only used to
 **sign** a spending delegation and to **prove** wallet ownership when
 claiming. No transaction is ever sent from your wallet.
@@ -36,23 +36,23 @@ prompted — RPC `https://rpc-testnet.gokite.ai/`, explorer
 
    | Budget | Papers cited (approx.) |
    |---|---|
-   | 0.1 USDT | 3 |
-   | 0.5 USDT | 5 |
-   | 1 USDT | 10 |
-   | 2 USDT | 20 |
+   | 0.1 USDC | 3 |
+   | 0.5 USDC | 5 |
+   | 1 USDC | 10 |
+   | 2 USDC | 20 |
 
-   The sidebar shows a live "≈ N papers · X USDT to authors" estimate.
+   The sidebar shows a live "≈ N papers · X USDC to authors" estimate.
 4. *(Optional)* Set a **publication-year window** — `From` / `To`.
    Either side can be left blank: `From 2020` means 2020-onward.
 5. Click **Pay & research**. The agent runs five steps live:
    **Search → Purchase → Read → Attribute → Settle**.
 
-Anonymous queries are capped at **0.5 USDT**. To go higher, connect a
+Anonymous queries are capped at **0.5 USDC**. To go higher, connect a
 wallet and sign a session (next section).
 
 ## 2. Connect a wallet + sign a session
 
-For budgets above 0.5 USDT, Kutip uses a **Kite-Passport-style session
+For budgets above 0.5 USDC, Kutip uses a **Kite-Passport-style session
 delegation**:
 
 1. Click **Connect wallet** (top right) and approve in MetaMask.

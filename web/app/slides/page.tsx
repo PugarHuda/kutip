@@ -25,7 +25,7 @@ const SLIDES: Slide[] = [
     body: (
       <p className="t-body ink-2 max-w-[560px]">
         An autonomous AI research agent that attests every citation on-chain
-        and splits USDT back to the cited authors, in real time, on the first
+        and splits USDC back to the cited authors, in real time, on the first
         AI-payments blockchain. <em>Kutip</em> (koo-teep) is Indonesian for{" "}
         <em>cite</em>.
       </p>

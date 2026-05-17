@@ -16,7 +16,7 @@ Kite's thesis is that AI agents should be **first-class economic actors** with t
                ▼
 ┌──────────────────────────────┐
 │  Agent (AA Smart Account)    │  ← derived via gokite-aa-sdk
-│  - holds USDT operating cap. │     EIP-4337 entry point:
+│  - holds USDC operating cap. │     EIP-4337 entry point:
 │  - executes UserOperations   │     0x4337…Ff108
 │  - this is what KiteScan     │
 │    shows as "payer"          │
@@ -37,7 +37,7 @@ Kite's thesis is that AI agents should be **first-class economic actors** with t
 | User EOA | ✅ Live | `PRIVATE_KEY` env; funded via Kite faucet |
 | Agent AA account | ✅ Live | `gokite-aa-sdk` v1.0.15; derived address via `sdk.getAccountAddress(eoa)` |
 | EIP-4337 bundler | ✅ Reachable | `https://bundler-service.staging.gokite.ai/rpc/` (chain 2368, EntryPoint `0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108`) |
-| Batched UserOps | ✅ Live | Attestation bundles USDT transfer + `attestAndSplit` in a single UserOperation |
+| Batched UserOps | ✅ Live | Attestation bundles USDC transfer + `attestAndSplit` in a single UserOperation |
 | Kite Passport signup | ⏳ Awaiting invite | Testnet is invitation-only; request submitted to Kite Discord `#testnet-support` |
 | Standing Intent (Passport-compatible) | ✅ Live | `lib/session.ts` — EIP-712 typed signature from user's wallet, stored server-side, verified via `recoverTypedDataAddress`. Schema mirrors Passport's `SpendingIntent` 1:1 |
 | Session Signature → per-tx enforcement | ✅ Live | `preflightSession()` in `lib/agent.ts` rejects queries over per-query or daily caps before any LLM cost is incurred |
@@ -79,18 +79,18 @@ Both paths produce identical `QueryRecord` on-chain. This lets the dev-mode path
 | `AA context unavailable` | `KUTIP_USE_AA=0` or no `PRIVATE_KEY` | Expected in dev; set both to enable |
 | `insufficient funds for gas` | AA account has no KITE | Send 0.05 KITE from EOA to AA address |
 | `AA2X sender not deployed` | AA account not yet counterfactual-deployed | First UserOp automatically deploys it; subsequent ops cheaper |
-| `ERC20: transfer amount exceeds balance` on attest | AA account has no USDT | Send USDT from EOA to AA address (see funding below) |
+| `ERC20: transfer amount exceeds balance` on attest | AA account has no USDC | Send USDC from EOA to AA address (see funding below) |
 | Bundler 5xx | Staging bundler transient | Retry once; if persistent, switch `KUTIP_USE_AA=0` and document in submission note |
 
 ### 4. Funding the AA account
 
 The AA account is a **separate wallet** from the EOA. It needs:
 - **KITE** for gas on each UserOperation (~0.0005 KITE per op)
-- **USDT** to cover `totalPaid` on each attestation (split internally)
+- **USDC** to cover `totalPaid` on each attestation (split internally)
 
 Funding steps:
 1. Run `pnpm dev`, visit `http://localhost:3000` — landing page shows the agent address.
-2. From MetaMask (EOA), send ~0.1 KITE and ~10 USDT to the AA address.
+2. From MetaMask (EOA), send ~0.1 KITE and ~10 USDC to the AA address.
 3. The next research query from `/research` will execute via AA automatically.
 
 ## Requesting the Kite Passport invitation
@@ -116,7 +116,7 @@ Request channel: **Kite Discord → `#testnet-support`** with:
    the delegation keyed by a deterministic session id.
 4. **Every research query** is pre-flighted: if the requested spend violates
    per-query or daily caps, the agent rejects before the LLM is even called.
-   Actionable error surfaces to the UI ("Daily cap would be exceeded: 0.5 USDT
+   Actionable error surfaces to the UI ("Daily cap would be exceeded: 0.5 USDC
    left today, query needs 1.0").
 5. **On successful attestation**, `recordSpend()` increments the session's
    daily counter. UI sidebar live-updates via `/api/session`.

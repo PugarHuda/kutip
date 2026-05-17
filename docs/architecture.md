@@ -47,7 +47,7 @@ on KiteScan without grepping a key custodian's database.
 flowchart TB
     User[User Wallet]
     Passport[Session Delegation<br/>EIP-712]
-    Vault[Kite Passport vault<br/>10 USDT/day · 2 USDT/tx]
+    Vault[Kite Passport vault<br/>10 USDC/day · 2 USDC/tx]
     Researcher[Researcher AA]
     Summarizer[Summarizer AA<br/>+ 5% sub-agent fee]
     Ledger[AttributionLedger]
@@ -75,7 +75,7 @@ For each query:
    per day. Server keeps the floor; client value can only ratchet up.
 2. **Researcher AA** discovers real papers (OpenAlex / Semantic Scholar),
    then settles corpus access through a genuine x402 handshake — an
-   HTTP 402 challenge paid with an on-chain USDT transfer on Kite,
+   HTTP 402 challenge paid with an on-chain USDC transfer on Kite,
    verified on-chain (facilitator-free, via `/api/x402`).
 3. Reads the papers with an OpenRouter LLM and ranks per-paper
    citation weights.

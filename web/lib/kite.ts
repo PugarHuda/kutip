@@ -21,9 +21,10 @@ export const PIEVERSE_FACILITATOR = "https://facilitator.pieverse.io" as const;
 export const SETTLE_ADDRESS =
   "0x12343e649e6b2b2b77649DFAb88f103c02F3C78b" as const;
 
-// Kite testnet settlement token: 18-decimal, on-chain symbol USDT —
-// UI copy says "USDT" to match. The *_USDC identifier names below are
-// kept as-is to avoid churning every import site; they're internal.
+// Kite testnet settlement token (0x0fF5…7e63), 18-decimal. The deployed
+// test token is symbol'd "USDT" / name "Test USD" on-chain, but Kite's
+// own docs and the hackathon spec both call the stablecoin "USDC" — so
+// UI copy + docs say "USDC" for ecosystem consistency.
 export const USDC_DECIMALS = 18 as const;
 export const USDC_UNIT = 10n ** BigInt(USDC_DECIMALS);
 
@@ -52,9 +53,9 @@ export function parseUSDC(amount: number): bigint {
  * spend tangibly worth more. More budget → broader literature review,
  * and (via the authors split) a larger payout to each cited author.
  *
- * Scales linearly (~10 papers per USDT) with no flat plateau, so a
+ * Scales linearly (~10 papers per USDC) with no flat plateau, so a
  * custom budget keeps buying more journals. Floor of 3 keeps even a
- * 0.1-USDT query useful; ceiling of 40 is a gas-safety bound — one
+ * 0.1-USDC query useful; ceiling of 40 is a gas-safety bound — one
  * `attestAndSplit` then settles ≤40 papers × ≤3 authors ≈ 120 transfers,
  * comfortably inside the block gas limit.
  *

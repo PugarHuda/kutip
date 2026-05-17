@@ -134,9 +134,9 @@ export async function searchOpenAlex(
       year: w.publication_year ?? new Date().getFullYear(),
       journal: w.primary_location?.source?.display_name ?? "Preprint",
       keywords: [],
-      // micro-USDT (6 dp). Matches the seeded catalog's 0.03-0.05 band
-      // so a default 0.1-USDT budget can afford 2-3 papers. The old
-      // 400000 (0.4 USDT) priced every runtime paper out of reach →
+      // micro-USDC (6 dp). Matches the seeded catalog's 0.03-0.05 band
+      // so a default 0.1-USDC budget can afford 2-3 papers. The old
+      // 400000 (0.4 USDC) priced every runtime paper out of reach →
       // 0 purchased → 0 citations → attestation reverted on
       // EmptyCitations.
       priceUSDC: 40000,

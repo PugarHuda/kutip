@@ -3,7 +3,7 @@
 > **Status:** finalized after the 2026-05-03 KitePass swap — Kite Passport now LIVE & INTEGRATED on chain.
 > **Deadline:** Sunday **2026-05-17** (Encode email 2026-04-28 · Rebecca).
 > **Live:** https://kutip-zeta.vercel.app · **Repo:** https://github.com/PugarHuda/kutip
-> **KitePass vault:** [`0xe2c4e97738884fd6db2fbb62c1cd672ef1debc4c`](https://testnet.kitescan.ai/address/0xe2c4e97738884fd6db2fbb62c1cd672ef1debc4c) · 10 USDT daily · 2 USDT per-tx
+> **KitePass vault:** [`0xe2c4e97738884fd6db2fbb62c1cd672ef1debc4c`](https://testnet.kitescan.ai/address/0xe2c4e97738884fd6db2fbb62c1cd672ef1debc4c) · 10 USDC daily · 2 USDC per-tx
 
 ---
 
@@ -16,7 +16,7 @@
 >
 > A Researcher smart account (EIP-4337, `0x4da7f4cF…`) operates within
 > a Kite Passport vault (`0xe2c4e9…ebc4c`) deployed live on Kite
-> testnet — 10 USDT daily, 2 USDT per-tx, on-chain enforcement, auditable
+> testnet — 10 USDC daily, 2 USDC per-tx, on-chain enforcement, auditable
 > by anyone. Every query pays a Summarizer sub-agent 5%, settles the
 > rest through AttributionLedger (80% cited authors / 15% operator /
 > 5% Kite ecosystem), then replicates the receipt to Avalanche Fuji
@@ -38,8 +38,8 @@
 
 Kutip ships an end-to-end agentic payment stack on Kite testnet:
 Researcher smart-account spends bounded by a live Kite Passport vault
-(0xe2c4e9…, 10 USDT/day, 2 USDT/tx, on-chain enforcement). Each query
-pays a Summarizer sub-agent 5%, settles USDT through AttributionLedger
+(0xe2c4e9…, 10 USDC/day, 2 USDC/tx, on-chain enforcement). Each query
+pays a Summarizer sub-agent 5%, settles USDC through AttributionLedger
 (50/40/10 split), replicates receipt to Avalanche Fuji via
 CitationMirror. Authors prove ORCID via real OAuth2 → binding on-chain
 in NameRegistry. Governance via 2-of-3 Safe multisig. Goldsky subgraph
@@ -62,7 +62,7 @@ automated QA checks.
 ERC-20 Transfer events (sub-agent fee + ledger transfer + distribution).
 
 **Voice:**
-> "Every citation this AI agent makes triggers a USDT payment to the
+> "Every citation this AI agent makes triggers a USDC payment to the
 > real authors. On-chain. In one atomic transaction. Let me show you."
 
 ### Shot 2 · 0:10–0:20 · Landing
@@ -79,7 +79,7 @@ block — Researcher AA, Summarizer AA, AttributionLedger, Pieverse chip.
 popup with structured data. Sign → "Passport · active" badge.
 
 **Voice:**
-> "Before the agent runs, I sign one Passport delegation: max 2 USDT
+> "Before the agent runs, I sign one Passport delegation: max 2 USDC
 > per query, 10 per day, 24-hour expiry. This is Kite's session-key
 > pattern — agent runs autonomously within these caps, no per-query
 > prompts. I can revoke anytime."
@@ -107,7 +107,7 @@ Fuji tx → SnowTrace.
 **Voice:**
 > "The receipt. Every author, their cut, their wallet, the hash. The
 > agent's spending was on-chain-bounded by our Kite Passport vault —
-> deployed live, ten USDT per day, two per transaction. Click — see
+> deployed live, ten USDC per day, two per transaction. Click — see
 > the rules and usage right on KiteScan. And within seconds, this
 > attestation mirrors to Avalanche Fuji. Cross-chain citation proof,
 > zero user gas."
@@ -138,7 +138,7 @@ Then flash to `/governance` — "2 / 3 signers required" big number.
 flowchart TB
     User[User Wallet<br/>signs EIP-712 SpendingIntent]
     Passport[Session Delegation<br/>max/query · daily cap · expiry]
-    KitePass[Kite Passport vault<br/>0xe2c4e9…ebc4c<br/>10 USDT/day · 2 USDT/tx]
+    KitePass[Kite Passport vault<br/>0xe2c4e9…ebc4c<br/>10 USDC/day · 2 USDC/tx]
     Researcher[Researcher AA<br/>0x4da7f4cF…]
     Summarizer[Summarizer AA<br/>0xA6C36bA2…]
     Ledger[AttributionLedger<br/>0xbC4eeC2f…]
@@ -172,7 +172,7 @@ flowchart TB
 
 ## Performance metrics (2026-04-21 production)
 
-Sequential stress test · 5 research queries · 0.1 USDT budget:
+Sequential stress test · 5 research queries · 0.1 USDC budget:
 
 | Metric | Value |
 |---|---|
@@ -206,12 +206,12 @@ Sequential stress test · 5 research queries · 0.1 USDT budget:
 >
 > **Kutip** is an autonomous research agent on Kite AI that actually
 > pays the humans it cites. Ask it a research question — it finds
-> papers, reads them with an LLM, and at the end it settles USDT
+> papers, reads them with an LLM, and at the end it settles USDC
 > transfers to every cited author's wallet, on-chain, atomically.
 >
 > Technically interesting bits:
 > - **EIP-4337 smart account** runs the agent — Kite's paymaster
->   covers gas in USDT, no native KITE ever touched.
+>   covers gas in USDC, no native KITE ever touched.
 > - **Session delegation** (Kite-Agent-Passport-compatible): user
 >   signs one EIP-712 to set caps, agent operates without prompts.
 > - **Real ORCID OAuth** for authors to prove they own the ORCID,

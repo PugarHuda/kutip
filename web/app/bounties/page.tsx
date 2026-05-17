@@ -109,7 +109,7 @@ export default async function BountiesPage() {
             value={String(active.length)}
             delta={
               active.length > 0
-                ? `${formatUSDC(totalActive)} USDT committed`
+                ? `${formatUSDC(totalActive)} USDC committed`
                 : "no active sponsors"
             }
           />
@@ -118,7 +118,7 @@ export default async function BountiesPage() {
             value={String(settled.length)}
             delta={
               settled.length > 0
-                ? `${formatUSDC(totalSettled)} USDT paid`
+                ? `${formatUSDC(totalSettled)} USDC paid`
                 : "awaiting first match"
             }
             accent="emerald"

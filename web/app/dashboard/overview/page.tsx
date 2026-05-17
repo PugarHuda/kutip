@@ -69,7 +69,7 @@ export default async function DashboardPage() {
             delta={totalCitations > 0 ? "live from subgraph" : "no queries yet"}
           />
           <StatTile
-            label="USDT distributed"
+            label="USDC distributed"
             value={formatUSDC(totalPaid)}
             delta={totalPaid > 0n ? "to real wallets" : "awaiting first query"}
             accent="emerald"
@@ -272,7 +272,7 @@ function ActivityRow({ a }: { a: GoldskyAttestation }) {
       </div>
       <div className="text-right flex-none">
         <div className="t-mono font-semibold text-emerald-700">
-          +{formatUSDC(paid)} USDT
+          +{formatUSDC(paid)} USDC
         </div>
         <a
           href={explorerTx(a.tx)}
@@ -319,7 +319,7 @@ function AuthorRow({
           </div>
         </div>
         <div className="t-mono font-semibold text-right">
-          {formatUSDC(BigInt(earnings))} USDT
+          {formatUSDC(BigInt(earnings))} USDC
         </div>
       </Link>
     </li>

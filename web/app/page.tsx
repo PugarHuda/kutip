@@ -51,7 +51,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="t-body ink-2 max-w-[540px] mt-5" style={{ fontSize: 18, lineHeight: "28px" }}>
-            Every citation triggers a payment to the author — in USDT, on Kite chain, in one
+            Every citation triggers a payment to the author — in USDC, on Kite chain, in one
             second. Attestation, not attribution theater.
           </p>
 
@@ -73,7 +73,7 @@ export default async function HomePage() {
             <span className="status-dot status-dot--done animate-pulse-dot" style={{ width: 6, height: 6 }} />
             <span>
               <strong className="text-kite-700">{totalCitations}</strong> citations ·{" "}
-              <strong className="text-kite-700">{formatUSDC(totalPaid)}</strong> USDT paid · live on
+              <strong className="text-kite-700">{formatUSDC(totalPaid)}</strong> USDC paid · live on
               Kite testnet
             </span>
           </div>
@@ -178,7 +178,7 @@ export default async function HomePage() {
             One query, three authors paid — atomic.
           </h2>
           <p className="t-body ink-2 max-w-[600px] mx-auto m-0">
-            The researcher pays 2 USDT up front. The agent reads, cites,
+            The researcher pays 2 USDC up front. The agent reads, cites,
             and settles in one transaction. Cited authors land their
             share before the response renders — every 12 seconds, on
             Kite testnet, live.
@@ -207,7 +207,7 @@ export default async function HomePage() {
             href="/gasless"
             icon={<GasIcon />}
             title="Gasless"
-            subtitle="Paymaster covers KITE, agent pays in USDT"
+            subtitle="Paymaster covers KITE, agent pays in USDC"
           />
           <FeatureTile
             href="/research"
@@ -266,7 +266,7 @@ export default async function HomePage() {
               citations · {authorsPaid} authors paid
             </div>
             <div className="t-mono-sm ink-3 mt-1">
-              {formatUSDC(totalPaid)} USDT distributed
+              {formatUSDC(totalPaid)} USDC distributed
             </div>
           </div>
           <div>

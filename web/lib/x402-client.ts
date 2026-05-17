@@ -31,7 +31,7 @@ export interface X402Settlement {
  * Real x402 buyer — runs the full handshake against an HTTP 402 resource:
  *
  *   1. POST the resource → receive `402` + the payment challenge.
- *   2. Settle the challenge with a genuine USDT transfer on Kite testnet
+ *   2. Settle the challenge with a genuine USDC transfer on Kite testnet
  *      (operator EOA is the payer).
  *   3. Retry with `X-PAYMENT: base64({txHash})` → receive `200`.
  *
@@ -65,7 +65,7 @@ export async function settleX402(
     throw new Error("x402: malformed challenge");
   }
 
-  // 2. Pay the challenge — a real USDT transfer on Kite.
+  // 2. Pay the challenge — a real USDC transfer on Kite.
   const account = privateKeyToAccount(pk as Hex);
   const wallet = createWalletClient({
     account,

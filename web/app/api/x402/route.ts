@@ -19,7 +19,7 @@ const TRANSFER_EVENT_ABI = [
 
 /**
  * Verify a real on-chain x402 payment — no facilitator. The tx must have
- * succeeded and carry a USDT `Transfer` to `payTo` of at least
+ * succeeded and carry a USDC `Transfer` to `payTo` of at least
  * `minAmount` (18-dp wei). The merchant proves the payment itself by
  * reading the Kite chain, so settlement is deterministic and auditable.
  */
@@ -54,16 +54,16 @@ async function verifyOnChainPayment(
  *
  * The research agent settles a micro-fee here before reading papers — a
  * genuine HTTP 402 → on-chain payment → retry-with-proof handshake. No
- * facilitator: the payment is a plain USDT transfer on Kite, and this
+ * facilitator: the payment is a plain USDC transfer on Kite, and this
  * route verifies it by reading the chain itself.
  *
  * Try it by hand:
  *   1. POST {queryId} with no header        → 402 + challenge
- *   2. transfer `maxAmountRequired` USDT to `payTo` on Kite
+ *   2. transfer `maxAmountRequired` USDC to `payTo` on Kite
  *   3. POST again with `X-PAYMENT: base64({"txHash":"0x…"})` → 200
  */
 
-// 0.001 USDT (18-dp). A symbolic access fee — the point is a real,
+// 0.001 USDC (18-dp). A symbolic access fee — the point is a real,
 // auditable on-chain settlement, not a large payment.
 const PRICE = 1_000_000_000_000_000n;
 

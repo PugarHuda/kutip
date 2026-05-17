@@ -149,7 +149,7 @@ export async function runResearchAgent(opts: {
   const purchased = await purchasePapers(candidates, budgetUSDC);
 
   // Real x402 handshake — the agent settles corpus access on-chain
-  // before reading: HTTP 402 → USDT transfer on Kite → retry with the
+  // before reading: HTTP 402 → USDC transfer on Kite → retry with the
   // txHash as proof. Fail-soft: a transient RPC/HTTP blip degrades the
   // detail line but never kills the query (the authoritative payment is
   // the attestation in step 5).
@@ -368,7 +368,7 @@ async function attestOnChain(opts: {
         : `eoa ${result.payer.slice(0, 8)}…${result.payer.slice(-4)}`;
 
     const subAgentNote = result.subAgent
-      ? ` · sub-agent fee ${(Number(result.subAgent.fee) / 1e18).toFixed(4)} USDT`
+      ? ` · sub-agent fee ${(Number(result.subAgent.fee) / 1e18).toFixed(4)} USDC`
       : "";
 
     opts.emit({

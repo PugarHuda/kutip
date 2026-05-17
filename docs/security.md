@@ -36,7 +36,7 @@ We explicitly *don't* defend against:
 | `/api/auth/orcid/demo-verify` | `KUTIP_ALLOW_DEMO_VERIFY` env flag | hardcoded allowlist (Josiah + synthetic `0000-0001-XXXX`) | `lookupOrcid` rejects real orcid.org records |
 | `/api/claim` | OAuth-cookie ORCID match | EIP-191 sig recovers to wallet | On-chain `NameRegistry` already-bound conflict check (409) |
 | `/api/session` (DELETE) | Caller address parsed | Signature recovers to caller | `validUntil` window (10 min) prevents replay |
-| `/api/query` | Origin allowlist | `KUTIP_API_KEY` for non-browser callers | Anonymous budget cap (0.5 USDT) |
+| `/api/query` | Origin allowlist | `KUTIP_API_KEY` for non-browser callers | Anonymous budget cap (0.5 USDC) |
 | `AttributionLedger.attestAndSplit` | `onlyAuthorized` modifier (operator EOA + agent AA) | CEI ordering in citation loop | Dust forwarding to ecosystem (conservation invariant) |
 | `UnclaimedYieldEscrow.claim` | `onlyOperator` modifier | `NameRegistry.walletOf == claimer` gate | First-write-wins on `Deposit.claimer` |
 | LLM citation weights | XML tag extraction | Schema validation | `Number.isFinite` + range + paper-id whitelist |
@@ -61,7 +61,7 @@ I verify that I, ORCID 0000-0002-1825-0097, own wallet 0x...
 chainId: 2368
 validUntil: 1734567890
 
-This binding controls future USDT payouts from the Kutip attribution ledger.
+This binding controls future USDC payouts from the Kutip attribution ledger.
 ```
 
 Why each line matters:
@@ -88,7 +88,7 @@ Three rounds. Each round is a single commit batch + a regression test.
 |---|---|---|
 | C1 | Critical | demo-verify allowlist (Josiah + synthetic 0000-0001) |
 | C2 | Critical | Server-side spend tracking — client `spentToday` is floor-only hint |
-| C3 | Critical | Origin allowlist + anonymous 0.5 USDT cap on `/api/query` |
+| C3 | Critical | Origin allowlist + anonymous 0.5 USDC cap on `/api/query` |
 | H2 | High | OAuth callback compares `token.orcid` against `expectedOrcid` |
 | H4 | High | LLM weight bounds check (`Number.isFinite`, range, paper-id whitelist) |
 | M5 | Medium | Strip signature bytes from public `/api/claim` GET |

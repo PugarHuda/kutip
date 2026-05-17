@@ -199,7 +199,7 @@ export interface AttestationResult {
 }
 
 // 5% of the query budget goes to the Summarizer sub-agent.
-// Capped at 0.05 USDT so a large query doesn't burn the AA pocket.
+// Capped at 0.05 USDC so a large query doesn't burn the AA pocket.
 const SUB_AGENT_FEE_BPS = 500n;
 const SUB_AGENT_FEE_CAP = 50000000000000000n; // 0.05 * 10^18
 function computeSubAgentFee(totalPaid: bigint): bigint {
@@ -242,7 +242,7 @@ async function submitViaAA(
 
   const calls: { target: Address; value: bigint; data: Hex }[] = [];
 
-  // Paymaster pulls gas-in-USDT from AA via transferFrom in postOp.
+  // Paymaster pulls gas-in-USDC from AA via transferFrom in postOp.
   // Without approval the whole userOp PostOpReverts with
   // ERC20InsufficientAllowance. Prepend a MAX_UINT approve when the
   // current allowance is low. Idempotent — one approve lasts forever.

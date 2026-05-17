@@ -113,7 +113,7 @@ export default function GovernancePage() {
                 <div className="t-mono font-bold mt-1 text-[26px] leading-[30px]">
                   {formatUSDC(stats.usdcBalance)}
                 </div>
-                <div className="t-small ink-3 mt-1">USDT · {formatKite(stats.kiteBalance)} KITE</div>
+                <div className="t-small ink-3 mt-1">USDC · {formatKite(stats.kiteBalance)} KITE</div>
               </div>
               <div className="card p-5">
                 <div className="t-caption">Safe version / nonce</div>

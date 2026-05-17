@@ -45,7 +45,7 @@ export function MoneyFlow() {
       width="100%"
       height="100%"
       style={{ maxHeight: 400 }}
-      aria-label="Money flow diagram: researcher pays the Kutip agent, which splits USDT to cited authors on Kite chain"
+      aria-label="Money flow diagram: researcher pays the Kutip agent, which splits USDC to cited authors on Kite chain"
     >
       <defs>
         <linearGradient id="mfLineK" x1="0" y1="0" x2="1" y2="0">
@@ -89,7 +89,7 @@ export function MoneyFlow() {
           fontWeight="600"
           fill="var(--kite-700)"
         >
-          − 2.00 USDT
+          − 2.00 USDC
         </text>
       </g>
 

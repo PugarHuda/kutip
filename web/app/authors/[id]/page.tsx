@@ -86,7 +86,7 @@ export default async function AuthorDetailPage({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
           <StatTile
-            label="USDT earned"
+            label="USDC earned"
             value={formatUSDC(stats.earnings)}
             delta={stats.earnings > 0n ? "attested on-chain" : "no earnings yet"}
             accent="emerald"

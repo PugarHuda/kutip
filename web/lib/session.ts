@@ -137,7 +137,7 @@ export async function checkSpendStateless(
 
   if (amount > session.intent.maxPerQueryUSDC) {
     throw new Error(
-      `Per-query cap exceeded: this query would spend ${fmt(amount)} but max is ${fmt(session.intent.maxPerQueryUSDC)} USDT`
+      `Per-query cap exceeded: this query would spend ${fmt(amount)} but max is ${fmt(session.intent.maxPerQueryUSDC)} USDC`
     );
   }
 
@@ -161,7 +161,7 @@ export async function checkSpendStateless(
     const remaining = session.intent.dailyCapUSDC - effectiveSpent;
     const leftStr = remaining < 0n ? "0.00" : fmt(remaining);
     throw new Error(
-      `Daily cap would be exceeded: ${leftStr} USDT left today, query needs ${fmt(amount)}`
+      `Daily cap would be exceeded: ${leftStr} USDC left today, query needs ${fmt(amount)}`
     );
   }
 
@@ -217,7 +217,7 @@ export function checkSpend({ sessionId, amount }: SpendCheckInput): SpendCheckRe
 
   if (amount > d.intent.maxPerQueryUSDC) {
     throw new Error(
-      `Per-query cap exceeded: this query would spend ${fmt(amount)} but max is ${fmt(d.intent.maxPerQueryUSDC)} USDT`
+      `Per-query cap exceeded: this query would spend ${fmt(amount)} but max is ${fmt(d.intent.maxPerQueryUSDC)} USDC`
     );
   }
 
@@ -231,7 +231,7 @@ export function checkSpend({ sessionId, amount }: SpendCheckInput): SpendCheckRe
   if (projected > d.intent.dailyCapUSDC) {
     const remaining = d.intent.dailyCapUSDC - d.spentToday;
     throw new Error(
-      `Daily cap would be exceeded: ${fmt(remaining)} USDT left today, query needs ${fmt(amount)}`
+      `Daily cap would be exceeded: ${fmt(remaining)} USDC left today, query needs ${fmt(amount)}`
     );
   }
 

@@ -34,7 +34,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Kutip — Citations that pay.",
   description:
-    "An autonomous AI research agent that pays cited authors in USDT, attested on Kite chain.",
+    "An autonomous AI research agent that pays cited authors in USDC, attested on Kite chain.",
   // icon.svg is auto-detected from app/icon.svg. We additionally point
   // apple-touch-icon at it so iOS 17+ (which gained SVG support) uses
   // the same vector mark instead of guessing a default URL. Older iOS

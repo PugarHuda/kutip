@@ -93,7 +93,7 @@ export async function GET() {
       address: PAYMASTER,
       kiteBalance: paymasterNative,
       usdcBalance: paymasterUsdc,
-      role: "Sponsors gas for every Agent UserOp, collects USDT instead"
+      role: "Sponsors gas for every Agent UserOp, collects USDC instead"
     },
     researcherAA: aa
       ? {
@@ -123,7 +123,7 @@ export async function GET() {
     stats: {
       userGasPaid: "0",
       userGasCurrency: "anything",
-      note: "Users pay zero gas. Agent's USDT is auto-converted to KITE for bundler by paymaster in postOp."
+      note: "Users pay zero gas. Agent's USDC is auto-converted to KITE for bundler by paymaster in postOp."
     }
   });
 }

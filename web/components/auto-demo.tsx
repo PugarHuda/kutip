@@ -153,7 +153,7 @@ export function AutoDemo({
             background: s.paying ? "var(--kite-700)" : undefined
           }}
         >
-          {s.paying ? "Paying 0.10 USDT…" : "Pay 0.10 USDT & research →"}
+          {s.paying ? "Paying 0.10 USDC…" : "Pay 0.10 USDC & research →"}
         </button>
 
         {s.stepsDone > 0 && (
@@ -212,7 +212,7 @@ export function AutoDemo({
                 className="t-mono-sm"
                 style={{ color: "var(--emerald-700)", fontWeight: 600 }}
               >
-                0.10 USDT paid
+                0.10 USDC paid
               </span>
             </div>
             <div className="mt-2 flex flex-col gap-1 text-sm">
@@ -288,7 +288,7 @@ function ReceiptRow({
         {name}
       </span>
       <span className="t-mono-sm" style={{ color: "var(--emerald-700)" }}>
-        + {amt} USDT
+        + {amt} USDC
       </span>
     </div>
   );

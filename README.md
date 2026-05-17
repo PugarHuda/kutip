@@ -1,6 +1,6 @@
 # Kutip — The research agent that pays its sources.
 
-> An autonomous AI research agent that attests every citation on-chain and splits USDT back to the cited authors, in real-time, on the first AI-payments blockchain.
+> An autonomous AI research agent that attests every citation on-chain and splits USDC back to the cited authors, in real-time, on the first AI-payments blockchain.
 
 **Built for:** Kite AI Global Hackathon 2026 — **Novel track**
 **Team:** Pugar Huda Mantoro ([@PugarHuda](https://github.com/PugarHuda))
@@ -12,14 +12,14 @@
 
 ## What it does in one sentence
 
-A user asks a research question. The agent pays for source papers via x402, reads them with an LLM, submits an on-chain attestation that splits USDT across the cited authors — all without the user signing a single wallet transaction, and without the agent ever holding a KITE token.
+A user asks a research question. The agent pays for source papers via x402, reads them with an LLM, submits an on-chain attestation that splits USDC across the cited authors — all without the user signing a single wallet transaction, and without the agent ever holding a KITE token.
 
 ## Demo flow (90 seconds)
 
 ```
 1. User opens /research, connects wallet, signs one EIP-712 delegation
-     "Agent may spend max 2 USDT/query, 10 USDT/day, 24h expiry"
-2. User types a question, clicks "Pay 0.5 USDT & research"
+     "Agent may spend max 2 USDC/query, 10 USDC/day, 24h expiry"
+2. User types a question, clicks "Pay 0.5 USDC & research"
      Zero gas prompts after this point.
 3. Agent (Researcher AA) runs 5 steps — each with live ticker:
      Search → Purchase via x402 → Read with LLM → Attribute → Settle on-chain
@@ -27,7 +27,7 @@ A user asks a research question. The agent pays for source papers via x402, read
      • transfer sub-agent fee (5%) to Summarizer AA
      • transfer totalPaid to AttributionLedger
      • call attestAndSplit(queryId, citations)
-     • paymaster postOp pulls ~0.02 USDT from AA for gas
+     • paymaster postOp pulls ~0.02 USDC from AA for gas
 5. Same query is mirrored to Avalanche Fuji within seconds
      via operator relayer — LayerZero-pattern cross-chain proof.
 6. Receipt shows:
@@ -45,7 +45,7 @@ A user asks a research question. The agent pays for source papers via x402, read
 |---|---|---|
 | **EIP-4337 AA via gokite-aa-sdk** | Agent has its own on-chain identity. KiteScan shows AA address as payer, not user. | [`lib/agent-passport.ts`](web/lib/agent-passport.ts) |
 | **Agent Passport session delegation** | User signs one EIP-712 SpendingIntent, agent operates within cap without per-query prompts. Drop-in-ready for Kite Passport public launch. | [`lib/session.ts`](web/lib/session.ts) |
-| **Kite paymaster gasless UX** | Agent never holds KITE. Paymaster fronts gas, pulls USDT back in postOp. User pays zero in any currency. | [`lib/ledger.ts:submitViaAA`](web/lib/ledger.ts) |
+| **Kite paymaster gasless UX** | Agent never holds KITE. Paymaster fronts gas, pulls USDC back in postOp. User pays zero in any currency. | [`lib/ledger.ts:submitViaAA`](web/lib/ledger.ts) |
 | **Multi-agent composition** | Researcher AA + Summarizer AA (different salts of same EOA). Sub-agent receives 5% per query automatically. | [`getSummarizerAAAddress()`](web/lib/agent-passport.ts) |
 | **ORCID OAuth ownership proof** | Authors prove ORCID via real OAuth2 flow (not just knowing the number). HMAC-signed session cookie enforced at API gate. | [`lib/orcid-oauth.ts`](web/lib/orcid-oauth.ts) |
 | **On-chain NameRegistry** | ORCID → wallet bindings persisted on Kite via operator AA. Claim survives Lambda cold starts, verifiable via KiteScan. | [`contracts/src/NameRegistry.sol`](contracts/src/NameRegistry.sol) |
@@ -135,7 +135,7 @@ A user asks a research question. The agent pays for source papers via x402, read
 
 ## Performance (April 2026, production deployment)
 
-Sequential stress test, 5 queries at 0.5 USDT each, measured end-to-end from `POST /api/query` to attestation confirmation:
+Sequential stress test, 5 queries at 0.5 USDC each, measured end-to-end from `POST /api/query` to attestation confirmation:
 
 | Metric | Value | Note |
 |---|---|---|
@@ -154,7 +154,7 @@ QA suite (`scripts/qa-test.mjs`): **50 / 50 automated checks green** on every pu
 | Requirement | Status |
 |---|---|
 | Agent performs a task and settles on Kite chain | ✅ `attestAndSplit` atomic batch |
-| Executes paid actions (API calls, services, transactions) | ✅ Real x402 handshake — HTTP 402 → on-chain USDT settle on Kite; plus the `attestAndSplit` payout tx |
+| Executes paid actions (API calls, services, transactions) | ✅ Real x402 handshake — HTTP 402 → on-chain USDC settle on Kite; plus the `attestAndSplit` payout tx |
 | Works end-to-end in a live demo in production | ✅ https://kutip-zeta.vercel.app |
 | Uses Kite chain for attestations (proof, auditability) | ✅ `AttributionLedger` on chain 2368 |
 | Functional UI (web app) | ✅ Next.js 14 App Router |
@@ -179,7 +179,7 @@ QA suite (`scripts/qa-test.mjs`): **50 / 50 automated checks green** on every pu
 | Agent LLM | OpenRouter · `z-ai/glm-4.5-air:free` primary, `openai/gpt-oss-120b:free` fallback |
 | Agent identity | EIP-4337 via `gokite-aa-sdk@1.0.15` · Kite staging bundler · Kite paymaster |
 | Corpus | OpenAlex + Semantic Scholar live search, with a static catalog fallback |
-| Payments | x402 — real HTTP 402 → on-chain USDT settlement on Kite, verified on-chain (facilitator-free). Pieverse facilitator path also wired. |
+| Payments | x402 — real HTTP 402 → on-chain USDC settlement on Kite, verified on-chain (facilitator-free). Pieverse facilitator path also wired. |
 | Contracts | Solidity 0.8.24 · Foundry · OpenZeppelin 5.x |
 | Chain | Kite testnet (2368) + Avalanche Fuji (43113) |
 | Indexer | Goldsky subgraph (AssemblyScript mapping) |
@@ -340,7 +340,7 @@ subgraph. No HTTP layer, no rate limits.
 | Source | Use for |
 |---|---|
 | `AttributionLedger.attestAndSplit` event | Watch every paid query, indexer-friendly |
-| `AttributionLedger.authorEarnings(addr)` | Lifetime USDT earned for a wallet |
+| `AttributionLedger.authorEarnings(addr)` | Lifetime USDC earned for a wallet |
 | Goldsky subgraph | Pre-aggregated leaderboard + recent attestations |
 | `CitationMirror` (Fuji) | Cross-chain proof reachable from Avalanche-native apps |
 

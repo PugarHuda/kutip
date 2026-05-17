@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
   if (!envelope && budgetUSDC > ANON_MAX_BUDGET_USDC) {
     return NextResponse.json(
       {
-        error: "Anonymous queries are capped at 0.5 USDT.",
+        error: "Anonymous queries are capped at 0.5 USDC.",
         hint: "Connect a wallet and sign a session delegation to use the full per-query budget."
       },
       { status: 402 }

@@ -84,7 +84,7 @@ export function AgentStateFooter() {
 
   const aa = balances?.researcher;
   const aaBal = aa?.balance ? BigInt(aa.balance) : null;
-  const lowBalance = aaBal !== null && aaBal < 10n ** 17n; // < 0.1 USDT
+  const lowBalance = aaBal !== null && aaBal < 10n ** 17n; // < 0.1 USDC
 
   const sessionActive =
     session !== null &&
@@ -121,7 +121,7 @@ export function AgentStateFooter() {
           AA
         </span>
         <span className={`font-semibold ${lowBalance ? "text-rose-500" : ""}`}>
-          {aa ? `${formatUSDC(aa.balance)} USDT` : "…"}
+          {aa ? `${formatUSDC(aa.balance)} USDC` : "…"}
         </span>
       </div>
 
@@ -180,8 +180,8 @@ function KitePassPanel() {
     dailyBudget > 0n ? Number((dailyUsed * 10000n) / dailyBudget) / 100 : 0;
 
   const tooltip = [
-    daily && `Daily: ${formatUSDC(daily.amountUsed)} / ${formatUSDC(daily.budget)} USDT`,
-    perTx && `Per-tx cap: ${formatUSDC(perTx.budget)} USDT`,
+    daily && `Daily: ${formatUSDC(daily.amountUsed)} / ${formatUSDC(daily.budget)} USDC`,
+    perTx && `Per-tx cap: ${formatUSDC(perTx.budget)} USDC`,
     info.address && `Vault: ${info.address}`
   ]
     .filter(Boolean)

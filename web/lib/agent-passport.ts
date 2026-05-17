@@ -9,7 +9,7 @@
  * Narrative for judges:
  *   - Service EOA (user's wallet) is the master identity.
  *   - Derived AA account is the AGENT's own on-chain identity — it holds
- *     USDT, signs transactions, and is what appears on KiteScan as the payer.
+ *     USDC, signs transactions, and is what appears on KiteScan as the payer.
  *   - When the Passport invitation arrives, layer signup/session on top.
  *     No business-logic change required.
  *

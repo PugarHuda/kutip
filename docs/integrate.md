@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 ```
 
-Without a `session`, the budget is capped at **0.5 USDT** (anonymous
+Without a `session`, the budget is capped at **0.5 USDC** (anonymous
 abuse fence). A signed session lifts the cap to the user's own limits.
 
 ### Response — Server-Sent Events
@@ -83,7 +83,7 @@ auditable. Run it by hand:
 curl -i -X POST https://kutip-zeta.vercel.app/api/x402 \
   -H 'Content-Type: application/json' -d '{"queryId":"demo-1"}'
 
-# 2. Transfer `maxAmountRequired` USDT to `payTo` on Kite testnet.
+# 2. Transfer `maxAmountRequired` USDC to `payTo` on Kite testnet.
 # 3. Retry with the proof — base64({"txHash":"0x…"}):
 curl -X POST https://kutip-zeta.vercel.app/api/x402 \
   -H 'Content-Type: application/json' \
