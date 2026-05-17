@@ -20,6 +20,12 @@ const nextConfig = {
       { source: "/registry", destination: "/dashboard/overview", permanent: false },
       { source: "/market", destination: "/dashboard/overview", permanent: false }
     ];
+  },
+  async rewrites() {
+    // Browsers, crawlers and link-preview bots hard-request /favicon.ico
+    // regardless of the <link rel="icon"> tag. app/icon.svg only answers
+    // /icon.svg, so /favicon.ico 404s — serve the SVG brand mark there.
+    return [{ source: "/favicon.ico", destination: "/icon.svg" }];
   }
 };
 

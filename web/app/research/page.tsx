@@ -73,7 +73,7 @@ const STEP_OUTLINE = [
 // the active one. Drives the agent-log animation so it always moves,
 // independent of when the browser actually delivers SSE events — real
 // `step` events only ever fast-forward past these estimates.
-const STEP_SCHEDULE_MS = [0, 4500, 8000, 22000, 24000];
+const STEP_SCHEDULE_MS = [0, 7000, 12000, 26000, 30000];
 
 /** Estimated active step (1-5) for a given elapsed time. */
 function stepFromElapsed(ms: number): number {
