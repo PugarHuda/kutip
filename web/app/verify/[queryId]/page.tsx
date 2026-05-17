@@ -11,6 +11,7 @@ import {
   formatUSDC,
   formatUSDCPrecise
 } from "@/lib/kite";
+import { getEscrowAddress } from "@/lib/escrow";
 import { listAuthors } from "@/lib/papers";
 import { getAccessMetrics, loadSummary } from "@/lib/summary-store";
 import { Addr, Breadcrumb, PayoutRow } from "@/components/ui";
@@ -31,6 +32,10 @@ export default async function VerifyPage({ params }: { params: { queryId: string
 
   const authors = listAuthors();
   const walletToAuthor = new Map(authors.map((a) => [a.wallet.toLowerCase(), a]));
+  // Citations to authors with no bound ORCID are paid to the escrow
+  // contract, not a dead address — label those rows so the payout
+  // table reads as intentional rather than "unknown".
+  const escrow = getEscrowAddress();
   const queryShort = `${queryId.slice(0, 10)}…${queryId.slice(-6)}`;
   const cachedSummary = loadSummary(queryId);
   const paywallMetrics = getAccessMetrics(queryId);
@@ -165,13 +170,23 @@ export default async function VerifyPage({ params }: { params: { queryId: string
               {citations.map((c, i) => {
                 const author = walletToAuthor.get(c.author.toLowerCase());
                 const walletShort = `${c.author.slice(0, 6)}…${c.author.slice(-4)}`;
+                const isEscrow =
+                  escrow && c.author.toLowerCase() === escrow.toLowerCase();
                 return (
                   <PayoutRow
                     key={`${c.author}-${c.txHash}`}
                     index={i}
                     top={i === 0}
-                    name={author?.name ?? walletShort}
-                    affiliation={author?.affiliation ?? "unknown affiliation"}
+                    name={
+                      author?.name ??
+                      (isEscrow ? "Unclaimed author" : walletShort)
+                    }
+                    affiliation={
+                      author?.affiliation ??
+                      (isEscrow
+                        ? "Held in escrow · accrues 5% APY until ORCID claimed"
+                        : "unknown affiliation")
+                    }
                     wallet={walletShort}
                     walletFull={c.author}
                     walletHref={explorerAddress(c.author)}

@@ -7,7 +7,7 @@ import {
 } from "@/lib/goldsky";
 import { getAuthorStats, getPublicClient } from "@/lib/ledger";
 import { listAuthors } from "@/lib/papers";
-import { formatUSDC, explorerAddress } from "@/lib/kite";
+import { formatUSDC, formatUSDCPrecise, explorerAddress } from "@/lib/kite";
 import { escrowAbi, getEscrowAddress } from "@/lib/escrow";
 import { ArrowRightIcon } from "@/components/icons";
 import { StatTile } from "@/components/ui";
@@ -211,7 +211,7 @@ export default async function DashboardEarningsPage() {
                       className="t-mono font-bold mt-3 tracking-tight"
                       style={{ color: accent.earn, fontSize: 22 }}
                     >
-                      {formatUSDC(r.earnings)} USDC
+                      {formatUSDCPrecise(r.earnings)} USDC
                     </div>
                     <div className="t-mono-sm ink-3 mt-1">
                       {r.citations} citation{r.citations === 1 ? "" : "s"}
@@ -245,7 +245,7 @@ export default async function DashboardEarningsPage() {
                   <span className="t-small ink-2">{r.affiliation}</span>
                   <span className="t-mono-sm text-right">{r.citations}</span>
                   <span className="t-mono text-right font-semibold text-emerald-700">
-                    {formatUSDC(r.earnings)}
+                    {formatUSDCPrecise(r.earnings)}
                   </span>
                 </Link>
               ))}

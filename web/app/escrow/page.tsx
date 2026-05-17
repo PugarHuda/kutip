@@ -2,7 +2,12 @@ import Link from "next/link";
 import type { Address, Hex } from "viem";
 import { escrowAbi, getEscrowAddress } from "@/lib/escrow";
 import { getPublicClient } from "@/lib/ledger";
-import { explorerAddress, explorerTx, formatUSDC } from "@/lib/kite";
+import {
+  explorerAddress,
+  explorerTx,
+  formatUSDC,
+  formatUSDCPrecise
+} from "@/lib/kite";
 import { StatTile } from "@/components/ui";
 import { CheckIcon, ExternalLinkIcon } from "@/components/icons";
 
@@ -157,7 +162,7 @@ export default async function EscrowPage() {
           />
           <StatTile
             label="Yield accrued"
-            value={formatUSDC(totalYield)}
+            value={formatUSDCPrecise(totalYield)}
             delta="5% APY · simulated"
             accent="emerald"
           />
@@ -248,7 +253,7 @@ export default async function EscrowPage() {
                     {formatUSDC(r.principal)}
                   </span>
                   <span className="t-mono text-right text-emerald-700">
-                    + {formatUSDC(r.accrued ?? 0n)}
+                    + {formatUSDCPrecise(r.accrued ?? 0n)}
                   </span>
                   <span className="flex justify-end">
                     {isClaimed ? (
