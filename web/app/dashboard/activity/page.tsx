@@ -4,12 +4,69 @@ import {
   isSubgraphEnabled,
   type GoldskyAttestation
 } from "@/lib/goldsky";
-import { explorerTx, explorerAddress, formatUSDC } from "@/lib/kite";
+import { getLedgerAddress, getPublicClient } from "@/lib/ledger";
+import { attributionLedgerAbi } from "@/lib/abi";
+import { formatUSDC } from "@/lib/kite";
 import { listAuthors } from "@/lib/papers";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+const LEDGER_DEPLOY_BLOCK = process.env.ATTRIBUTION_LEDGER_DEPLOY_BLOCK
+  ? BigInt(process.env.ATTRIBUTION_LEDGER_DEPLOY_BLOCK)
+  : 20944832n;
+
+/**
+ * RPC fallback for the activity feed.
+ *
+ * The Goldsky subgraph is the fast path, but it's only wired when
+ * NEXT_PUBLIC_SUBGRAPH_URL is set. Without it, this reads QueryAttested
+ * events straight off the AttributionLedger so the feed still works —
+ * same path /verify uses. Mapped onto GoldskyAttestation so the render
+ * block below doesn't care which source it got.
+ */
+async function fetchRecentOnChain(limit: number): Promise<GoldskyAttestation[]> {
+  const ledger = getLedgerAddress();
+  if (!ledger) return [];
+  try {
+    const client = getPublicClient();
+    const logs = await client.getContractEvents({
+      address: ledger,
+      abi: attributionLedgerAbi,
+      eventName: "QueryAttested",
+      fromBlock: LEDGER_DEPLOY_BLOCK,
+      toBlock: "latest"
+    });
+    const recent = logs.slice(-limit).reverse();
+
+    // Events carry block height, not wall-clock time. Resolve real
+    // block timestamps for the "When" column — dedupe so a busy block
+    // with several attestations is fetched once.
+    const uniqueBlocks = [...new Set(recent.map((l) => l.blockNumber as bigint))];
+    const blockTimes = new Map<bigint, bigint>();
+    await Promise.all(
+      uniqueBlocks.map(async (bn) => {
+        const block = await client.getBlock({ blockNumber: bn });
+        blockTimes.set(bn, block.timestamp);
+      })
+    );
+
+    return recent.map((log) => ({
+      id: log.args.queryId as string,
+      payer: log.args.payer as string,
+      totalPaid: (log.args.totalPaid as bigint).toString(),
+      authorsShare: "0",
+      citationCount: Number(log.args.citationCount),
+      block: (log.blockNumber as bigint).toString(),
+      timestamp: String(blockTimes.get(log.blockNumber as bigint) ?? 0n),
+      tx: log.transactionHash as string
+    }));
+  } catch (err) {
+    console.error("[activity] fetchRecentOnChain failed:", err);
+    return [];
+  }
+}
 
 function timeAgo(tsSec: number | string): string {
   const t = typeof tsSec === "string" ? Number(tsSec) : tsSec;
@@ -30,6 +87,11 @@ export default async function DashboardActivityPage() {
   if (isSubgraphEnabled()) {
     attestations = (await fetchRecentAttestationsFromGoldsky(20)) ?? [];
   }
+  // Subgraph off or returned nothing — read the ledger directly so the
+  // feed reflects on-chain truth regardless of indexer availability.
+  if (attestations.length === 0) {
+    attestations = await fetchRecentOnChain(20);
+  }
 
   return (
     <div className="px-6 lg:px-10 py-8 lg:py-10">
@@ -37,9 +99,9 @@ export default async function DashboardActivityPage() {
         <div className="t-caption">Dashboard · Activity</div>
         <h1 className="t-h1-tight mt-1 mb-3">Recent attestations</h1>
         <p className="t-body ink-2 max-w-[620px] m-0">
-          Live feed of every query settled on Kite testnet, indexed by Goldsky.
-          Each row is a citation that actually moved USDC — click through for
-          the tx on KiteScan.
+          Live feed of every query settled on Kite testnet, read straight from
+          the AttributionLedger. Each row actually moved USDC — click through
+          for the tx on KiteScan.
         </p>
 
         {attestations.length === 0 ? (
