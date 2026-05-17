@@ -6,7 +6,7 @@ import {
   getQueryRecord
 } from "@/lib/ledger";
 import { loadSummary } from "@/lib/summary-store";
-import { formatUSDC } from "@/lib/kite";
+import { formatUSDCPrecise } from "@/lib/kite";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -57,8 +57,8 @@ export async function GET(
     contract: getLedgerAddress(),
     attestation: {
       payer: record.payer,
-      totalPaidUSDC: formatUSDC(record.totalPaid),
-      authorsShareUSDC: formatUSDC(record.authorsShare),
+      totalPaidUSDC: formatUSDCPrecise(record.totalPaid),
+      authorsShareUSDC: formatUSDCPrecise(record.authorsShare),
       totalPaidRaw: record.totalPaid.toString(),
       authorsShareRaw: record.authorsShare.toString(),
       citationCount: record.citationCount,
@@ -67,7 +67,7 @@ export async function GET(
     payouts: citations.map((c) => ({
       author: c.author,
       weightBps: c.weightBps,
-      amountUSDC: formatUSDC(c.amount),
+      amountUSDC: formatUSDCPrecise(c.amount),
       amountRaw: c.amount.toString(),
       txHash: c.txHash
     })),
