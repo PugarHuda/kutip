@@ -13,12 +13,18 @@
  * as new queries run.
  */
 
+import { keccak256, toBytes } from "viem";
 import type { ResearchResult } from "./types";
 
 interface StoredSummary {
   queryId: string;
   query: string;
   summary: string;
+  // keccak256 of the UTF-8 synthesis text. Tamper-evidence: anyone who
+  // receives the summary can recompute this and confirm it's byte-for-byte
+  // what Kutip produced for the attested query. Surfaced on /verify and
+  // returned by the /api/summaries paywall response.
+  summaryHash: string;
   citations: ResearchResult["citations"];
   paperDetails: ResearchResult["paperDetails"];
   totalPaidUSDC: number;
@@ -53,11 +59,16 @@ function metrics(): Map<string, PaywallMetrics> {
   return g[metricsKey]!;
 }
 
+export function summaryDigest(summary: string): string {
+  return keccak256(toBytes(summary));
+}
+
 export function saveSummary(result: ResearchResult): void {
   summaries().set(result.queryId.toLowerCase(), {
     queryId: result.queryId,
     query: result.query,
     summary: result.summary,
+    summaryHash: summaryDigest(result.summary),
     citations: result.citations,
     paperDetails: result.paperDetails,
     totalPaidUSDC: result.totalPaidUSDC,

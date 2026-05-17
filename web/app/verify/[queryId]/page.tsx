@@ -187,7 +187,22 @@ export default async function VerifyPage({ params }: { params: { queryId: string
                     </p>
                   ))}
               </div>
-              <div className="t-mono-sm ink-3 mt-5 pt-4 border-t border-token">
+              <div className="mt-5 pt-4 border-t border-token">
+                <div className="t-caption mb-1">
+                  Summary digest · keccak256
+                </div>
+                <div
+                  className="t-mono-sm ink-2"
+                  style={{ wordBreak: "break-all" }}
+                >
+                  {cachedSummary.summaryHash}
+                </div>
+                <div className="t-small ink-3 mt-1">
+                  keccak256 of the synthesis text above — any edit changes
+                  this hash, so a tampered summary is detectable.
+                </div>
+              </div>
+              <div className="t-mono-sm ink-3 mt-3">
                 Cached{" "}
                 {new Date(cachedSummary.savedAt).toISOString().slice(0, 16).replace("T", " ")}{" "}
                 UTC · {cachedSummary.totalPaidUSDC} USDC paid across{" "}
@@ -297,12 +312,13 @@ export default async function VerifyPage({ params }: { params: { queryId: string
         <div className="flex gap-2.5 justify-between items-center pt-6 mt-6 border-t border-token">
           <div className="t-small ink-3">Signed by Kutip agent · v0.1</div>
           <div className="flex gap-2">
-            <button type="button" className="btn btn--ghost btn--sm">
-              Copy permalink
-            </button>
-            <button type="button" className="btn btn--ghost btn--sm">
-              Download JSON
-            </button>
+            <a
+              href={`/api/receipt/${queryId}`}
+              download={`kutip-receipt-${queryId.slice(2, 10)}.json`}
+              className="btn btn--ghost btn--sm"
+            >
+              Download JSON receipt
+            </a>
             {ledger && (
               <a
                 href={explorerAddress(ledger)}
