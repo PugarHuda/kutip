@@ -9,10 +9,11 @@ import { ConnectWallet } from "./connect-wallet";
 export function TopNav() {
   const pathname = usePathname();
 
-  // Dashboard and Docs each have their own sidebar chrome — skip the
-  // marketing topnav on both so there aren't two stacked headers.
+  // Dashboard, Docs and the /slides deck each have their own chrome —
+  // skip the marketing topnav so there aren't two stacked headers.
   if (pathname?.startsWith("/dashboard")) return null;
   if (pathname?.startsWith("/docs")) return null;
+  if (pathname?.startsWith("/slides")) return null;
 
   return (
     <nav className="topnav">
@@ -25,6 +26,13 @@ export function TopNav() {
       </Link>
 
       <div className="flex gap-2 items-center">
+        <Link
+          href="/slides"
+          className="t-small no-underline px-2.5 py-1 rounded-md transition-colors hidden sm:inline-block"
+          style={{ color: "var(--ink-2)" }}
+        >
+          Pitch
+        </Link>
         <Link
           href="/docs"
           aria-current={pathname?.startsWith("/docs") ? "page" : undefined}
