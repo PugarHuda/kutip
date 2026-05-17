@@ -183,12 +183,27 @@ export async function runResearchAgent(opts: {
     step: { step: 3, label: stepThreeLabel, status: "running" }
   });
 
-  const { summary, citationWeights } = await summarizeWithLLM(query, purchased);
+  const { summary, citationWeights, relevant } = await summarizeWithLLM(
+    query,
+    purchased
+  );
 
   emit({
     type: "step",
     step: { step: 3, label: stepThreeLabel, status: "done" }
   });
+
+  // Relevance gate — if the agent learned nothing usable from the
+  // purchased papers, stop here: no attribution, no on-chain settle,
+  // no author paid. Citing (and paying) for irrelevant sources would
+  // betray the "pay the humans you learn from" contract.
+  if (!relevant) {
+    throw new Error(
+      `No source relevant to "${query}". Kutip cites — and pays — only ` +
+        `papers it genuinely used, so nothing was attested and no author ` +
+        `was paid. Try a research question (a topic to investigate).`
+    );
+  }
 
   emit({
     type: "step",
@@ -519,7 +534,11 @@ async function purchasePapers(candidates: Paper[], budgetUSDC: number): Promise<
 async function summarizeWithLLM(
   query: string,
   papers: Paper[]
-): Promise<{ summary: string; citationWeights: Map<string, number> }> {
+): Promise<{
+  summary: string;
+  citationWeights: Map<string, number>;
+  relevant: boolean;
+}> {
   if (!process.env.OPENROUTER_API_KEY) {
     return fallbackSummary(query, papers);
   }
@@ -533,17 +552,32 @@ async function summarizeWithLLM(
 
   const prompt = `You are a research assistant. A user asked: "${query}"
 
-Below are ${papers.length} paper abstracts you've already purchased. Synthesize a concise summary (3 paragraphs max) answering the user's question, citing papers inline as [1], [2], etc. Then output a JSON block with citation weights (integer basis points summing to exactly 10000) showing how much each paper contributed to your answer. Use the paper id (e.g. "p001") as the key.
+Below are ${papers.length} paper abstracts. First judge relevance: do any
+of them contain information that genuinely helps answer the question?
 
 ${corpus}
 
-Reply in EXACTLY this format with both tags present:
+Reply in EXACTLY one of these two formats.
+
+If NONE of the papers are relevant (the question is off-topic, not a
+research question, or about something the papers do not cover), reply
+ONLY with:
+<relevant>no</relevant>
 <summary>
-Your 3-paragraph synthesis with [1], [2] style citations.
+One short paragraph stating no relevant sources were found for this query.
+</summary>
+
+Otherwise reply with:
+<relevant>yes</relevant>
+<summary>
+A 3-paragraph synthesis answering the question, with [1], [2] style
+inline citations.
 </summary>
 <weights>
 {"p001": 3000, "p002": 2500, ...}
-</weights>`;
+</weights>
+Weights are integer basis points summing to exactly 10000; key = paper
+id. Give any paper that did NOT contribute a weight of 0.`;
 
   let text: string;
   try {
@@ -556,6 +590,11 @@ Your 3-paragraph synthesis with [1], [2] style citations.
 
   const summaryMatch = text.match(/<summary>([\s\S]*?)<\/summary>/);
   const weightsMatch = text.match(/<weights>([\s\S]*?)<\/weights>/);
+
+  // Relevance gate — refuse (and pay nobody) only on an explicit "no";
+  // a missing/garbled tag defaults to relevant so a parse glitch can't
+  // reject a genuine query.
+  const relevant = !/<relevant>\s*no\s*<\/relevant>/i.test(text);
 
   const summary = (summaryMatch?.[1] ?? text).trim();
   const citationWeights = new Map<string, number>();
@@ -589,7 +628,7 @@ Your 3-paragraph synthesis with [1], [2] style citations.
     evenWeights(papers, citationWeights);
   }
 
-  return { summary, citationWeights: normalize(citationWeights, papers) };
+  return { summary, citationWeights: normalize(citationWeights, papers), relevant };
 }
 
 async function callOpenRouter(prompt: string, model: string): Promise<string> {
@@ -674,7 +713,7 @@ function modelFriendlyName(modelId: string): string {
 function fallbackSummary(
   query: string,
   papers: Paper[]
-): { summary: string; citationWeights: Map<string, number> } {
+): { summary: string; citationWeights: Map<string, number>; relevant: boolean } {
   const bullets = papers
     .map((p, i) => `- [${i + 1}] ${p.title} — ${p.abstract.slice(0, 120)}...`)
     .join("\n");
@@ -689,7 +728,8 @@ In production, the configured OpenRouter model would synthesize a coherent 3-par
 
   const weights = new Map<string, number>();
   evenWeights(papers, weights);
-  return { summary, citationWeights: weights };
+  // Demo mode (no LLM key) can't judge relevance — never refuses.
+  return { summary, citationWeights: weights, relevant: true };
 }
 
 export function evenWeights(papers: Paper[], map: Map<string, number>) {
