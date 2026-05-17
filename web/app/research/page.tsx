@@ -11,6 +11,7 @@ import {
 import type { AgentEvent, AgentStep, ResearchResult } from "@/lib/types";
 import { ArrowRightIcon, CheckIcon, ChevronDownIcon, SearchIcon } from "@/components/icons";
 import { Cite, PayoutRow, Skeleton } from "@/components/ui";
+import { FundAgent } from "@/components/fund-agent";
 import {
   SessionManager,
   updateLocalSpent,
@@ -676,11 +677,9 @@ function ResearchSidebar({
               )}{" "}
               USDC
             </div>
-            <div className="t-mono-sm ink-3 mt-1">
-              Top up Researcher AA via MetaMask
-            </div>
           </div>
         )}
+        <FundAgent />
       </div>
 
       <SessionManager onSessionChange={onSessionChange} />
