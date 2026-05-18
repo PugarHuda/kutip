@@ -40,7 +40,7 @@ Kutip ships an end-to-end agentic payment stack on Kite testnet:
 Researcher smart-account spends bounded by a live Kite Passport vault
 (0xe2c4e9…, 10 USDC/day, 2 USDC/tx, on-chain enforcement). Each query
 pays a Summarizer sub-agent 5%, settles USDC through AttributionLedger
-(50/40/10 split), replicates receipt to Avalanche Fuji via
+(80/15/5 split — authors take the majority), replicates receipt to Avalanche Fuji via
 CitationMirror. Authors prove ORCID via real OAuth2 → binding on-chain
 in NameRegistry. Governance via 2-of-3 Safe multisig. Goldsky subgraph
 powers leaderboards + author profiles. Fully gasless — Kite paymaster

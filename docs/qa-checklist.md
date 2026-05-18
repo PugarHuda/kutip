@@ -142,7 +142,7 @@ Toggle via TopNav moon icon, sweep all 9 pages.
 | Subgraph index lag 30-60s after new tx | Goldsky re-indexing | Mention during voice-over |
 | Pieverse full x402 signing not wired | Test USD lacks EIP-3009 | Handshake + reachability only |
 | `/claim` registry resets on cold start | Per-process in-memory | Production needs NameRegistry contract |
-| `/api/summaries` cache resets on cold start | Per-process in-memory | Production needs IPFS/Arweave |
+| `/api/summaries` paywall metrics reset on cold start | Per-process in-memory | Summaries themselves persist to Vercel Blob; only the resale counters are in-memory |
 | Ash Safe not in production flow | Testnet deploy not confirmed | Currently uses EOA as ecosystemFund |
 | ORCID claims + escrow integration is post-attest (2-tx) | Escrow.operator immutable = EOA | Transactions sequential, both required for success |
 | OpenSea / KiteScan may not render URL-encoded tokenURI | Base64 was skipped for solc 0.8.24 compat | Some explorers handle data:application/json,{...} fine, others don't. Non-blocking for function. |

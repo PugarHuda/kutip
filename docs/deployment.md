@@ -98,10 +98,10 @@ The service wallet (= `PRIVATE_KEY`) must hold enough mock USDC to cover each qu
 `totalPaid`. Every `attestAndSplit` call:
 
 1. `transfer` the full query fee to the ledger.
-2. Ledger fans out 50 / 40 / 10 to operator / authors / ecosystem.
+2. Ledger fans out 80 / 15 / 5 to authors / operator / ecosystem.
 
-For a 2-USDC query the service wallet spends 2 USDC and receives 1 USDC back (operator share),
-so budget at least `~5 × queries × 2 USDC` to run a smooth demo.
+For a 2-USDC query the service wallet spends 2 USDC and receives 0.30 USDC back (15% operator
+share), so budget at least `~5 × queries × 2 USDC` to run a smooth demo.
 
 ### 6. Verify on KiteScan
 
@@ -127,6 +127,21 @@ progress → confirm step 5 lands a real tx on KiteScan.
 | Ecosystem Fund | — | Receives 5% of each query revenue |
 
 Fill these in after step 2.
+
+## Web app — Vercel + Blob storage
+
+The Next.js app deploys to Vercel. Research summaries are persisted to
+**Vercel Blob** so `/dashboard/history`, `/verify`, and the receipt /
+reverse-x402 endpoints survive serverless cold starts.
+
+1. Vercel dashboard → project → **Storage** → **Create Database** →
+   **Blob** → connect to the project (all environments).
+2. This injects the `BLOB_READ_WRITE_TOKEN` env var automatically.
+3. **Redeploy** so the running deployment picks the token up.
+
+The store is optional — without `BLOB_READ_WRITE_TOKEN` the summary
+store degrades to in-memory (per-instance, lost on cold start) and the
+app still runs. See [`web/lib/summary-store.ts`](../web/lib/summary-store.ts).
 
 ## Gas Estimates
 

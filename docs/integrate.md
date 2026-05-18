@@ -94,6 +94,32 @@ curl -X POST https://kutip-zeta.vercel.app/api/x402 \
 
 Each settlement tx is single-use (replay-guarded).
 
+### `GET /api/receipt/{queryId}` — portable attestation receipt
+
+Returns a self-contained JSON proof for any attested query — no payment,
+no auth. It is rebuilt server-side from canonical sources every call:
+the on-chain `QueryRecord` + `CitationPaid` events, plus the persisted
+synthesis and its keccak256 digest.
+
+```bash
+curl https://kutip-zeta.vercel.app/api/receipt/<queryId>
+```
+
+```jsonc
+{
+  "kind": "kutip-attestation-receipt",
+  "queryId": "0x…",
+  "attestation": { "payer": "0x…", "totalPaidUSDC": "0.10",
+                   "authorsShareUSDC": "0.08", "citationCount": 9, … },
+  "payouts": [ { "author": "0x…", "amountUSDC": "0.008888", "txHash": "0x…" }, … ],
+  "summary": { "query": "…", "synthesis": "…",
+               "summaryHash": "0x…", "summaryHashAlgo": "keccak256(utf8(synthesis))" }
+}
+```
+
+If the synthesis isn't in the warm cache the `summary` field carries a
+note instead — the on-chain `attestation` block is always complete.
+
 ## 2. MCP server
 
 The `mcp/` package bridges Kutip to the **Model Context Protocol**, so
@@ -111,10 +137,14 @@ and the schema in **[`mcp/README.md`](../mcp/README.md)**.
 
 ## 3. Reverse-x402 — agents that cite Kutip pay Kutip
 
-`GET /api/summaries/{queryId}` serves a cached summary behind a
+`GET /api/summaries/{queryId}` serves a persisted summary behind a
 **reverse-x402 paywall**. When another agent re-cites a Kutip answer it
 pays Kutip, and Kutip forwards that to the original authors. This closes
 the loop: Kutip pays humans → other agents pay Kutip → Kutip pays humans.
+
+Summaries persist in Vercel Blob (`summaries/<queryId>.json`), so the
+paywall and the receipt endpoint resolve across server restarts — not
+just within a warm Lambda.
 
 It is the same x402 spec used to *buy* papers, run in the other
 direction — Kutip as a paid data source for the wider agent economy.

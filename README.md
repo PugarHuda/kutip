@@ -53,9 +53,11 @@ A user asks a research question. The agent pays for source papers via x402, read
 | **2-of-3 Safe governance** | Ecosystem fund + escrow gated by Safe v1.4.1 multisig. Even if one signer key leaks, funds stay put. | [`scripts/deploy-safe.mjs`](scripts/deploy-safe.mjs) |
 | **Unclaimed yield escrow** | Payouts to un-bound authors accrue in `UnclaimedYieldEscrow` (5% APY target) until they bind an ORCID. | [`contracts/src/UnclaimedYieldEscrow.sol`](contracts/src/UnclaimedYieldEscrow.sol) |
 | **ERC-8004 Trustless Agents + ERC-6551 TBAs** | Each agent has a Reputation NFT whose token-bound account holds its earnings. Portable, composable. | [`contracts/src/AgentRegistry8004.sol`](contracts/src/AgentRegistry8004.sol) |
-| **Reverse x402** | Cached query summaries re-monetized via x402 paywall. Other agents pay Kutip to cite Kutip → recursive author payouts. | [`app/api/summaries/[queryId]/route.ts`](web/app/api/summaries/[queryId]/route.ts) |
+| **Reverse x402** | Persisted query summaries re-monetized via x402 paywall. Other agents pay Kutip to cite Kutip → recursive author payouts. | [`app/api/summaries/[queryId]/route.ts`](web/app/api/summaries/[queryId]/route.ts) |
+| **Verifiable summaries** | Every synthesis is keccak256-digested and persisted to Vercel Blob (survives cold starts). `/verify` shows the digest for tamper-evidence; `/api/receipt/[queryId]` exports a portable JSON proof — on-chain attestation + payouts + synthesis in one artifact. | [`lib/summary-store.ts`](web/lib/summary-store.ts) |
+| **Research history** | `/dashboard/history` lists every past run — query, synthesis preview, payout, digest — backed by the same persisted store. | [`app/dashboard/history/page.tsx`](web/app/dashboard/history/page.tsx) |
 | **Citation bounties** | Anyone can sponsor a research question; Kutip satisfies it and claims the bounty. | [`contracts/src/BountyMarket.sol`](contracts/src/BountyMarket.sol) |
-| **Goldsky subgraph** | Full indexer for attestations, authors, day stats, bindings. Powers `/leaderboard` windowed queries + `/authors/[id]` sparklines. | [`subgraph/`](subgraph/) |
+| **On-chain-first reads** | Dashboard activity, earnings, and agent stats read `QueryAttested` events straight from the ledger via RPC — the Goldsky subgraph is an optional fast path, never a hard dependency. | [`app/dashboard/activity/page.tsx`](web/app/dashboard/activity/page.tsx) |
 
 ---
 
@@ -108,7 +110,7 @@ A user asks a research question. The agent pays for source papers via x402, read
 
 | Contract | Address | Purpose |
 |---|---|---|
-| AttributionLedger | [`0xbC4eeC2f…2D36`](https://testnet.kitescan.ai/address/0xbC4eeC2f75a0DCf61509842e1c18Abff7236A338) | Atomic settle — split fee (80/15/5) + emit citation events |
+| AttributionLedger | [`0xbC4eeC2f…A338`](https://testnet.kitescan.ai/address/0xbC4eeC2f75a0DCf61509842e1c18Abff7236A338) | Atomic settle — split fee (80/15/5) + emit citation events |
 | UnclaimedYieldEscrow | [`0xcbab887d…547b40`](https://testnet.kitescan.ai/address/0xcbab887da9c2a16612a9120b4170e74c50547b40) | Holds payouts for un-bound authors at 5% APY target |
 | BountyMarket | [`0x1ba00a38…b3f72`](https://testnet.kitescan.ai/address/0x1ba00a38b25adf68ac599cd25094e2aa923b3f72) | Sponsored research questions, operator-settled |
 | AgentReputation (ERC-721) | [`0x8f53EB5C…db15`](https://testnet.kitescan.ai/address/0x8f53EB5C04B773F0F31FE41623EA19d2Fd84db15) | Soul-bound agent reputation NFTs |
@@ -199,6 +201,8 @@ git clone https://github.com/PugarHuda/kutip && cd kutip
 cp .env.example .env
 #   Fill: PRIVATE_KEY, OPENROUTER_API_KEY,
 #         ORCID_CLIENT_ID + SECRET + COOKIE_SECRET (optional, enables OAuth)
+#         BLOB_READ_WRITE_TOKEN (optional — persists summaries; without
+#         it the summary store degrades to in-memory)
 
 # 2) Contracts
 cd contracts
@@ -232,6 +236,8 @@ Kutip/
 ├── web/                    Next.js 14 app
 │   ├── app/
 │   │   ├── research/               Main agent UI (Passport + live ticker)
+│   │   ├── dashboard/              Sidebar workbench — overview, activity,
+│   │   │                           earnings, history, verify, infra pages
 │   │   ├── claim/                  ORCID OAuth + wallet-sign claim flow
 │   │   ├── leaderboard/            Windowed earnings (all/week/month)
 │   │   ├── authors/[id]/           Per-author profile + 30-day sparkline
@@ -246,7 +252,8 @@ Kutip/
 │   │       ├── balances/           Live AA + paymaster balances
 │   │       ├── gasless-stats/      Paymaster probe
 │   │       ├── safe-stats/         Multisig state
-│   │       ├── summaries/[id]/     Reverse-x402 cache
+│   │       ├── summaries/[id]/     Reverse-x402 paywall
+│   │       ├── receipt/[id]/       Portable JSON attestation receipt
 │   │       └── auth/orcid/*        OAuth authorize/callback/status
 │   ├── lib/                        Business logic (agent, session, ledger, etc.)
 │   └── scripts/                    qa-test, stress-test, fund-aa, deploy-safe
@@ -317,6 +324,10 @@ curl -X POST https://kutip-zeta.vercel.app/api/query \
 # Retrieve a saved summary (reverse-x402: receipt-or-pay).
 curl https://kutip-zeta.vercel.app/api/summaries/<queryId>
 
+# Download a portable JSON receipt — on-chain attestation + per-author
+# payouts + synthesis + keccak256 digest, rebuilt from canonical sources.
+curl https://kutip-zeta.vercel.app/api/receipt/<queryId>
+
 # Real x402 corpus-access endpoint — POST with no header returns a
 # genuine HTTP 402 challenge; pay on-chain, retry with X-PAYMENT.
 curl -i -X POST https://kutip-zeta.vercel.app/api/x402 \
@@ -330,7 +341,7 @@ curl -X POST https://kutip-zeta.vercel.app/api/claim \
 ```
 
 Full request/response shapes live in the route files:
-[`api/query`](web/app/api/query/route.ts) · [`api/x402`](web/app/api/x402/route.ts) · [`api/summaries/[queryId]`](web/app/api/summaries/[queryId]/route.ts) · [`api/claim`](web/app/api/claim/route.ts).
+[`api/query`](web/app/api/query/route.ts) · [`api/x402`](web/app/api/x402/route.ts) · [`api/summaries/[queryId]`](web/app/api/summaries/[queryId]/route.ts) · [`api/receipt/[queryId]`](web/app/api/receipt/[queryId]/route.ts) · [`api/claim`](web/app/api/claim/route.ts).
 
 ### 3. On-chain — for indexers, wallets, settlement bots
 

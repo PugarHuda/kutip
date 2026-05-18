@@ -101,10 +101,22 @@ deterministic placeholder wallet until you claim it:
 
 Anyone can audit a query without trusting the UI:
 
-- **`/verify`** — paste a `queryId` to see the on-chain citation ledger.
+- **`/verify`** — paste a `queryId` to see the on-chain citation ledger,
+  the per-author payout split, the full research synthesis, and its
+  **keccak256 digest**. The digest is tamper-evidence: recompute it from
+  the synthesis text and any edit shows up as a mismatch.
+- **Download JSON receipt** — one button bundles the on-chain attestation,
+  every payout, the synthesis, and the digest into a portable artifact.
 - Or open the KiteScan tx directly from any receipt.
-- The leaderboard (`/leaderboard`) and author pages read live on-chain
-  events — no database in between.
+- The dashboard activity feed, earnings, and agent stats all read live
+  `QueryAttested` events on-chain — no database required in the path.
+
+## 6. Browse research history
+
+**`/dashboard/history`** lists every research run Kutip has done —
+query, a synthesis preview, USDC paid, citation count, and the digest.
+Click any row to open its full `/verify` page. Summaries are persisted
+(Vercel Blob), so the history survives server restarts.
 
 ---
 
