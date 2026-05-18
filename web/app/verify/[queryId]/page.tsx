@@ -205,8 +205,8 @@ export default async function VerifyPage({ params }: { params: { queryId: string
               <div className="t-mono-sm ink-3 mt-3">
                 Cached{" "}
                 {new Date(cachedSummary.savedAt).toISOString().slice(0, 16).replace("T", " ")}{" "}
-                UTC · {cachedSummary.totalPaidUSDC} USDC paid across{" "}
-                {cachedSummary.citations.length} citations
+                UTC · {(cachedSummary.totalPaidUSDC / 1e18).toFixed(2)} USDC
+                paid across {cachedSummary.citations.length} citations
               </div>
             </div>
           </div>

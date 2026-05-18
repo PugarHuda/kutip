@@ -67,7 +67,7 @@ export default async function DashboardHistoryPage() {
                   </p>
                   <div className="flex items-center gap-4 flex-wrap t-mono-sm ink-3">
                     <span className="text-emerald-700 font-semibold">
-                      {s.totalPaidUSDC} USDC paid
+                      {(s.totalPaidUSDC / 1e18).toFixed(2)} USDC paid
                     </span>
                     <span>·</span>
                     <span>{s.citations.length} citations</span>
