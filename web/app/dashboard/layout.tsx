@@ -69,6 +69,13 @@ const NAV: NavItem[] = [
     match: (p) => p.startsWith("/dashboard/earnings")
   },
   {
+    href: "/dashboard/history",
+    label: "History",
+    group: "main",
+    icon: <Icon d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M12 7v5l3 2" />,
+    match: (p) => p.startsWith("/dashboard/history")
+  },
+  {
     href: "/dashboard/claim",
     label: "Claim as Author",
     group: "author",

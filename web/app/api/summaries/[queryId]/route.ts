@@ -41,7 +41,7 @@ export async function GET(
   }
   const queryId = raw.toLowerCase();
 
-  const stored = loadSummary(queryId);
+  const stored = await loadSummary(queryId);
 
   // Cache-miss fallback: if the query exists on-chain (subgraph), serve a
   // metadata-only 402 challenge. Full summary text lives in the warm

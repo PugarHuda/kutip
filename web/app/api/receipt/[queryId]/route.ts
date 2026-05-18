@@ -47,7 +47,7 @@ export async function GET(
     );
   }
 
-  const stored = loadSummary(queryId);
+  const stored = await loadSummary(queryId);
   const receipt = {
     kind: "kutip-attestation-receipt",
     version: "1.0",

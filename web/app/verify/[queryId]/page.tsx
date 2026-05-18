@@ -37,7 +37,7 @@ export default async function VerifyPage({ params }: { params: { queryId: string
   // table reads as intentional rather than "unknown".
   const escrow = getEscrowAddress();
   const queryShort = `${queryId.slice(0, 10)}…${queryId.slice(-6)}`;
-  const cachedSummary = loadSummary(queryId);
+  const cachedSummary = await loadSummary(queryId);
   const paywallMetrics = getAccessMetrics(queryId);
   const now = Date.now();
   const ageMin = record

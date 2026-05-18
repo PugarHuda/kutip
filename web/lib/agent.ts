@@ -317,7 +317,7 @@ export async function runResearchAgent(opts: {
   // Cache for reverse-x402 resale. Other agents can now pay Kutip to cite
   // this summary via /api/summaries/[queryId]. Closes the recursive loop:
   // Kutip pays humans → Kutip earns from agents → Kutip pays humans …
-  saveSummary(result);
+  await saveSummary(result);
 
   return result;
 }
