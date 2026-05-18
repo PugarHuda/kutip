@@ -427,15 +427,18 @@ async function attestOnChain(opts: {
  * ("automasi publikasi konten") or a tool-flavoured one ("n8n workflow")
  * matches nothing verbatim. One cheap LLM call translates + extracts the
  * researchable core, so search hits real papers regardless of how the
- * user phrased it. Falls back to the raw query if the LLM is unavailable.
+ * user phrased it. The LLM is also told to fix spelling, so a typo'd
+ * query ("autoamtion publsihing") still resolves to real keywords.
+ * Falls back to the raw query if the LLM is unavailable.
  */
 async function normalizeSearchQuery(query: string): Promise<string> {
   try {
     const prompt =
       `Convert this research request into 3 to 8 English academic search ` +
-      `keywords suitable for a scholarly database. Translate to English if ` +
-      `needed. Output ONLY the keywords on one line — no quotes, no ` +
-      `explanation, no label.\n\nRequest: ${query}`;
+      `keywords suitable for a scholarly database. Correct any spelling ` +
+      `mistakes and translate to English if needed. Output ONLY the ` +
+      `keywords on one line — no quotes, no explanation, no label.` +
+      `\n\nRequest: ${query}`;
     const raw = await callOpenRouter(prompt, MODEL);
     const firstLine = raw.trim().split("\n").find((l) => l.trim()) ?? "";
     const cleaned = firstLine
