@@ -380,6 +380,8 @@ sidebar). Highlights:
 - [**Agent Passport**](docs/agent-passport.md) — EIP-712 session
   delegation deeper dive
 - [**Demo script**](docs/demo-script.md) — the 90-second walkthrough
+- [**Finale pitch**](docs/finale-pitch.md) — 3-minute hard-cap script,
+  slide-by-slide timing, clip shot list (Kite AI finale, 2026-06-16)
 
 Import into [GitBook](https://gitbook.com), [Honkit](https://github.com/honkit/honkit),
 or [mdBook](https://rust-lang.github.io/mdBook/) — all read

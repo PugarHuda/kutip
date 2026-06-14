@@ -216,18 +216,25 @@ const SLIDES: Slide[] = [
 
 function ClipSlot({ clip }: { clip: ClipSpec }) {
   const [loaded, setLoaded] = useState(false);
+  // Try .webm first (what Playwright recordings produce), fall back to
+  // .mp4 (what manual Win+G recordings produce). Browser picks the
+  // first source it can load; the placeholder stays visible if neither
+  // file exists yet.
+  const webmSrc = clip.src.replace(/\.mp4$/, ".webm");
   return (
     <div className="deck-clip">
       <video
         key={clip.src}
-        src={clip.src}
         autoPlay
         muted
         loop
         playsInline
         preload="metadata"
         onLoadedData={() => setLoaded(true)}
-      />
+      >
+        <source src={webmSrc} type="video/webm" />
+        <source src={clip.src} type="video/mp4" />
+      </video>
       {!loaded && (
         <div className="deck-clip__placeholder">
           <div className="t-caption">{clip.label}</div>

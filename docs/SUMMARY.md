@@ -28,6 +28,7 @@ tree. GitHub renders it as a normal markdown file.
 ## Submission artefacts
 
 * [Demo script](demo-script.md)
+* [Finale pitch](finale-pitch.md)
 * [Screenshot guide](screenshot-guide.md)
 * [Submission copy](submission-copy.md)
 
