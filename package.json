@@ -22,5 +22,8 @@
     "attribution"
   ],
   "author": "Pugar Huda Mantoro",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
 }

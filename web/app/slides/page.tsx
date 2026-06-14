@@ -75,22 +75,28 @@ const SLIDES: Slide[] = [
       duration: "≈ 12 s"
     },
     body: (
-      <div className="deck-split">
-        {[
-          ["80%", "Cited authors", "var(--emerald-600)"],
-          ["15%", "Operator", "var(--kite-700)"],
-          ["5%", "Kite ecosystem", "var(--ink-3)"]
-        ].map(([pct, label, color]) => (
-          <div key={label} className="deck-split__row">
-            <span
-              className="deck-split__pct"
-              style={{ color: color as string }}
-            >
-              {pct}
-            </span>
-            <span className="t-body">{label}</span>
-          </div>
-        ))}
+      <div className="flex flex-col gap-3">
+        <div className="deck-split">
+          {[
+            ["80%", "Cited authors", "var(--emerald-600)"],
+            ["15%", "Operator", "var(--kite-700)"],
+            ["5%", "Kite ecosystem", "var(--ink-3)"]
+          ].map(([pct, label, color]) => (
+            <div key={label} className="deck-split__row">
+              <span
+                className="deck-split__pct"
+                style={{ color: color as string }}
+              >
+                {pct}
+              </span>
+              <span className="t-body">{label}</span>
+            </div>
+          ))}
+        </div>
+        <p className="t-small ink-3 max-w-[520px]">
+          Every receipt also mirrors to Avalanche Fuji within seconds —
+          cross-chain proof, same atomic settle.
+        </p>
       </div>
     )
   },
@@ -208,6 +214,71 @@ const SLIDES: Slide[] = [
           >
             GitHub ↗
           </a>
+        </div>
+      </div>
+    )
+  },
+  // Backup slide — NOT part of the 3-minute pitch. Kept here so the
+  // presenter can press `End` to jump to it during Q&A and answer
+  // "but does it also do X?" without scrambling between tabs.
+  {
+    kicker: "Backup · Q&A only",
+    title: "What didn't make the 3-minute cut.",
+    body: (
+      <div className="deck-moats">
+        <div className="deck-moat">
+          <div className="deck-moat__n">Fuji mirror</div>
+          <div className="deck-moat__title">Cross-chain receipt</div>
+          <div className="deck-moat__body">
+            Every Kite attestation replicates to <code>CitationMirror</code>{" "}
+            on Avalanche Fuji within seconds. LayerZero-pattern; swaps to
+            DVN-attested when Kite exposes its LZ endpoint.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">ERC-8004 + 6551</div>
+          <div className="deck-moat__title">Agents with NFT identities</div>
+          <div className="deck-moat__body">
+            Each agent holds a reputation NFT (ERC-721) with a
+            token-bound account (ERC-6551) — portable identity, future
+            DAO governance.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">Reverse x402</div>
+          <div className="deck-moat__title">Agents pay Kutip back</div>
+          <div className="deck-moat__body">
+            Other agents pay Kutip via x402 to cite a persisted summary
+            — that flows back to the original authors. Recursive
+            royalties for human knowledge.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">Escrow + yield</div>
+          <div className="deck-moat__title">Unclaimed shares earn</div>
+          <div className="deck-moat__body">
+            Citations to un-bound authors accrue in{" "}
+            <code>UnclaimedYieldEscrow</code> at a 5% APY target until
+            they verify ORCID and claim.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">BountyMarket</div>
+          <div className="deck-moat__title">Sponsored research</div>
+          <div className="deck-moat__body">
+            Anyone funds a bounty for a topic; Kutip earns it on a
+            matching citation, paying authors on top of the user fee.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">MCP server</div>
+          <div className="deck-moat__title">Drop-in for any LLM client</div>
+          <div className="deck-moat__body">
+            <code>kutip.research</code>, <code>kutip.summary</code>,{" "}
+            <code>kutip.authors</code> — Claude Desktop, Cursor, Cline
+            call Kutip natively. Every external call still pays cited
+            authors on-chain.
+          </div>
         </div>
       </div>
     )
