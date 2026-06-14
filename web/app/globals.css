@@ -815,6 +815,39 @@ body > * {
     line-height: 1.5;
     margin-top: 6px;
   }
+  /* Mini-clip slot inside a Q&A backup card. Auto-loop silent video
+     above the text — gives every Q&A topic its own visual without a
+     dedicated slide. */
+  .deck-moat__clip {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .deck-moat__clip video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #000;
+  }
+  .deck-moat__clip-tag {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    background: color-mix(in srgb, #000 65%, transparent);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
   @media (max-width: 720px) {
     .deck-moats { grid-template-columns: 1fr; }
   }

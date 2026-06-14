@@ -220,70 +220,112 @@ const SLIDES: Slide[] = [
   },
   // Backup slide — NOT part of the 3-minute pitch. Kept here so the
   // presenter can press `End` to jump to it during Q&A and answer
-  // "but does it also do X?" without scrambling between tabs.
+  // "but does it also do X?" without scrambling between tabs. Each
+  // card has its own silent looping clip; visual support pre-loaded.
   {
     kicker: "Backup · Q&A only",
-    title: "What didn't make the 3-minute cut.",
+    title: "Everything else Kutip does.",
     body: (
       <div className="deck-moats">
-        <div className="deck-moat">
-          <div className="deck-moat__n">Fuji mirror</div>
-          <div className="deck-moat__title">Cross-chain receipt</div>
-          <div className="deck-moat__body">
-            Every Kite attestation replicates to <code>CitationMirror</code>{" "}
-            on Avalanche Fuji within seconds. LayerZero-pattern; swaps to
-            DVN-attested when Kite exposes its LZ endpoint.
-          </div>
-        </div>
-        <div className="deck-moat">
-          <div className="deck-moat__n">ERC-8004 + 6551</div>
-          <div className="deck-moat__title">Agents with NFT identities</div>
-          <div className="deck-moat__body">
-            Each agent holds a reputation NFT (ERC-721) with a
-            token-bound account (ERC-6551) — portable identity, future
-            DAO governance.
-          </div>
-        </div>
-        <div className="deck-moat">
-          <div className="deck-moat__n">Reverse x402</div>
-          <div className="deck-moat__title">Agents pay Kutip back</div>
-          <div className="deck-moat__body">
-            Other agents pay Kutip via x402 to cite a persisted summary
-            — that flows back to the original authors. Recursive
-            royalties for human knowledge.
-          </div>
-        </div>
-        <div className="deck-moat">
-          <div className="deck-moat__n">Escrow + yield</div>
-          <div className="deck-moat__title">Unclaimed shares earn</div>
-          <div className="deck-moat__body">
-            Citations to un-bound authors accrue in{" "}
-            <code>UnclaimedYieldEscrow</code> at a 5% APY target until
-            they verify ORCID and claim.
-          </div>
-        </div>
-        <div className="deck-moat">
-          <div className="deck-moat__n">BountyMarket</div>
-          <div className="deck-moat__title">Sponsored research</div>
-          <div className="deck-moat__body">
-            Anyone funds a bounty for a topic; Kutip earns it on a
-            matching citation, paying authors on top of the user fee.
-          </div>
-        </div>
-        <div className="deck-moat">
-          <div className="deck-moat__n">MCP server</div>
-          <div className="deck-moat__title">Drop-in for any LLM client</div>
-          <div className="deck-moat__body">
-            <code>kutip.research</code>, <code>kutip.summary</code>,{" "}
-            <code>kutip.authors</code> — Claude Desktop, Cursor, Cline
-            call Kutip natively. Every external call still pays cited
-            authors on-chain.
-          </div>
-        </div>
+        <BackupCard
+          tag="Fuji mirror"
+          src="/clips/qa-mirror.webm"
+          title="Cross-chain receipt"
+          body={
+            <>
+              Every Kite attestation replicates to{" "}
+              <code>CitationMirror</code> on Avalanche Fuji within
+              seconds. LayerZero-pattern.
+            </>
+          }
+        />
+        <BackupCard
+          tag="ERC-8004 + 6551"
+          src="/clips/qa-agents.webm"
+          title="Agents with NFT identities"
+          body={
+            <>
+              Each agent holds a reputation NFT (ERC-721) with a
+              token-bound account (ERC-6551). Portable identity.
+            </>
+          }
+        />
+        <BackupCard
+          tag="Reverse x402"
+          src="/clips/qa-reverse-x402.webm"
+          title="Agents pay Kutip back"
+          body={
+            <>
+              Other agents pay Kutip via x402 to cite a persisted
+              summary — that flows back to the original authors.
+            </>
+          }
+        />
+        <BackupCard
+          tag="Escrow + yield"
+          src="/clips/qa-escrow.webm"
+          title="Unclaimed shares earn"
+          body={
+            <>
+              Citations to un-bound authors accrue in{" "}
+              <code>UnclaimedYieldEscrow</code> at a 5% APY target
+              until ORCID is verified.
+            </>
+          }
+        />
+        <BackupCard
+          tag="BountyMarket"
+          src="/clips/qa-bounties.webm"
+          title="Sponsored research"
+          body={
+            <>
+              Anyone funds a bounty for a topic; Kutip earns it on a
+              matching citation — extra payout on top of the user fee.
+            </>
+          }
+        />
+        <BackupCard
+          tag="MCP server"
+          src="/clips/qa-mcp.webm"
+          title="Drop-in for any LLM client"
+          body={
+            <>
+              <code>kutip.research</code>, <code>kutip.summary</code>,{" "}
+              <code>kutip.authors</code> — Claude Desktop / Cursor /
+              Cline call Kutip natively.
+            </>
+          }
+        />
       </div>
     )
   }
 ];
+
+function BackupCard({
+  tag,
+  src,
+  title,
+  body
+}: {
+  tag: string;
+  src: string;
+  title: string;
+  body: React.ReactNode;
+}) {
+  return (
+    <div className="deck-moat">
+      <div className="deck-moat__clip">
+        <video autoPlay muted loop playsInline preload="metadata">
+          <source src={src} type="video/webm" />
+          <source src={src.replace(/\.webm$/, ".mp4")} type="video/mp4" />
+        </video>
+        <div className="deck-moat__clip-tag">{tag}</div>
+      </div>
+      <div className="deck-moat__title">{title}</div>
+      <div className="deck-moat__body">{body}</div>
+    </div>
+  );
+}
 
 function ClipSlot({ clip }: { clip: ClipSpec }) {
   const [loaded, setLoaded] = useState(false);
