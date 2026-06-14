@@ -733,4 +733,119 @@ body > * {
     width: 86px;
     flex: none;
   }
+
+  /* finale: per-feature clip slot. Autoplay-muted-loop video shown
+     while the presenter narrates over it. Placeholder visible until
+     the file exists so the deck still reads pre-recording. */
+  .deck-clip {
+    position: relative;
+    width: min(820px, 100%);
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--ink) 5%, transparent);
+    border: 1px solid var(--border);
+    margin-top: 12px;
+  }
+  .deck-clip video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #000;
+  }
+  .deck-clip__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    background:
+      repeating-linear-gradient(
+        45deg,
+        transparent 0 14px,
+        color-mix(in srgb, var(--ink) 4%, transparent) 14px 28px
+      );
+    color: var(--ink-2);
+  }
+  .deck-clip__caption {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    background: color-mix(in srgb, #000 60%, transparent);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+
+  /* finale: "Three moats" — 3 column grid for slide 4. */
+  .deck-moats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    max-width: 880px;
+  }
+  .deck-moat {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 18px 20px;
+    background: color-mix(in srgb, var(--surface) 100%, transparent);
+  }
+  .deck-moat__n {
+    font-family: var(--font-jetbrains), monospace;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--kite-700);
+  }
+  .deck-moat__title {
+    font-weight: 700;
+    font-size: 17px;
+    margin-top: 6px;
+  }
+  .deck-moat__body {
+    color: var(--ink-2);
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin-top: 6px;
+  }
+  @media (max-width: 720px) {
+    .deck-moats { grid-template-columns: 1fr; }
+  }
+
+  /* finale: big-number scale slide. */
+  .deck-numbers {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    max-width: 880px;
+  }
+  .deck-number {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 14px 16px;
+    background: var(--surface);
+  }
+  .deck-number__v {
+    font-family: var(--font-jetbrains), monospace;
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--kite-700);
+  }
+  .deck-number__l {
+    color: var(--ink-3);
+    font-size: 12.5px;
+    margin-top: 4px;
+  }
+  @media (max-width: 720px) {
+    .deck-numbers { grid-template-columns: repeat(2, 1fr); }
+  }
 }

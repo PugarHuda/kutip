@@ -5,89 +5,81 @@ import Link from "next/link";
 import { BrandMark, ArrowRightIcon } from "@/components/icons";
 
 /**
- * /slides — a self-contained pitch deck for judges. Keyboard (←/→/Space),
- * on-screen controls, and dot navigation. Each slide is one viewport.
- * Content mirrors docs/submission-copy.md so the story stays in sync.
+ * /slides — finale pitch deck, 3-minute hard cap.
+ *
+ * Structure: 7 slides, one beat each, 3 of them carry a pre-recorded
+ * clip the presenter narrates over (no live demos by Encode's rule).
+ * Clip files live under `/public/clips/` — until they're recorded the
+ * slot shows a placeholder with the exact shot list so the deck is
+ * usable for dry-runs before footage exists.
+ *
+ * Keyboard: ←/→/Space to navigate, Home/End to jump.
  */
+
+interface ClipSpec {
+  src: string;
+  label: string;
+  shot: string;
+  duration: string;
+}
 
 interface Slide {
   kicker: string;
   title: string;
-  body: React.ReactNode;
+  body?: React.ReactNode;
+  clip?: ClipSpec;
 }
-
-const LEDGER = "0xbC4eeC2f75a0DCf61509842e1c18Abff7236A338";
 
 const SLIDES: Slide[] = [
   {
-    kicker: "Kite AI Global Hackathon 2026 · Novel track",
-    title: "Kutip — the research agent that pays its sources.",
+    kicker: "Kite AI Hackathon · Novel Track",
+    title: "AI cites humans. Humans get nothing.",
     body: (
-      <p className="t-body ink-2 max-w-[560px]">
-        An autonomous AI research agent that attests every citation on-chain
-        and splits USDC back to the cited authors, in real time, on the first
-        AI-payments blockchain. <em>Kutip</em> (koo-teep) is Indonesian for{" "}
-        <em>cite</em>.
+      <p className="t-body ink-2 max-w-[620px]">
+        I'm Pugar. I built <strong>Kutip</strong> — an AI research agent
+        that pays the humans it learns from. On-chain. Atomically. The
+        moment it answers.
       </p>
     )
   },
   {
-    kicker: "The problem",
-    title: "AI reads humanity's research and pays the authors nothing.",
+    kicker: "What it does",
+    title: "Five steps. One transaction. Real authors paid.",
+    clip: {
+      src: "/clips/flow.mp4",
+      label: "Clip 1 · Agent flow",
+      shot:
+        "Type a query → click Pay → 5-step progress runs end-to-end → receipt appears.",
+      duration: "≈ 15 s"
+    },
     body: (
-      <ul className="deck-list">
-        <li>Every LLM answer stands on millions of uncredited papers.</li>
-        <li>Citations are invisible — no link from &ldquo;used&rdquo; to &ldquo;paid&rdquo;.</li>
+      <ul className="deck-list mt-1">
+        <li>Search real papers (OpenAlex / Semantic Scholar)</li>
+        <li>Pay each via a real HTTP-402 x402 handshake on Kite</li>
+        <li>Synthesize with an LLM, weight every citation</li>
         <li>
-          Authors fund the knowledge AI monetises and capture none of it.
+          Settle <code className="t-mono-sm">attestAndSplit</code> in one
+          atomic UserOp
         </li>
       </ul>
     )
   },
   {
-    kicker: "The solution",
-    title: "Turn the act of citing into a payment rail.",
-    body: (
-      <p className="t-body ink-2 max-w-[560px]">
-        Ask Kutip a research question. It pays for source papers via x402,
-        reads them with an LLM, then submits one on-chain attestation that
-        splits the query fee across every cited author — verifiable, atomic,
-        fail-closed. No citation, no payment; no payment, no answer.
-      </p>
-    )
-  },
-  {
-    kicker: "How it works",
-    title: "Five steps, one transaction.",
-    body: (
-      <div className="deck-steps">
-        {[
-          ["Search", "Discover real papers (OpenAlex / Semantic Scholar)"],
-          ["Purchase", "Settle per-paper access via the x402 spec"],
-          ["Read", "LLM synthesises an answer, ranks citation weights"],
-          ["Attribute", "Build the per-author citation ledger"],
-          ["Settle", "attestAndSplit() on Kite — pays authors atomically"]
-        ].map(([t, d], i) => (
-          <div key={t} className="deck-step">
-            <span className="deck-step__n">{i + 1}</span>
-            <div>
-              <div className="font-semibold">{t}</div>
-              <div className="t-small ink-3">{d}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  },
-  {
-    kicker: "The economics",
-    title: "Authors-majority by design — 80 / 15 / 5.",
+    kicker: "Where the money goes",
+    title: "80% to authors. Verifiable, not promised.",
+    clip: {
+      src: "/clips/payout.mp4",
+      label: "Clip 2 · Payout proof",
+      shot:
+        "Receipt 'Authors paid' table → click tx hash → KiteScan opens, Transfer events visible.",
+      duration: "≈ 12 s"
+    },
     body: (
       <div className="deck-split">
         {[
           ["80%", "Cited authors", "var(--emerald-600)"],
-          ["15%", "Operator (sustains the agent)", "var(--kite-700)"],
-          ["5%", "Kite ecosystem fund", "var(--ink-3)"]
+          ["15%", "Operator", "var(--kite-700)"],
+          ["5%", "Kite ecosystem", "var(--ink-3)"]
         ].map(([pct, label, color]) => (
           <div key={label} className="deck-split__row">
             <span
@@ -99,84 +91,114 @@ const SLIDES: Slide[] = [
             <span className="t-body">{label}</span>
           </div>
         ))}
-        <p className="t-small ink-3 mt-2">
-          Baked immutably into AttributionLedger. The pitch and the contract
-          agree: the humans take the largest cut.
-        </p>
       </div>
     )
   },
   {
-    kicker: "Built on Kite",
-    title: "A real agent, with a real wallet, paying real money.",
+    kicker: "Three things you won't find anywhere else",
+    title: "Unfair advantages.",
     body: (
-      <ul className="deck-list">
-        <li>
-          <strong>EIP-4337 smart account</strong> — the agent has its own
-          on-chain identity (Researcher AA) and sub-agent (Summarizer AA).
-        </li>
-        <li>
-          <strong>x402 payments</strong> — pay-per-paper settlement via the
-          Pieverse facilitator.
-        </li>
-        <li>
-          <strong>Kite Passport</strong> — the user signs one EIP-712
-          delegation; spending is capped per-query and per-day.
-        </li>
-        <li>
-          <strong>Gasless</strong> — paymaster sponsors gas; the user never
-          signs a transaction and never holds a KITE token.
-        </li>
-      </ul>
+      <div className="deck-moats">
+        <div className="deck-moat">
+          <div className="deck-moat__n">01</div>
+          <div className="deck-moat__title">Multi-agent on EIP-4337</div>
+          <div className="deck-moat__body">
+            Researcher + Summarizer = two separate smart accounts. The
+            Summarizer earns its own 5% sub-agent fee, atomically. One
+            EIP-712 Passport delegation → full autonomy within a cap.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">02</div>
+          <div className="deck-moat__title">Truly gasless</div>
+          <div className="deck-moat__body">
+            Kite paymaster fronts gas in USDC. Agent never holds KITE.
+            User pays zero gas in any currency. Not "abstracted" —
+            actually zero.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">03</div>
+          <div className="deck-moat__title">Verifiable, not just visible</div>
+          <div className="deck-moat__body">
+            Every synthesis is <code>keccak256</code>-digested and
+            persisted. One endpoint exports a portable JSON proof — the
+            attestation, the payouts, and the synthesis text together.
+          </div>
+        </div>
+      </div>
     )
   },
   {
-    kicker: "Not a mock",
-    title: "Every number on this site is on-chain.",
+    kicker: "Anyone can audit",
+    title: "Every summary hashed. Every payout exportable.",
+    clip: {
+      src: "/clips/verify.mp4",
+      label: "Clip 3 · Verify & history",
+      shot:
+        "/dashboard/history list → click a row → /verify page → 'Summary digest · keccak256' → Download JSON button.",
+      duration: "≈ 12 s"
+    },
     body: (
-      <ul className="deck-list">
-        <li>
-          AttributionLedger live on Kite testnet —{" "}
-          <span className="t-mono-sm">{LEDGER}</span>
-        </li>
-        <li>109 real author wallets · 32 example papers attested on-chain.</li>
-        <li>
-          Every receipt mirrored to Avalanche Fuji (LayerZero-pattern) for
-          portable proof.
-        </li>
-        <li>
-          55 Foundry tests · 144 Vitest tests · CI coverage gates on the
-          financial modules.
-        </li>
-      </ul>
-    )
-  },
-  {
-    kicker: "Infrastructure, not just an app",
-    title: "Any agent can cite-and-pay through Kutip.",
-    body: (
-      <p className="t-body ink-2 max-w-[560px]">
-        Kutip ships an MCP server and a public REST endpoint. Drop it into
-        Claude Desktop, an autonomous agent, or a backend — call one tool,
-        and cited authors get paid on-chain. Kutip is a payment rail for
-        human knowledge that other builders plug into.
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Recompute the keccak256 from the synthesis text — any edit shows
+        up as a mismatch. The full receipt JSON ships in one click.
       </p>
     )
   },
   {
-    kicker: "Try it",
-    title: "Ask a question. Pay the humans you learn from.",
+    kicker: "Live on testnet today",
+    title: "Real, deployable, not a sketch.",
+    body: (
+      <div className="deck-numbers">
+        <div className="deck-number">
+          <div className="deck-number__v">12</div>
+          <div className="deck-number__l">Solidity contracts</div>
+        </div>
+        <div className="deck-number">
+          <div className="deck-number__v">2</div>
+          <div className="deck-number__l">chains (Kite + Fuji)</div>
+        </div>
+        <div className="deck-number">
+          <div className="deck-number__v">56</div>
+          <div className="deck-number__l">Foundry tests + fuzz</div>
+        </div>
+        <div className="deck-number">
+          <div className="deck-number__v">149</div>
+          <div className="deck-number__l">Vitest cases</div>
+        </div>
+        <div className="deck-number">
+          <div className="deck-number__v">80 / 15 / 5</div>
+          <div className="deck-number__l">on-chain split</div>
+        </div>
+        <div className="deck-number">
+          <div className="deck-number__v">ORCID</div>
+          <div className="deck-number__l">real OAuth + binding</div>
+        </div>
+        <div className="deck-number">
+          <div className="deck-number__v">Safe</div>
+          <div className="deck-number__l">2-of-3 governance</div>
+        </div>
+        <div className="deck-number">
+          <div className="deck-number__v">CI</div>
+          <div className="deck-number__l">green on every push</div>
+        </div>
+      </div>
+    )
+  },
+  {
+    kicker: "Kutip",
+    title: "The research agent that pays its sources.",
     body: (
       <div className="flex flex-col gap-3">
-        <p className="t-body ink-2 max-w-[520px]">
-          The live agent, the contracts, and the docs are all open.
+        <p className="t-body ink-2 max-w-[560px]">
+          AI agents will only grow. The question is whether they extract
+          from humans or pay them. Kutip shows the second model is real
+          — and live today.
         </p>
-        <div className="flex flex-wrap gap-2.5">
+        <div className="flex flex-wrap gap-2.5 mt-1">
           <Link href="/research" className="btn btn--primary">
-            Run the agent <ArrowRightIcon size={14} />
-          </Link>
-          <Link href="/docs" className="btn btn--ghost">
-            Read the docs
+            kutip-zeta.vercel.app <ArrowRightIcon size={14} />
           </Link>
           <a
             href="https://github.com/PugarHuda/kutip"
@@ -191,6 +213,32 @@ const SLIDES: Slide[] = [
     )
   }
 ];
+
+function ClipSlot({ clip }: { clip: ClipSpec }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="deck-clip">
+      <video
+        key={clip.src}
+        src={clip.src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onLoadedData={() => setLoaded(true)}
+      />
+      {!loaded && (
+        <div className="deck-clip__placeholder">
+          <div className="t-caption">{clip.label}</div>
+          <div className="t-h3 mt-1">Record this clip — drop at {clip.src}</div>
+          <div className="t-small ink-3 max-w-[540px] mt-2">{clip.shot}</div>
+        </div>
+      )}
+      <div className="deck-clip__caption">{clip.duration}</div>
+    </div>
+  );
+}
 
 export default function SlidesPage() {
   const [i, setI] = useState(0);
@@ -233,7 +281,10 @@ export default function SlidesPage() {
       <section key={i} className="deck__slide animate-fade-up">
         <div className="deck__kicker">{slide.kicker}</div>
         <h1 className="deck__title">{slide.title}</h1>
-        <div className="deck__body">{slide.body}</div>
+        <div className="deck__body">
+          {slide.clip && <ClipSlot clip={slide.clip} />}
+          {slide.body}
+        </div>
       </section>
 
       <div className="deck__nav">
@@ -268,7 +319,7 @@ export default function SlidesPage() {
       </div>
 
       <div className="t-mono-sm ink-3 deck__hint">
-        ← → or Space to navigate
+        ← → or Space to navigate · drop clips at /public/clips/
       </div>
     </main>
   );
