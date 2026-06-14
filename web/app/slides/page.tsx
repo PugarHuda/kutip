@@ -35,11 +35,22 @@ const SLIDES: Slide[] = [
     kicker: "Kite AI Hackathon · Novel Track",
     title: "AI cites humans. Humans get nothing.",
     body: (
-      <p className="t-body ink-2 max-w-[620px]">
-        I'm Pugar. I built <strong>Kutip</strong> — an AI research agent
-        that pays the humans it learns from. On-chain. Atomically. The
-        moment it answers.
-      </p>
+      <div className="flex flex-col gap-4">
+        <p className="t-body ink-2 max-w-[620px]">
+          I'm Pugar. I built <strong>Kutip</strong> — an AI research agent
+          that pays the humans it learns from. On-chain. Atomically. The
+          moment it answers.
+        </p>
+        {/* Small live-product anchor — landing reel on the side so the
+            hook line keeps focus while judges see this is shipped. */}
+        <div className="deck-clip" style={{ maxWidth: 520 }}>
+          <video autoPlay muted loop playsInline preload="metadata">
+            <source src="/clips/landing.webm" type="video/webm" />
+            <source src="/clips/landing.mp4" type="video/mp4" />
+          </video>
+          <div className="deck-clip__caption">kutip-zeta.vercel.app</div>
+        </div>
+      </div>
     )
   },
   {

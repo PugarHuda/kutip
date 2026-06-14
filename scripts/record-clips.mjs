@@ -119,7 +119,54 @@ async function scrollAndPoint(page, y, cursor) {
   if (cursor) await page.mouse.move(cursor[0], cursor[1], { steps: 30 });
 }
 
-// ─── MAIN-PITCH CLIPS (slides 3 + 5) ────────────────────────────────
+// ─── MAIN-PITCH CLIPS (slides 1 + 2 + 3 + 5) ─────────────────────────
+
+async function landing(page) {
+  // Slow auto-scroll over the landing hero so slide 1 has subtle
+  // proof-of-product visual behind the hook line.
+  await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(2000);
+  await page.mouse.move(640, 300, { steps: 25 });
+  await page.waitForTimeout(1500);
+  await scrollAndPoint(page, 200, [700, 350]);
+  await page.waitForTimeout(2000);
+  await scrollAndPoint(page, 600, [560, 380]);
+  await page.waitForTimeout(2000);
+  await scrollAndPoint(page, 1100, [820, 360]);
+  await page.waitForTimeout(2000);
+}
+
+async function flow(page) {
+  // Anonymous research run: no wallet needed up to 0.5 USDC. Drives the
+  // 5-step agent flow from query input to receipt.
+  await page.goto(`${BASE}/research`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(2500);
+  // Aim the cursor at the query box, type slowly.
+  const queryBox = page.locator("textarea").first();
+  await queryBox.waitFor({ state: "visible", timeout: 10000 });
+  const box = await queryBox.boundingBox();
+  if (box) await page.mouse.move(box.x + 80, box.y + 30, { steps: 25 });
+  await page.waitForTimeout(800);
+  await queryBox.click();
+  await queryBox.type(
+    "Latest progress on direct air capture cost reduction",
+    { delay: 35 }
+  );
+  await page.waitForTimeout(1200);
+  // Hover the Pay button.
+  const pay = page.locator('button:has-text("Pay")').first();
+  await pay.waitFor({ state: "visible", timeout: 8000 });
+  const payBox = await pay.boundingBox();
+  if (payBox) await page.mouse.move(payBox.x + 80, payBox.y + 20, { steps: 30 });
+  await page.waitForTimeout(800);
+  await pay.click();
+  // Watch the 5-step ticker land. Warm path ~12 s, cold ~30 s.
+  // Pad to ~28 s so the receipt renders even on a cold lambda.
+  await page.waitForTimeout(28000);
+  // Slow scroll toward the receipt panel.
+  await scrollAndPoint(page, 400, [640, 400]);
+  await page.waitForTimeout(2500);
+}
 
 async function payout(page) {
   await page.goto(`${BASE}/verify/${QUERY_ID}`, { waitUntil: "networkidle" });
@@ -224,6 +271,8 @@ async function qaMcp(page) {
 
 // ─── RUN ALL ─────────────────────────────────────────────────────────
 
+await record("landing", landing);
+await record("flow", flow);
 await record("payout", payout);
 await record("verify", verify);
 await record("qa-mirror", qaMirror);
