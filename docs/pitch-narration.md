@@ -1,8 +1,8 @@
 # 📖 NARASI · BACA INI · KUTIP FINALE PITCH
 
-3 menit untuk pitch utama (slide 1–9). Slide 10–16 hanya kalau juri
-tanya. Total ~380 kata = ~145 wpm = mendarat **2:40 di latihan**,
-**2:50–3:00 di stage**.
+3 menit untuk pitch utama (slide 1–10). Slide 11–14 hanya kalau juri
+tanya. Total ~400 kata = ~145 wpm = mendarat **2:50 di latihan**,
+**3:00 di stage**.
 
 ---
 
@@ -99,59 +99,61 @@ tanya. Total ~380 kata = ~145 wpm = mendarat **2:40 di latihan**,
 
 ---
 
-### Slide 8 · SCALE · 2:30 – 2:48
+### Slide 8 · SCALE · 2:30 – 2:45
 
 > "Live on testnet today.
 >
 > **Twelve contracts. Two chains. Two hundred tests.** CI green every
-> push. MCP server for any LLM client."
+> push."
 
-*[18 dtk · ucapkan angka pelan]*
+*[15 dtk · ucapkan angka pelan]*
 
 ---
 
-### Slide 9 · THANK YOU · 2:48 – 3:00
+### Slide 9 · INFRASTRUCTURE · 2:45 – 3:05
+
+> "This isn't a demo — it's **infrastructure**.
+>
+> Real **ORCID OAuth** — authors prove identity, bind on-chain.
+>
+> A **five-percent APY escrow** for un-bound authors. No
+> use-it-or-lose-it.
+>
+> And an **MCP server** — Claude Desktop, Cursor, Cline call Kutip
+> natively. Every external call still pays the humans."
+
+*[20 dtk · ucapkan tiga pilar dengan jeda di tiap nama]*
+
+---
+
+### Slide 10 · THANK YOU · 3:05 – 3:15
 
 > "Solo. Seven weeks. On Kite.
 >
 > **Thank you.** Questions welcome."
 
-*[12 dtk · slow down, lalu diam 2 dtk]*
+*[10 dtk · slow down, lalu diam 2 dtk]*
 
 ---
 
-# 🎙️ Q&A · DEEP DIVES (slide 10–16, hanya kalau ditanya)
+# 🎙️ Q&A · DEEP DIVES (slide 11–14, hanya kalau ditanya)
 
-Tiap baris ~8 detik. Klip auto-play, kamu narasikan di atasnya.
+ORCID, Escrow, dan MCP sudah masuk main pitch slide 9. Yang sisanya
+disini sebagai jawaban-siap untuk pertanyaan juri. Tiap baris ~8 dtk.
 
-### Slide 10 · Authors 1/2 · ORCID OAuth
-> "Real ORCID OAuth — not just typing the number. Sign EIP-712 to
-> bind **ORCID-to-wallet** on-chain. Future citations route there
-> automatically."
-
-### Slide 11 · Authors 2/2 · UnclaimedYieldEscrow
-> "Citations for un-bound authors park in escrow at **5% APY**. On
-> claim, principal plus yield ship to their wallet. **No
-> use-it-or-lose-it.**"
-
-### Slide 12 · Agent identity · ERC-8004 + ERC-6551
+### Slide 11 · Agent identity · ERC-8004 + ERC-6551
 > "Each agent holds an **ERC-8004 reputation NFT** with a token-bound
 > account. Portable identity. **Auditable on-chain.**"
 
-### Slide 13 · Ecosystem 1/4 · Reverse x402
+### Slide 12 · Recursive royalties · Reverse x402
 > "Other agents pay Kutip via x402 to cite a summary — that flows
 > back to authors. Humans get paid **forever, not just once**."
 
-### Slide 14 · Ecosystem 2/4 · BountyMarket
+### Slide 13 · Sponsored research · BountyMarket
 > "Anyone funds a topic. Kutip earns the bounty on a matching
 > citation — extra payout on top of the user fee."
 
-### Slide 15 · Ecosystem 3/4 · MCP server
-> "Three tools, any LLM client — Claude Desktop, Cursor, Cline.
-> External calls still pay authors on-chain. **Infrastructure, not
-> just an app.**"
-
-### Slide 16 · Ecosystem 4/4 · Fuji mirror
+### Slide 14 · Cross-chain proof · Fuji mirror
 > "Every attestation replicates to **Avalanche Fuji** within seconds.
 > LayerZero-pattern. **Cross-chain proof, live today.**"
 
@@ -160,17 +162,22 @@ Tiap baris ~8 detik. Klip auto-play, kamu narasikan di atasnya.
 # ⏱️ Cheat sheet · waktu per slide
 
 ```
-0:00 ──┬─ Slide 1  Hook              12s
-0:12 ──┼─ Slide 2  Problem 🆕        20s
-0:32 ──┼─ Slide 3  Solution 🆕       18s
-0:50 ──┼─ Slide 4  Flow + clip       22s
-1:12 ──┼─ Slide 5  Payout + clip     20s
-1:32 ──┼─ Slide 6  Three moats       40s  ← bagian terpadat
-2:12 ──┼─ Slide 7  Verify + clip     18s
-2:30 ──┼─ Slide 8  Scale             18s
-2:48 ──┴─ Slide 9  Thank you         12s
-3:00    ============ HARD CAP
+0:00 ──┬─ Slide 1  Hook                12s
+0:12 ──┼─ Slide 2  Problem             20s
+0:32 ──┼─ Slide 3  Solution            18s
+0:50 ──┼─ Slide 4  Flow + clip         22s
+1:12 ──┼─ Slide 5  Payout + clip       20s
+1:32 ──┼─ Slide 6  Three moats         40s  ← bagian terpadat
+2:12 ──┼─ Slide 7  Verify + clip       18s
+2:30 ──┼─ Slide 8  Scale               15s
+2:45 ──┼─ Slide 9  Infrastructure 🆕   20s
+3:05 ──┴─ Slide 10 Thank you           10s
+3:15    ============ over-cap by 15s — drop slides if drift
 ```
+
+**⚠️ Time budget tight.** Kalau di latihan kamu finish 3:15, **drop
+Slide 8 (Scale)** dulu — tile-tilenya numerik, juri tidak butuh
+dengar semua. Atau drop satu moat di Slide 6.
 
 ## 🚨 Kalau drift waktu
 

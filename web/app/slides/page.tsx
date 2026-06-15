@@ -239,6 +239,41 @@ const SLIDES: Slide[] = [
     )
   },
   {
+    kicker: "This isn't a demo — it's infrastructure",
+    title: "ORCID. Escrow. MCP.",
+    body: (
+      <div className="deck-moats" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+        <div className="deck-moat">
+          <div className="deck-moat__n">ORCID</div>
+          <div className="deck-moat__title">Real OAuth + on-chain bind</div>
+          <div className="deck-moat__body">
+            Authors prove identity at orcid.org, then sign EIP-712 to
+            bind their wallet in NameRegistry. Future citations route
+            automatically.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">5% APY</div>
+          <div className="deck-moat__title">Yield-bearing escrow</div>
+          <div className="deck-moat__body">
+            Citations for un-bound authors don't get burned — they
+            accrue in <code>UnclaimedYieldEscrow</code> until claimed.
+            No use-it-or-lose-it.
+          </div>
+        </div>
+        <div className="deck-moat">
+          <div className="deck-moat__n">MCP</div>
+          <div className="deck-moat__title">Any LLM client, natively</div>
+          <div className="deck-moat__body">
+            Claude Desktop, Cursor, Cline call <code>kutip.research</code>{" "}
+            directly. <strong>Every external call still pays cited
+            authors on-chain.</strong>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
     kicker: "Kutip · the research agent that pays its sources",
     title: "Thank you.",
     body: (
@@ -262,49 +297,10 @@ const SLIDES: Slide[] = [
       </div>
     )
   },
-  // Deep-dive slides — four narrative clusters. Ordered so each topic
-  // builds on the previous: Authors (humans) → Agents (entities) →
-  // Verifiability (proof) → Ecosystem (reach).
-  //
-  // Authors · how the human side gets paid
-  {
-    kicker: "Authors · 1 of 2",
-    title: "ORCID OAuth — authors prove ownership, then bind on-chain.",
-    clip: {
-      src: "/clips/qa-orcid.mp4",
-      label: "ORCID claim flow",
-      shot: "Claim page · ORCID OAuth + wallet bind UI.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Real ORCID OAuth — not just typing a number. After login, the
-        author signs an EIP-712 claim that binds <code>ORCID → wallet</code>{" "}
-        in the on-chain <code>NameRegistry</code>. Future citations
-        route to their real wallet, permanently.
-      </p>
-    )
-  },
-  {
-    kicker: "Authors · 2 of 2",
-    title: "Authors not on Kutip yet? Their shares earn 5% APY.",
-    clip: {
-      src: "/clips/qa-escrow.mp4",
-      label: "UnclaimedYieldEscrow",
-      shot: "Escrow page · principal + yield table per ORCID.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Citations for un-bound authors don't get burned — they accrue
-        in <code>UnclaimedYieldEscrow</code> at a 5% APY target. When
-        the author verifies their ORCID, principal + yield ship to
-        their wallet. No "use-it-or-lose-it."
-      </p>
-    )
-  },
-  // Agent identity — standalone (the other two Agent slides were
-  // covered enough by Slide 4 moats / Slide 6 scale to warrant cutting).
+  // Deep-dive slides — ORCID/Escrow/MCP got promoted to the main
+  // pitch's Infrastructure slide. What's left here is everything that
+  // didn't quite fit the 3-minute story but still answers a likely
+  // judge question.
   {
     kicker: "Deep dive · agent identity",
     title: "Agents that own NFTs and wallets.",
@@ -322,9 +318,8 @@ const SLIDES: Slide[] = [
       </p>
     )
   },
-  // Ecosystem · how Kutip reaches beyond itself
   {
-    kicker: "Ecosystem · 1 of 4",
+    kicker: "Deep dive · recursive royalties",
     title: "Other agents pay Kutip. Kutip pays authors.",
     clip: {
       src: "/clips/qa-reverse-x402.mp4",
@@ -341,8 +336,8 @@ const SLIDES: Slide[] = [
     )
   },
   {
-    kicker: "Ecosystem · 2 of 4",
-    title: "Anyone can fund a question. Authors get paid for matches.",
+    kicker: "Deep dive · sponsored research",
+    title: "Anyone can fund a question.",
     clip: {
       src: "/clips/qa-bounties.mp4",
       label: "BountyMarket",
@@ -358,25 +353,7 @@ const SLIDES: Slide[] = [
     )
   },
   {
-    kicker: "Ecosystem · 3 of 4",
-    title: "kutip.research() — natively in any LLM client.",
-    clip: {
-      src: "/clips/qa-mcp.mp4",
-      label: "MCP server",
-      shot: "Docs · MCP integration section.",
-      duration: "≈ 7 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Kutip ships an MCP server — three tools any MCP client (Claude
-        Desktop, Cursor, Cline) calls natively. Every external call
-        still pays cited authors on-chain. Infrastructure, not just an
-        app.
-      </p>
-    )
-  },
-  {
-    kicker: "Ecosystem · 4 of 4",
+    kicker: "Deep dive · cross-chain proof",
     title: "Every receipt mirrors to Avalanche Fuji.",
     clip: {
       src: "/clips/qa-mirror.mp4",

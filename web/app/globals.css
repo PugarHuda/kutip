@@ -598,11 +598,12 @@ body > * {
 /* ---- /slides pitch deck ---- */
 @layer components {
   .deck {
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
-    padding: 26px clamp(20px, 6vw, 96px) 22px;
+    padding: 18px clamp(20px, 6vw, 96px) 16px;
+    overflow: hidden;
   }
   .deck__top {
     display: flex;
@@ -610,34 +611,39 @@ body > * {
     justify-content: space-between;
   }
   .deck__slide {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     width: 100%;
     max-width: 920px;
     margin: 0 auto;
-    padding: 24px 0;
+    padding: 12px 0;
+    min-height: 0;
+    overflow-y: auto;
   }
   .deck__kicker {
     font-family: var(--font-jetbrains), monospace;
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--kite-700);
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
+  /* Smaller cap so even the longest title fits without scroll on
+     720p+ windows. vh-aware so the title auto-shrinks if the viewport
+     is short. */
   .deck__title {
-    font-size: clamp(28px, 4.4vw, 50px);
-    line-height: 1.1;
+    font-size: clamp(22px, min(3.5vw, 4.2vh), 38px);
+    line-height: 1.12;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--ink);
-    margin: 0 0 26px;
-    max-width: 17ch;
+    margin: 0 0 16px;
+    max-width: 20ch;
   }
   .deck__body {
-    font-size: 17px;
+    font-size: 15.5px;
   }
   .deck__nav {
     display: flex;
@@ -743,12 +749,14 @@ body > * {
   .deck-clip {
     position: relative;
     width: min(820px, 100%);
+    /* Cap height so the clip never pushes title/body off-screen. */
+    max-height: 50vh;
     aspect-ratio: 16 / 9;
     border-radius: 14px;
     overflow: hidden;
     background: color-mix(in srgb, var(--ink) 5%, transparent);
     border: 1px solid var(--border);
-    margin-top: 12px;
+    margin-top: 10px;
   }
   .deck-clip video {
     width: 100%;
