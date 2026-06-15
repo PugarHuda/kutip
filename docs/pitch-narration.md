@@ -105,65 +105,61 @@ juri tanya. Total ~320 kata = ~145 wpm = mendarat **2:30 di latihan**,
 
 # 🎙️ Q&A · DEEP DIVES (slide 8–19, hanya kalau ditanya)
 
-Tiap baris ~10–15 detik. Klip auto-play, kamu narasikan di atasnya.
+Tiap baris ~8 detik. Klip auto-play, kamu narasikan di atasnya.
+Pendek = juri puas, lanjut ke pertanyaan berikut.
 
 ### Slide 8 · Authors 1/3 · ORCID OAuth
-> "Real ORCID OAuth — not just typing the number. Sign in at
-> orcid.org. Sign an EIP-712 claim that binds **ORCID-to-wallet**
-> on-chain. Future citations route automatically."
+> "Real ORCID OAuth — not just typing the number. Sign EIP-712 to
+> bind **ORCID-to-wallet** on-chain. Future citations route there
+> automatically."
 
 ### Slide 9 · Authors 2/3 · UnclaimedYieldEscrow
-> "Citations for authors without a wallet park in an escrow at
-> **5% APY**. When they verify their ORCID, principal plus yield
-> ship to their wallet. **No use-it-or-lose-it.**"
+> "Citations for un-bound authors park in escrow at **5% APY**. On
+> claim, principal plus yield ship to their wallet. **No
+> use-it-or-lose-it.**"
 
 ### Slide 10 · Authors 3/3 · Earnings dashboard
-> "**109 author wallets paid** across attested queries. Podium,
-> ranked list, sub-cent precision. Numbers from the ledger — not a
-> spreadsheet."
+> "**109 author wallets paid.** Sub-cent precision. Numbers from the
+> ledger — not a spreadsheet."
 
 ### Slide 11 · Agents 1/3 · ERC-8004 + ERC-6551
 > "Each agent holds an **ERC-8004 reputation NFT** with a token-bound
-> account. Portable identity. Auditable. Ready for DAO governance."
+> account. Portable identity. **Auditable on-chain.**"
 
 ### Slide 12 · Agents 2/3 · Gasless paymaster
-> "Paymaster fronts gas in KITE. Pulls cost back in USDC from the
-> agent's account inside the same UserOp. **Atomically.** Agent
-> never holds KITE."
+> "Paymaster fronts gas in KITE, pulls cost back in USDC — same
+> UserOp, **atomically**. Agent never holds KITE."
 
 ### Slide 13 · Agents 3/3 · Safe governance
-> "Even if one signer's key leaks, funds stay put. Attestations
-> flow through the agent — fast path. Config moves need two
-> signatures — slow path. Live **Safe v1.4.1** on Kite."
+> "If a signer key leaks, funds stay put. Attestations flow through
+> the agent. Config moves need two signatures. Live **Safe v1.4.1**
+> on Kite."
 
 ### Slide 14 · Verifiability 1/2 · Activity feed
 > "Dashboard reads `QueryAttested` events **directly off the
-> AttributionLedger**. Goldsky is optional, never the trust path.
-> **The chain is the source of truth.**"
+> ledger**. **The chain is the source of truth** — no indexer in
+> the trust path."
 
 ### Slide 15 · Verifiability 2/2 · Research history
-> "Every past run persisted to Vercel Blob — query, synthesis,
-> **keccak256 digest**, payouts. Survives cold starts. **Trail of
-> evidence, not just a UI.**"
+> "Every past run persisted with its **keccak256 digest**, payouts,
+> and full synthesis. **Trail of evidence — not just a UI.**"
 
 ### Slide 16 · Ecosystem 1/4 · Reverse x402
 > "Other agents pay Kutip via x402 to cite a summary — that flows
-> back to the authors. Humans get paid **forever, not just once**.
-> Recursive royalties."
+> back to authors. Humans get paid **forever, not just once**."
 
 ### Slide 17 · Ecosystem 2/4 · BountyMarket
-> "Anyone funds a topic with USDC. Kutip earns the bounty on a
-> matching citation — extra payout on top of the user fee."
+> "Anyone funds a topic. Kutip earns the bounty on a matching
+> citation — extra payout on top of the user fee."
 
 ### Slide 18 · Ecosystem 3/4 · MCP server
-> "Three tools any LLM client calls natively — Claude Desktop,
-> Cursor, Cline. Every external call still pays cited authors
-> on-chain. **Infrastructure, not just an app.**"
+> "Three tools, any LLM client — Claude Desktop, Cursor, Cline.
+> External calls still pay authors on-chain. **Infrastructure, not
+> just an app.**"
 
 ### Slide 19 · Ecosystem 4/4 · Fuji mirror
-> "Every Kite attestation replicates to `CitationMirror` on
-> **Avalanche Fuji** within seconds. LayerZero-pattern. Cross-chain
-> proof today, DVN-attested when Kite exposes its endpoint."
+> "Every attestation replicates to **Avalanche Fuji** within seconds.
+> LayerZero-pattern. **Cross-chain proof, live today.**"
 
 ---
 
