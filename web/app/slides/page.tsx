@@ -236,7 +236,7 @@ const SLIDES: Slide[] = [
   //
   // Authors · how the human side gets paid
   {
-    kicker: "Authors · 1 of 3",
+    kicker: "Authors · 1 of 2",
     title: "ORCID OAuth — authors prove ownership, then bind on-chain.",
     clip: {
       src: "/clips/qa-orcid.mp4",
@@ -254,7 +254,7 @@ const SLIDES: Slide[] = [
     )
   },
   {
-    kicker: "Authors · 2 of 3",
+    kicker: "Authors · 2 of 2",
     title: "Authors not on Kutip yet? Their shares earn 5% APY.",
     clip: {
       src: "/clips/qa-escrow.mp4",
@@ -271,27 +271,10 @@ const SLIDES: Slide[] = [
       </p>
     )
   },
+  // Agent identity — standalone (the other two Agent slides were
+  // covered enough by Slide 4 moats / Slide 6 scale to warrant cutting).
   {
-    kicker: "Authors · 3 of 3",
-    title: "Earnings dashboard — who got paid, how much, when.",
-    clip: {
-      src: "/clips/qa-earnings.mp4",
-      label: "Earnings dashboard",
-      shot: "Earnings · podium + per-author rows.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        109 author wallets paid across attested queries — top 3 podium,
-        full ranked list, sub-cent precision. Click any author to open
-        their on-chain history. <strong>Numbers come from the ledger,
-        not a spreadsheet.</strong>
-      </p>
-    )
-  },
-  // Agents · how the on-chain entities work
-  {
-    kicker: "Agents · 1 of 3",
+    kicker: "Deep dive · agent identity",
     title: "Agents that own NFTs and wallets.",
     clip: {
       src: "/clips/qa-agents.mp4",
@@ -304,78 +287,6 @@ const SLIDES: Slide[] = [
         Each agent holds an ERC-8004 reputation NFT with a token-bound
         account (ERC-6551). Portable identity, future DAO governance —
         Kutip is one of the few real ERC-8004 deployments on testnet.
-      </p>
-    )
-  },
-  {
-    kicker: "Agents · 2 of 3",
-    title: "User pays nothing. Agent holds no KITE. Ever.",
-    clip: {
-      src: "/clips/qa-gasless.mp4",
-      label: "Gasless paymaster",
-      shot: "Gasless page · live paymaster balance + USDC postOp flow.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Kite's paymaster fronts gas in native KITE, pulls its cost back
-        in USDC from the agent's smart account inside the same UserOp,
-        atomically. The user never signs a transaction. The agent
-        never touches a gas token.
-      </p>
-    )
-  },
-  {
-    kicker: "Agents · 3 of 3",
-    title: "2-of-3 Safe multisig governs the ecosystem fund.",
-    clip: {
-      src: "/clips/qa-governance.mp4",
-      label: "Safe multisig",
-      shot: "Governance page · Safe v1.4.1 signers + threshold.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Even if one signer's key leaks, funds stay put. Attestations
-        keep flowing through the agent AA (fast path); config and
-        ecosystem-fund moves require two signatures (slow path). Live{" "}
-        <code>Safe v1.4.1</code> on Kite testnet.
-      </p>
-    )
-  },
-  // Verifiability · how anyone can audit
-  {
-    kicker: "Verifiability · 1 of 2",
-    title: "Activity feed — every paid query, real-time.",
-    clip: {
-      src: "/clips/qa-activity.mp4",
-      label: "Dashboard activity",
-      shot: "Dashboard activity table · QueryAttested events streamed live.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Reads <code>QueryAttested</code> events straight off the
-        AttributionLedger via RPC — Goldsky subgraph is an optional
-        fast path, never the trust path. The chain is the source of
-        truth; the dashboard never lies about what's on it.
-      </p>
-    )
-  },
-  {
-    kicker: "Verifiability · 2 of 2",
-    title: "Every past query, persisted with its digest.",
-    clip: {
-      src: "/clips/qa-history.mp4",
-      label: "Research history",
-      shot: "History page · persisted summaries with hash digests.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Each research run is persisted to Vercel Blob — query, full
-        synthesis, keccak256 digest, payout count. Survives serverless
-        cold starts. <strong>Trail of evidence, not just a UI.</strong>
       </p>
     )
   },

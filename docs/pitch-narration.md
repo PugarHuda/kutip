@@ -103,61 +103,40 @@ juri tanya. Total ~320 kata = ~145 wpm = mendarat **2:30 di latihan**,
 
 ---
 
-# 🎙️ Q&A · DEEP DIVES (slide 8–19, hanya kalau ditanya)
+# 🎙️ Q&A · DEEP DIVES (slide 8–14, hanya kalau ditanya)
 
-Tiap baris ~8 detik. Klip auto-play, kamu narasikan di atasnya.
-Pendek = juri puas, lanjut ke pertanyaan berikut.
+Deep-dive dipangkas ke 7 slide setelah audit kekuatan — yang lemah
+(Earnings, Gasless redundan, Safe governance, Activity, History) sudah
+implicit di pitch 3 menit. Tiap baris ~8 detik.
 
-### Slide 8 · Authors 1/3 · ORCID OAuth
+### Slide 8 · Authors 1/2 · ORCID OAuth
 > "Real ORCID OAuth — not just typing the number. Sign EIP-712 to
 > bind **ORCID-to-wallet** on-chain. Future citations route there
 > automatically."
 
-### Slide 9 · Authors 2/3 · UnclaimedYieldEscrow
+### Slide 9 · Authors 2/2 · UnclaimedYieldEscrow
 > "Citations for un-bound authors park in escrow at **5% APY**. On
 > claim, principal plus yield ship to their wallet. **No
 > use-it-or-lose-it.**"
 
-### Slide 10 · Authors 3/3 · Earnings dashboard
-> "**109 author wallets paid.** Sub-cent precision. Numbers from the
-> ledger — not a spreadsheet."
-
-### Slide 11 · Agents 1/3 · ERC-8004 + ERC-6551
+### Slide 10 · Agent identity · ERC-8004 + ERC-6551
 > "Each agent holds an **ERC-8004 reputation NFT** with a token-bound
 > account. Portable identity. **Auditable on-chain.**"
 
-### Slide 12 · Agents 2/3 · Gasless paymaster
-> "Paymaster fronts gas in KITE, pulls cost back in USDC — same
-> UserOp, **atomically**. Agent never holds KITE."
-
-### Slide 13 · Agents 3/3 · Safe governance
-> "If a signer key leaks, funds stay put. Attestations flow through
-> the agent. Config moves need two signatures. Live **Safe v1.4.1**
-> on Kite."
-
-### Slide 14 · Verifiability 1/2 · Activity feed
-> "Dashboard reads `QueryAttested` events **directly off the
-> ledger**. **The chain is the source of truth** — no indexer in
-> the trust path."
-
-### Slide 15 · Verifiability 2/2 · Research history
-> "Every past run persisted with its **keccak256 digest**, payouts,
-> and full synthesis. **Trail of evidence — not just a UI.**"
-
-### Slide 16 · Ecosystem 1/4 · Reverse x402
+### Slide 11 · Ecosystem 1/4 · Reverse x402
 > "Other agents pay Kutip via x402 to cite a summary — that flows
 > back to authors. Humans get paid **forever, not just once**."
 
-### Slide 17 · Ecosystem 2/4 · BountyMarket
+### Slide 12 · Ecosystem 2/4 · BountyMarket
 > "Anyone funds a topic. Kutip earns the bounty on a matching
 > citation — extra payout on top of the user fee."
 
-### Slide 18 · Ecosystem 3/4 · MCP server
+### Slide 13 · Ecosystem 3/4 · MCP server
 > "Three tools, any LLM client — Claude Desktop, Cursor, Cline.
 > External calls still pay authors on-chain. **Infrastructure, not
 > just an app.**"
 
-### Slide 19 · Ecosystem 4/4 · Fuji mirror
+### Slide 14 · Ecosystem 4/4 · Fuji mirror
 > "Every attestation replicates to **Avalanche Fuji** within seconds.
 > LayerZero-pattern. **Cross-chain proof, live today.**"
 
