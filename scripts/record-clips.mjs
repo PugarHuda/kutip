@@ -19,9 +19,10 @@
  */
 
 import { chromium } from "playwright";
-import { mkdirSync, renameSync, existsSync } from "node:fs";
+import { mkdirSync, renameSync, existsSync, unlinkSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(__dirname, "..");
@@ -110,6 +111,38 @@ async function record(name, fn) {
   if (existsSync(final)) console.log(`  · overwriting ${final}`);
   renameSync(tmp, final);
   console.log(`  ✓ saved ${final}`);
+  trimVideo(final);
+}
+
+// Playwright recordings start at context creation → the first ~1.5 s is
+// always blank → white as the page boots. Trim that off and re-encode
+// in webm/vp9 so each clip opens directly on the demo content. ffmpeg
+// is required — script no-ops cleanly if it's missing.
+function trimVideo(srcPath) {
+  const tmp = srcPath.replace(/\.webm$/, ".trim.webm");
+  // execFileSync (not exec/execSync) — args go straight to ffmpeg, no
+  // shell interpretation, so paths with spaces/quotes can never be
+  // mis-parsed even though we control them.
+  const args = [
+    "-y",
+    "-loglevel", "error",
+    "-ss", "1.5",
+    "-i", srcPath,
+    "-c:v", "libvpx-vp9",
+    "-b:v", "1200k",
+    "-an",
+    tmp
+  ];
+  try {
+    execFileSync("ffmpeg", args, {
+      stdio: ["ignore", "ignore", "inherit"]
+    });
+    if (existsSync(srcPath)) unlinkSync(srcPath);
+    renameSync(tmp, srcPath);
+    console.log(`  ✂  trimmed first 1.5 s`);
+  } catch (err) {
+    console.warn(`  · ffmpeg trim skipped: ${err.message}`);
+  }
 }
 
 // Smooth-scroll helper that also moves the cursor toward what's revealed.

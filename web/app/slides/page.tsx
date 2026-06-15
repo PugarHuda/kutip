@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { BrandMark, ArrowRightIcon } from "@/components/icons";
 
@@ -21,6 +21,7 @@ interface ClipSpec {
   label: string;
   shot: string;
   duration: string;
+  small?: boolean;
 }
 
 interface Slide {
@@ -37,19 +38,19 @@ const SLIDES: Slide[] = [
     body: (
       <div className="flex flex-col gap-4">
         <p className="t-body ink-2 max-w-[620px]">
-          I'm Pugar. I built <strong>Kutip</strong> — an AI research agent
+          I'm Huda. I built <strong>Kutip</strong> — an AI research agent
           that pays the humans it learns from. On-chain. Atomically. The
           moment it answers.
         </p>
-        {/* Small live-product anchor — landing reel on the side so the
-            hook line keeps focus while judges see this is shipped. */}
-        <div className="deck-clip" style={{ maxWidth: 520 }}>
-          <video autoPlay muted loop playsInline preload="metadata">
-            <source src="/clips/landing.webm" type="video/webm" />
-            <source src="/clips/landing.mp4" type="video/mp4" />
-          </video>
-          <div className="deck-clip__caption">kutip-zeta.vercel.app</div>
-        </div>
+        <ClipSlot
+          clip={{
+            src: "/clips/landing.mp4",
+            label: "Landing reel",
+            shot: "Auto-scroll over the live landing page.",
+            duration: "kutip-zeta.vercel.app",
+            small: true
+          }}
+        />
       </div>
     )
   },
@@ -229,125 +230,148 @@ const SLIDES: Slide[] = [
       </div>
     )
   },
-  // Backup slide — NOT part of the 3-minute pitch. Kept here so the
-  // presenter can press `End` to jump to it during Q&A and answer
-  // "but does it also do X?" without scrambling between tabs. Each
-  // card has its own silent looping clip; visual support pre-loaded.
+  // Deep-dive slides — one per feature that didn't fit the 3-minute
+  // main pitch. Each gets a full-size clip + dedicated talking points
+  // so the presenter can walk through every Kutip feature in detail.
   {
-    kicker: "Backup · Q&A only",
-    title: "Everything else Kutip does.",
+    kicker: "Deep dive · cross-chain proof",
+    title: "Every receipt mirrors to Avalanche Fuji.",
+    clip: {
+      src: "/clips/qa-mirror.mp4",
+      label: "Cross-chain mirror",
+      shot: "Verify page → tx hash chip · LayerZero-pattern replication.",
+      duration: "≈ 7 s"
+    },
     body: (
-      <div className="deck-moats">
-        <BackupCard
-          tag="Fuji mirror"
-          src="/clips/qa-mirror.webm"
-          title="Cross-chain receipt"
-          body={
-            <>
-              Every Kite attestation replicates to{" "}
-              <code>CitationMirror</code> on Avalanche Fuji within
-              seconds. LayerZero-pattern.
-            </>
-          }
-        />
-        <BackupCard
-          tag="ERC-8004 + 6551"
-          src="/clips/qa-agents.webm"
-          title="Agents with NFT identities"
-          body={
-            <>
-              Each agent holds a reputation NFT (ERC-721) with a
-              token-bound account (ERC-6551). Portable identity.
-            </>
-          }
-        />
-        <BackupCard
-          tag="Reverse x402"
-          src="/clips/qa-reverse-x402.webm"
-          title="Agents pay Kutip back"
-          body={
-            <>
-              Other agents pay Kutip via x402 to cite a persisted
-              summary — that flows back to the original authors.
-            </>
-          }
-        />
-        <BackupCard
-          tag="Escrow + yield"
-          src="/clips/qa-escrow.webm"
-          title="Unclaimed shares earn"
-          body={
-            <>
-              Citations to un-bound authors accrue in{" "}
-              <code>UnclaimedYieldEscrow</code> at a 5% APY target
-              until ORCID is verified.
-            </>
-          }
-        />
-        <BackupCard
-          tag="BountyMarket"
-          src="/clips/qa-bounties.webm"
-          title="Sponsored research"
-          body={
-            <>
-              Anyone funds a bounty for a topic; Kutip earns it on a
-              matching citation — extra payout on top of the user fee.
-            </>
-          }
-        />
-        <BackupCard
-          tag="MCP server"
-          src="/clips/qa-mcp.webm"
-          title="Drop-in for any LLM client"
-          body={
-            <>
-              <code>kutip.research</code>, <code>kutip.summary</code>,{" "}
-              <code>kutip.authors</code> — Claude Desktop / Cursor /
-              Cline call Kutip natively.
-            </>
-          }
-        />
-      </div>
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Same atomic attestation, replicated to <code>CitationMirror</code>{" "}
+        on Fuji within seconds. Cross-chain proof. Swaps to DVN-attested
+        the moment Kite exposes its LZ endpoint.
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · agent identity",
+    title: "Agents that own NFTs and wallets.",
+    clip: {
+      src: "/clips/qa-agents.mp4",
+      label: "ERC-8004 + ERC-6551",
+      shot: "Agents page · Researcher + Summarizer NFT cards.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Each agent holds an ERC-8004 reputation NFT with a token-bound
+        account (ERC-6551). Portable identity, future DAO governance —
+        Kutip is one of the few real ERC-8004 deployments on testnet.
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · recursive royalties",
+    title: "Other agents pay Kutip. Kutip pays authors.",
+    clip: {
+      src: "/clips/qa-reverse-x402.mp4",
+      label: "Reverse x402",
+      shot: "Verify page · paywalled summary endpoint card.",
+      duration: "≈ 7 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        When another agent cites a Kutip summary, they pay Kutip via
+        x402 — and that flows back to the original authors. The loop
+        closes: humans get paid forever, not just once.
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · unclaimed earnings",
+    title: "Authors not on Kutip yet? Their shares earn 5% APY.",
+    clip: {
+      src: "/clips/qa-escrow.mp4",
+      label: "UnclaimedYieldEscrow",
+      shot: "Escrow page · principal + yield table per ORCID.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Citations for un-bound authors don't get burned — they accrue
+        in <code>UnclaimedYieldEscrow</code> at a 5% APY target. When
+        the author verifies their ORCID, principal + yield ship to
+        their wallet. No "use-it-or-lose-it".
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · sponsored research",
+    title: "Anyone can fund a question. Authors get paid for matches.",
+    clip: {
+      src: "/clips/qa-bounties.mp4",
+      label: "BountyMarket",
+      shot: "Bounties page · active + settled bounties.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Sponsor a topic with USDC; Kutip earns the bounty on a matching
+        citation, paying it on top of the user fee. Researchers earn
+        even when the asker doesn't know the paper exists.
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · integration",
+    title: "kutip.research() — natively in any LLM client.",
+    clip: {
+      src: "/clips/qa-mcp.mp4",
+      label: "MCP server",
+      shot: "Docs · MCP integration section.",
+      duration: "≈ 7 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Kutip ships an MCP server — three tools any MCP client (Claude
+        Desktop, Cursor, Cline) calls natively. Every external call
+        still pays cited authors on-chain. Infrastructure, not just an
+        app.
+      </p>
     )
   }
 ];
 
-function BackupCard({
-  tag,
-  src,
-  title,
-  body
-}: {
-  tag: string;
-  src: string;
-  title: string;
-  body: React.ReactNode;
-}) {
-  return (
-    <div className="deck-moat">
-      <div className="deck-moat__clip">
-        <video autoPlay muted loop playsInline preload="metadata">
-          <source src={src} type="video/webm" />
-          <source src={src.replace(/\.webm$/, ".mp4")} type="video/mp4" />
-        </video>
-        <div className="deck-moat__clip-tag">{tag}</div>
-      </div>
-      <div className="deck-moat__title">{title}</div>
-      <div className="deck-moat__body">{body}</div>
-    </div>
-  );
-}
+const SPEEDS = [1, 1.5, 2, 3] as const;
 
 function ClipSlot({ clip }: { clip: ClipSpec }) {
   const [loaded, setLoaded] = useState(false);
-  // Try .webm first (what Playwright recordings produce), fall back to
-  // .mp4 (what manual Win+G recordings produce). Browser picks the
-  // first source it can load; the placeholder stays visible if neither
-  // file exists yet.
+  const [playing, setPlaying] = useState(true);
+  const [speed, setSpeed] = useState<number>(1);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  // Try .webm first (Playwright output), fall back to .mp4 (manual
+  // captures). Browser uses the first source it can load; placeholder
+  // stays visible if neither file exists yet.
   const webmSrc = clip.src.replace(/\.mp4$/, ".webm");
+
+  function togglePlay() {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().catch(() => {});
+      setPlaying(true);
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
+  }
+  function changeSpeed(s: number) {
+    const v = videoRef.current;
+    if (v) v.playbackRate = s;
+    setSpeed(s);
+  }
+
   return (
-    <div className="deck-clip">
+    <div className={`deck-clip${clip.small ? " deck-clip--small" : ""}`}>
       <video
+        ref={videoRef}
         key={clip.src}
         autoPlay
         muted
@@ -355,6 +379,8 @@ function ClipSlot({ clip }: { clip: ClipSpec }) {
         playsInline
         preload="metadata"
         onLoadedData={() => setLoaded(true)}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
       >
         <source src={webmSrc} type="video/webm" />
         <source src={clip.src} type="video/mp4" />
@@ -362,10 +388,33 @@ function ClipSlot({ clip }: { clip: ClipSpec }) {
       {!loaded && (
         <div className="deck-clip__placeholder">
           <div className="t-caption">{clip.label}</div>
-          <div className="t-h3 mt-1">Record this clip — drop at {clip.src}</div>
+          <div className="t-h3 mt-1">Loading — drop at {clip.src}</div>
           <div className="t-small ink-3 max-w-[540px] mt-2">{clip.shot}</div>
         </div>
       )}
+      <div className="deck-clip__controls">
+        <button
+          type="button"
+          onClick={togglePlay}
+          aria-label={playing ? "Pause" : "Play"}
+          className="deck-clip__btn"
+        >
+          {playing ? "⏸" : "▶"}
+        </button>
+        <div className="deck-clip__speeds">
+          {SPEEDS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => changeSpeed(s)}
+              className="deck-clip__btn deck-clip__btn--speed"
+              data-active={speed === s}
+            >
+              {s}×
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="deck-clip__caption">{clip.duration}</div>
     </div>
   );

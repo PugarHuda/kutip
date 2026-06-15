@@ -26,6 +26,11 @@ Target landing: **2:55** with a 5-second buffer. If you drift, drop one
 moat from slide 4 (`02 Gasless` is the safest cut — the digest moat is
 the differentiator).
 
+**Slides 8–13 are deep-dive Q&A** — one feature per slide (Fuji mirror,
+ERC-8004/6551, Reverse-x402, Escrow yield, BountyMarket, MCP), each
+with its own clip. NOT part of the 3-minute pitch. Press `→` past
+slide 7 only during Q&A, or `End` to jump straight to the last one.
+
 ---
 
 ## The script (~430 words · 145 wpm)
@@ -33,7 +38,7 @@ the differentiator).
 ### Slide 1 · Hook · 0:00–0:15
 > "AI now writes papers, recommends papers, summarizes papers. The
 > humans who actually wrote those papers? They get nothing.
-> I'm Pugar. I built **Kutip** — an AI research agent that pays the
+> I'm Huda. I built **Kutip** — an AI research agent that pays the
 > humans it learns from."
 
 ### Slide 2 · Flow + Clip 1 · 0:15–0:45
@@ -106,7 +111,7 @@ rename to the exact filename above → place in `web/public/clips/`.
 - [ ] Browser tab focused; mute system notifications.
 - [ ] Mic test, lighting test, network test.
 - [ ] Chat message ready to send when you join the call:
-      `Hey — I'm Pugar from Kutip, looking forward to pitching.`
+      `Hey — I'm Huda from Kutip, looking forward to pitching.`
 
 ## Failure modes — and the cheap save
 
