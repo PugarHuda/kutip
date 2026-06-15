@@ -55,6 +55,40 @@ const SLIDES: Slide[] = [
     )
   },
   {
+    kicker: "The problem",
+    title: "Citations are everywhere. Payments — nowhere.",
+    body: (
+      <div className="flex flex-col gap-3 max-w-[640px] mt-1">
+        <p className="t-body ink-2">
+          AI-generated content is already the majority of new web pages.
+          Every LLM answer rests on millions of human-authored papers.
+        </p>
+        <p className="t-body ink-2">
+          The people who fund knowledge with their careers earn{" "}
+          <strong>zero of what AI extracts from it</strong>. Attribution
+          exists. Payment doesn't.
+        </p>
+      </div>
+    )
+  },
+  {
+    kicker: "The solution",
+    title: "Every citation IS a payment.",
+    body: (
+      <div className="flex flex-col gap-3 max-w-[640px] mt-1">
+        <p className="t-body ink-2">
+          Kutip flips that.{" "}
+          <strong>On-chain. Atomic. The moment the citation lands.</strong>
+        </p>
+        <p className="t-body ink-2">
+          An AI research agent that runs autonomously inside a
+          cryptographic spending cap, performs paid actions via x402,
+          and settles USDC to every cited author — verifiable on Kite.
+        </p>
+      </div>
+    )
+  },
+  {
     kicker: "What it does",
     title: "Five steps. One transaction. Real authors paid.",
     clip: {
@@ -205,16 +239,14 @@ const SLIDES: Slide[] = [
     )
   },
   {
-    kicker: "Kutip",
-    title: "The research agent that pays its sources.",
+    kicker: "Kutip · the research agent that pays its sources",
+    title: "Thank you.",
     body: (
-      <div className="flex flex-col gap-3">
-        <p className="t-body ink-2 max-w-[560px]">
-          AI agents will only grow. The question is whether they extract
-          from humans or pay them. Kutip shows the second model is real
-          — and live today.
+      <div className="flex flex-col gap-4 mt-1">
+        <p className="t-body ink-2 max-w-[520px]">
+          Solo. Seven weeks. On Kite. Questions welcome.
         </p>
-        <div className="flex flex-wrap gap-2.5 mt-1">
+        <div className="flex flex-wrap gap-2.5">
           <Link href="/research" className="btn btn--primary">
             kutip-zeta.vercel.app <ArrowRightIcon size={14} />
           </Link>
