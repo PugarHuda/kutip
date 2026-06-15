@@ -26,24 +26,26 @@ Target landing: **2:55** with a 5-second buffer. If you drift, drop one
 moat from slide 4 (`02 Gasless` is the safest cut — the digest moat is
 the differentiator).
 
-**Slides 8–19 are deep-dive Q&A** — one feature per slide, each with
-its own clip. NOT part of the 3-minute pitch. Press `→` past slide 7
-only during Q&A, or `End` to jump to the last one. Slide order:
+**Slides 8–19 are deep-dive Q&A** — grouped into four narrative
+clusters. NOT part of the 3-minute pitch. Press `→` past slide 7 only
+during Q&A. Order builds on itself: Authors first (the human side),
+then Agents (on-chain entities), then Verifiability (proof), then
+Ecosystem (reach beyond Kutip).
 
-| # | Feature | If asked about… |
-|---|---------|-----------------|
-| 8 | Cross-chain Fuji mirror | "Is this only on Kite?" |
-| 9 | ERC-8004 + ERC-6551 | "Agent identity? Reputation?" |
-| 10 | Reverse x402 | "Do other agents use Kutip?" |
-| 11 | UnclaimedYieldEscrow | "What if the author doesn't have a wallet?" |
-| 12 | BountyMarket | "Can someone fund a question?" |
-| 13 | MCP server | "How do other tools integrate?" |
-| 14 | ORCID OAuth + bind | "How do authors prove identity?" |
-| 15 | Gasless paymaster | "Who pays gas?" |
-| 16 | Activity feed | "Where's the live data?" |
-| 17 | Earnings dashboard | "How many authors paid?" |
-| 18 | Safe 2-of-3 governance | "What about treasury risk?" |
-| 19 | Research history | "Can I see past queries?" |
+| # | Group | Feature | If asked about… |
+|---|-------|---------|-----------------|
+| 8 | Authors 1/3 | ORCID OAuth + bind | "How do authors prove identity?" |
+| 9 | Authors 2/3 | UnclaimedYieldEscrow | "What if the author has no wallet?" |
+| 10 | Authors 3/3 | Earnings dashboard | "How many authors paid?" |
+| 11 | Agents 1/3 | ERC-8004 + ERC-6551 | "Agent identity? Reputation?" |
+| 12 | Agents 2/3 | Gasless paymaster | "Who pays gas?" |
+| 13 | Agents 3/3 | Safe 2-of-3 governance | "What about treasury risk?" |
+| 14 | Verifiability 1/2 | Activity feed | "Where's the live data?" |
+| 15 | Verifiability 2/2 | Research history | "Can I see past queries?" |
+| 16 | Ecosystem 1/4 | Reverse x402 | "Do other agents use Kutip?" |
+| 17 | Ecosystem 2/4 | BountyMarket | "Can someone fund a question?" |
+| 18 | Ecosystem 3/4 | MCP server | "How do other tools integrate?" |
+| 19 | Ecosystem 4/4 | Cross-chain Fuji mirror | "Is this only on Kite?" |
 
 ---
 
@@ -99,68 +101,68 @@ only during Q&A, or `End` to jump to the last one. Slide order:
 
 ## Q&A talking points — slides 8–19 (clips auto-play; just narrate)
 
-Each line below is a 10–15 second answer if a judge asks. Open the
-slide that already has the visual, talk over the auto-playing clip.
+Each line below is a 10–15 second answer. Open the slide that already
+has the visual, talk over the auto-playing clip.
 
-### Slide 8 · Fuji mirror
-> "Every Kite attestation replicates to a `CitationMirror` contract on
-> Avalanche Fuji within seconds — LayerZero-pattern relay. Cross-chain
-> proof today, DVN-attested the moment Kite exposes its LZ endpoint."
-
-### Slide 9 · ERC-8004 + ERC-6551
-> "Each agent — Researcher and Summarizer — holds an ERC-8004
-> reputation NFT with a token-bound account. Portable identity,
-> auditable history, ready for DAO governance."
-
-### Slide 10 · Reverse x402
-> "When another agent cites a Kutip summary, they pay Kutip via x402 —
-> and that flows back to the original authors. Humans get paid
-> forever, not just once. Recursive royalties."
-
-### Slide 11 · UnclaimedYieldEscrow
-> "Citations to authors without a bound wallet park in an escrow at a
-> five-percent APY target. When they verify their ORCID, principal
-> plus accrued yield ship to their wallet. No use-it-or-lose-it."
-
-### Slide 12 · BountyMarket
-> "Anyone funds a topic with USDC. When Kutip cites a matching paper,
-> the bounty releases — extra payout on top of the user fee.
-> Researchers earn even when the asker doesn't know the paper exists."
-
-### Slide 13 · MCP server
-> "Kutip ships an MCP server — three tools any LLM client calls
-> natively. Claude Desktop, Cursor, Cline. Every external call still
-> pays cited authors on-chain. Infrastructure, not just an app."
-
-### Slide 14 · ORCID OAuth + NameRegistry
+### Slide 8 · ORCID OAuth + NameRegistry
 > "Real ORCID OAuth — not just typing the number. Sign in at
 > orcid.org, then sign an EIP-712 claim that binds ORCID-to-wallet
 > in our on-chain `NameRegistry`. Future citations route automatically."
 
-### Slide 15 · Gasless paymaster
-> "Kite's paymaster fronts gas in native KITE, pulls its cost back in
-> USDC from the agent's smart account inside the same UserOp —
-> atomically. The user never signs. The agent never holds KITE."
+### Slide 9 · UnclaimedYieldEscrow
+> "Citations to authors without a bound wallet park in an escrow at a
+> five-percent APY target. When they verify their ORCID, principal
+> plus accrued yield ship to their wallet. No use-it-or-lose-it."
 
-### Slide 16 · Activity feed
-> "The dashboard reads `QueryAttested` events directly off the
-> AttributionLedger via RPC. Goldsky is an optional fast path, never
-> the trust path. The chain is the source of truth."
-
-### Slide 17 · Earnings dashboard
+### Slide 10 · Earnings dashboard
 > "109 author wallets paid across attested queries. Top three podium,
 > ranked list, sub-cent precision. Click any author to open their
 > on-chain history. Numbers from the ledger, not a spreadsheet."
 
-### Slide 18 · 2-of-3 Safe governance
+### Slide 11 · ERC-8004 + ERC-6551
+> "Each agent — Researcher and Summarizer — holds an ERC-8004
+> reputation NFT with a token-bound account. Portable identity,
+> auditable history, ready for DAO governance."
+
+### Slide 12 · Gasless paymaster
+> "Kite's paymaster fronts gas in native KITE, pulls its cost back in
+> USDC from the agent's smart account inside the same UserOp —
+> atomically. The user never signs. The agent never holds KITE."
+
+### Slide 13 · 2-of-3 Safe governance
 > "Even if one signer's key leaks, funds stay put. Attestations keep
 > flowing through the agent AA — fast path. Config and ecosystem
 > moves require two signatures — slow path. Live Safe v1.4.1 on Kite."
 
-### Slide 19 · Research history
+### Slide 14 · Activity feed
+> "The dashboard reads `QueryAttested` events directly off the
+> AttributionLedger via RPC. Goldsky is an optional fast path, never
+> the trust path. The chain is the source of truth."
+
+### Slide 15 · Research history
 > "Every past run is persisted to Vercel Blob — query, full synthesis,
 > keccak256 digest, payout count. Survives serverless cold starts.
 > Trail of evidence, not just a UI."
+
+### Slide 16 · Reverse x402
+> "When another agent cites a Kutip summary, they pay Kutip via x402 —
+> and that flows back to the original authors. Humans get paid
+> forever, not just once. Recursive royalties."
+
+### Slide 17 · BountyMarket
+> "Anyone funds a topic with USDC. When Kutip cites a matching paper,
+> the bounty releases — extra payout on top of the user fee.
+> Researchers earn even when the asker doesn't know the paper exists."
+
+### Slide 18 · MCP server
+> "Kutip ships an MCP server — three tools any LLM client calls
+> natively. Claude Desktop, Cursor, Cline. Every external call still
+> pays cited authors on-chain. Infrastructure, not just an app."
+
+### Slide 19 · Cross-chain Fuji mirror
+> "Every Kite attestation replicates to a `CitationMirror` contract on
+> Avalanche Fuji within seconds — LayerZero-pattern relay. Cross-chain
+> proof today, DVN-attested the moment Kite exposes its LZ endpoint."
 
 ---
 

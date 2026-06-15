@@ -34,14 +34,35 @@ const QUERY_ID =
 
 mkdirSync(OUT, { recursive: true });
 
-// Init script — runs on every new page, draws a glowing blue dot that
-// tracks the mouse so the recording is followable.
+// Init script — runs on every new page BEFORE first paint:
+//   1. Injects a dark background style on <html>/<body> so the
+//      recording never captures the browser's default white flash
+//      while Kutip's CSS is still loading.
+//   2. Draws a glowing blue dot that tracks the mouse so viewers can
+//      follow the recording without audio.
 function cursorInit() {
+  // 1. Dark background — must run before first paint, hence prepended
+  //    to <html> the moment the parser sees it.
+  try {
+    const style = document.createElement("style");
+    style.id = "__finale_bg";
+    style.textContent = "html,body{background:#0b0d0e !important}";
+    (document.head || document.documentElement).appendChild(style);
+  } catch {
+    // pre-DOM — re-tried by ensure() once body exists
+  }
   const ensure = () => {
     if (document.getElementById("__finale_cursor")) return;
     if (!document.body) {
       setTimeout(ensure, 40);
       return;
+    }
+    // Re-inject style if it didn't make it in pre-DOM phase.
+    if (!document.getElementById("__finale_bg")) {
+      const s = document.createElement("style");
+      s.id = "__finale_bg";
+      s.textContent = "html,body{background:#0b0d0e !important}";
+      document.head.appendChild(s);
     }
     const c = document.createElement("div");
     c.id = "__finale_cursor";
@@ -397,22 +418,33 @@ async function qaHistory(page) {
 
 // ─── RUN ALL ─────────────────────────────────────────────────────────
 
-await record("landing", landing);
-await record("flow", flow);
-await record("payout", payout);
-await record("verify", verify);
-await record("qa-mirror", qaMirror);
-await record("qa-agents", qaAgents);
-await record("qa-reverse-x402", qaReverseX402);
-await record("qa-escrow", qaEscrow);
-await record("qa-bounties", qaBounties);
-await record("qa-mcp", qaMcp);
-await record("qa-orcid", qaOrcid);
-await record("qa-gasless", qaGasless);
-await record("qa-activity", qaActivity);
-await record("qa-earnings", qaEarnings);
-await record("qa-governance", qaGovernance);
-await record("qa-history", qaHistory);
+// Filter: pass --only=name1,name2 to re-record a subset (saves time
+// when fixing one or two clips after tweaking a recording function).
+const onlyArg = process.argv.find((a) => a.startsWith("--only="));
+const onlySet = onlyArg
+  ? new Set(onlyArg.slice("--only=".length).split(","))
+  : null;
+async function maybe(name, fn) {
+  if (onlySet && !onlySet.has(name)) return;
+  await record(name, fn);
+}
+
+await maybe("landing", landing);
+await maybe("flow", flow);
+await maybe("payout", payout);
+await maybe("verify", verify);
+await maybe("qa-mirror", qaMirror);
+await maybe("qa-agents", qaAgents);
+await maybe("qa-reverse-x402", qaReverseX402);
+await maybe("qa-escrow", qaEscrow);
+await maybe("qa-bounties", qaBounties);
+await maybe("qa-mcp", qaMcp);
+await maybe("qa-orcid", qaOrcid);
+await maybe("qa-gasless", qaGasless);
+await maybe("qa-activity", qaActivity);
+await maybe("qa-earnings", qaEarnings);
+await maybe("qa-governance", qaGovernance);
+await maybe("qa-history", qaHistory);
 
 console.log("\n▸ Done. Commit:");
 console.log("   git add web/public/clips/*.webm");

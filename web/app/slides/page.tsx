@@ -230,28 +230,68 @@ const SLIDES: Slide[] = [
       </div>
     )
   },
-  // Deep-dive slides — one per feature that didn't fit the 3-minute
-  // main pitch. Each gets a full-size clip + dedicated talking points
-  // so the presenter can walk through every Kutip feature in detail.
+  // Deep-dive slides — four narrative clusters. Ordered so each topic
+  // builds on the previous: Authors (humans) → Agents (entities) →
+  // Verifiability (proof) → Ecosystem (reach).
+  //
+  // Authors · how the human side gets paid
   {
-    kicker: "Deep dive · cross-chain proof",
-    title: "Every receipt mirrors to Avalanche Fuji.",
+    kicker: "Authors · 1 of 3",
+    title: "ORCID OAuth — authors prove ownership, then bind on-chain.",
     clip: {
-      src: "/clips/qa-mirror.mp4",
-      label: "Cross-chain mirror",
-      shot: "Verify page → tx hash chip · LayerZero-pattern replication.",
-      duration: "≈ 7 s"
+      src: "/clips/qa-orcid.mp4",
+      label: "ORCID claim flow",
+      shot: "Claim page · ORCID OAuth + wallet bind UI.",
+      duration: "≈ 8 s"
     },
     body: (
       <p className="t-body ink-2 max-w-[620px] mt-1">
-        Same atomic attestation, replicated to <code>CitationMirror</code>{" "}
-        on Fuji within seconds. Cross-chain proof. Swaps to DVN-attested
-        the moment Kite exposes its LZ endpoint.
+        Real ORCID OAuth — not just typing a number. After login, the
+        author signs an EIP-712 claim that binds <code>ORCID → wallet</code>{" "}
+        in the on-chain <code>NameRegistry</code>. Future citations
+        route to their real wallet, permanently.
       </p>
     )
   },
   {
-    kicker: "Deep dive · agent identity",
+    kicker: "Authors · 2 of 3",
+    title: "Authors not on Kutip yet? Their shares earn 5% APY.",
+    clip: {
+      src: "/clips/qa-escrow.mp4",
+      label: "UnclaimedYieldEscrow",
+      shot: "Escrow page · principal + yield table per ORCID.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Citations for un-bound authors don't get burned — they accrue
+        in <code>UnclaimedYieldEscrow</code> at a 5% APY target. When
+        the author verifies their ORCID, principal + yield ship to
+        their wallet. No "use-it-or-lose-it."
+      </p>
+    )
+  },
+  {
+    kicker: "Authors · 3 of 3",
+    title: "Earnings dashboard — who got paid, how much, when.",
+    clip: {
+      src: "/clips/qa-earnings.mp4",
+      label: "Earnings dashboard",
+      shot: "Earnings · podium + per-author rows.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        109 author wallets paid across attested queries — top 3 podium,
+        full ranked list, sub-cent precision. Click any author to open
+        their on-chain history. <strong>Numbers come from the ledger,
+        not a spreadsheet.</strong>
+      </p>
+    )
+  },
+  // Agents · how the on-chain entities work
+  {
+    kicker: "Agents · 1 of 3",
     title: "Agents that own NFTs and wallets.",
     clip: {
       src: "/clips/qa-agents.mp4",
@@ -268,95 +308,7 @@ const SLIDES: Slide[] = [
     )
   },
   {
-    kicker: "Deep dive · recursive royalties",
-    title: "Other agents pay Kutip. Kutip pays authors.",
-    clip: {
-      src: "/clips/qa-reverse-x402.mp4",
-      label: "Reverse x402",
-      shot: "Verify page · paywalled summary endpoint card.",
-      duration: "≈ 7 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        When another agent cites a Kutip summary, they pay Kutip via
-        x402 — and that flows back to the original authors. The loop
-        closes: humans get paid forever, not just once.
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · unclaimed earnings",
-    title: "Authors not on Kutip yet? Their shares earn 5% APY.",
-    clip: {
-      src: "/clips/qa-escrow.mp4",
-      label: "UnclaimedYieldEscrow",
-      shot: "Escrow page · principal + yield table per ORCID.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Citations for un-bound authors don't get burned — they accrue
-        in <code>UnclaimedYieldEscrow</code> at a 5% APY target. When
-        the author verifies their ORCID, principal + yield ship to
-        their wallet. No "use-it-or-lose-it".
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · sponsored research",
-    title: "Anyone can fund a question. Authors get paid for matches.",
-    clip: {
-      src: "/clips/qa-bounties.mp4",
-      label: "BountyMarket",
-      shot: "Bounties page · active + settled bounties.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Sponsor a topic with USDC; Kutip earns the bounty on a matching
-        citation, paying it on top of the user fee. Researchers earn
-        even when the asker doesn't know the paper exists.
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · integration",
-    title: "kutip.research() — natively in any LLM client.",
-    clip: {
-      src: "/clips/qa-mcp.mp4",
-      label: "MCP server",
-      shot: "Docs · MCP integration section.",
-      duration: "≈ 7 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Kutip ships an MCP server — three tools any MCP client (Claude
-        Desktop, Cursor, Cline) calls natively. Every external call
-        still pays cited authors on-chain. Infrastructure, not just an
-        app.
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · author identity",
-    title: "ORCID OAuth — authors prove ownership, then bind on-chain.",
-    clip: {
-      src: "/clips/qa-orcid.mp4",
-      label: "ORCID claim flow",
-      shot: "Claim page · ORCID OAuth + wallet bind UI.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Real ORCID OAuth — not just typing a number. After login, the
-        author signs an EIP-712 claim that binds <code>ORCID → wallet</code>{" "}
-        in the on-chain <code>NameRegistry</code>. From then on, future
-        citations route straight to their real wallet.
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · zero-gas UX",
+    kicker: "Agents · 2 of 3",
     title: "User pays nothing. Agent holds no KITE. Ever.",
     clip: {
       src: "/clips/qa-gasless.mp4",
@@ -374,7 +326,26 @@ const SLIDES: Slide[] = [
     )
   },
   {
-    kicker: "Deep dive · live ledger",
+    kicker: "Agents · 3 of 3",
+    title: "2-of-3 Safe multisig governs the ecosystem fund.",
+    clip: {
+      src: "/clips/qa-governance.mp4",
+      label: "Safe multisig",
+      shot: "Governance page · Safe v1.4.1 signers + threshold.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Even if one signer's key leaks, funds stay put. Attestations
+        keep flowing through the agent AA (fast path); config and
+        ecosystem-fund moves require two signatures (slow path). Live{" "}
+        <code>Safe v1.4.1</code> on Kite testnet.
+      </p>
+    )
+  },
+  // Verifiability · how anyone can audit
+  {
+    kicker: "Verifiability · 1 of 2",
     title: "Activity feed — every paid query, real-time.",
     clip: {
       src: "/clips/qa-activity.mp4",
@@ -392,43 +363,7 @@ const SLIDES: Slide[] = [
     )
   },
   {
-    kicker: "Deep dive · author leaderboard",
-    title: "Earnings page — who got paid, how much, when.",
-    clip: {
-      src: "/clips/qa-earnings.mp4",
-      label: "Earnings dashboard",
-      shot: "Earnings · podium + per-author rows.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        109 author wallets paid across attested queries — top 3 podium,
-        full ranked list, sub-cent precision. Click any author to open
-        their on-chain history. <strong>Numbers come from the ledger,
-        not a spreadsheet.</strong>
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · governance",
-    title: "2-of-3 Safe multisig governs the ecosystem fund.",
-    clip: {
-      src: "/clips/qa-governance.mp4",
-      label: "Safe multisig",
-      shot: "Governance page · Safe v1.4.1 signers + threshold.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Even if one signer's key leaks, funds stay put. Attestations
-        keep flowing through the agent AA (fast path); config changes
-        and ecosystem-fund moves require two signatures (slow path).
-        Live <code>Safe v1.4.1</code> on Kite testnet.
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · research history",
+    kicker: "Verifiability · 2 of 2",
     title: "Every past query, persisted with its digest.",
     clip: {
       src: "/clips/qa-history.mp4",
@@ -441,6 +376,76 @@ const SLIDES: Slide[] = [
         Each research run is persisted to Vercel Blob — query, full
         synthesis, keccak256 digest, payout count. Survives serverless
         cold starts. <strong>Trail of evidence, not just a UI.</strong>
+      </p>
+    )
+  },
+  // Ecosystem · how Kutip reaches beyond itself
+  {
+    kicker: "Ecosystem · 1 of 4",
+    title: "Other agents pay Kutip. Kutip pays authors.",
+    clip: {
+      src: "/clips/qa-reverse-x402.mp4",
+      label: "Reverse x402",
+      shot: "Verify page · paywalled summary endpoint card.",
+      duration: "≈ 7 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        When another agent cites a Kutip summary, they pay Kutip via
+        x402 — and that flows back to the original authors. The loop
+        closes: humans get paid forever, not just once.
+      </p>
+    )
+  },
+  {
+    kicker: "Ecosystem · 2 of 4",
+    title: "Anyone can fund a question. Authors get paid for matches.",
+    clip: {
+      src: "/clips/qa-bounties.mp4",
+      label: "BountyMarket",
+      shot: "Bounties page · active + settled bounties.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Sponsor a topic with USDC; Kutip earns the bounty on a matching
+        citation, paying it on top of the user fee. Researchers earn
+        even when the asker doesn't know the paper exists.
+      </p>
+    )
+  },
+  {
+    kicker: "Ecosystem · 3 of 4",
+    title: "kutip.research() — natively in any LLM client.",
+    clip: {
+      src: "/clips/qa-mcp.mp4",
+      label: "MCP server",
+      shot: "Docs · MCP integration section.",
+      duration: "≈ 7 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Kutip ships an MCP server — three tools any MCP client (Claude
+        Desktop, Cursor, Cline) calls natively. Every external call
+        still pays cited authors on-chain. Infrastructure, not just an
+        app.
+      </p>
+    )
+  },
+  {
+    kicker: "Ecosystem · 4 of 4",
+    title: "Every receipt mirrors to Avalanche Fuji.",
+    clip: {
+      src: "/clips/qa-mirror.mp4",
+      label: "Cross-chain mirror",
+      shot: "Verify page → tx hash chip · LayerZero-pattern replication.",
+      duration: "≈ 7 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Same atomic attestation, replicated to <code>CitationMirror</code>{" "}
+        on Fuji within seconds. Cross-chain proof. Swaps to DVN-attested
+        the moment Kite exposes its LZ endpoint.
       </p>
     )
   }
