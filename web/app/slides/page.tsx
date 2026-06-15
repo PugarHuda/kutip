@@ -363,11 +363,16 @@ const SLIDES: Slide[] = [
 ];
 
 const SPEEDS = [1, 1.5, 2, 3] as const;
+// Default playback rate. 3× gives judges a brisk-but-readable
+// fast-forward through each demo without having to touch the speed
+// buttons — clips of 8-15 s become 3-5 s of visual support behind the
+// narration. Override per-clip by tapping a speed pill.
+const DEFAULT_SPEED = 3;
 
 function ClipSlot({ clip }: { clip: ClipSpec }) {
   const [loaded, setLoaded] = useState(false);
   const [playing, setPlaying] = useState(true);
-  const [speed, setSpeed] = useState<number>(1);
+  const [speed, setSpeed] = useState<number>(DEFAULT_SPEED);
   const [current, setCurrent] = useState(0);
   const [total, setTotal] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -413,7 +418,14 @@ function ClipSlot({ clip }: { clip: ClipSpec }) {
         loop
         playsInline
         preload="auto"
-        onLoadedData={() => setLoaded(true)}
+        onLoadedData={(e) => {
+          setLoaded(true);
+          // playbackRate must be applied to the live element after it
+          // exists — initial useState doesn't propagate to the DOM
+          // node. Without this the clip starts at 1× until user
+          // touches a speed pill.
+          e.currentTarget.playbackRate = DEFAULT_SPEED;
+        }}
         onLoadedMetadata={(e) => setTotal(e.currentTarget.duration || 0)}
         onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
         onPlay={() => setPlaying(true)}
