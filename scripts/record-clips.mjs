@@ -34,35 +34,18 @@ const QUERY_ID =
 
 mkdirSync(OUT, { recursive: true });
 
-// Init script — runs on every new page BEFORE first paint:
-//   1. Injects a dark background style on <html>/<body> so the
-//      recording never captures the browser's default white flash
-//      while Kutip's CSS is still loading.
-//   2. Draws a glowing blue dot that tracks the mouse so viewers can
-//      follow the recording without audio.
+// Init script — runs on every new page, draws a glowing blue dot that
+// tracks the mouse so viewers can follow the recording without audio.
+// Earlier versions also injected a dark background to hide the
+// pre-CSS white flash — but that made clips of light-theme pages
+// look like the app was dark, which is worse than the brief flash.
+// We rely on ffmpeg trim + poster JPG to mask the actual flash now.
 function cursorInit() {
-  // 1. Dark background — must run before first paint, hence prepended
-  //    to <html> the moment the parser sees it.
-  try {
-    const style = document.createElement("style");
-    style.id = "__finale_bg";
-    style.textContent = "html,body{background:#0b0d0e !important}";
-    (document.head || document.documentElement).appendChild(style);
-  } catch {
-    // pre-DOM — re-tried by ensure() once body exists
-  }
   const ensure = () => {
     if (document.getElementById("__finale_cursor")) return;
     if (!document.body) {
       setTimeout(ensure, 40);
       return;
-    }
-    // Re-inject style if it didn't make it in pre-DOM phase.
-    if (!document.getElementById("__finale_bg")) {
-      const s = document.createElement("style");
-      s.id = "__finale_bg";
-      s.textContent = "html,body{background:#0b0d0e !important}";
-      document.head.appendChild(s);
     }
     const c = document.createElement("div");
     c.id = "__finale_cursor";
@@ -106,10 +89,12 @@ function cursorInit() {
   }
 }
 
-// Per-clip trim — landing has a longer above-fold animation, so it
-// needs a deeper cut. Everything else cuts the standard 1.5 s blank.
+// Per-clip trim — landing has a long pre-paint flash (heavy hero +
+// font loading) so it needs a deeper cut; flow goes through a fast
+// /research route, just 2 s is enough. Everything else uses 1.5 s.
 const TRIM_SEC = {
-  landing: 3.0,
+  landing: 5.0,
+  flow: 2.0,
   default: 1.5
 };
 
