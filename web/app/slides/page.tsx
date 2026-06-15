@@ -336,6 +336,113 @@ const SLIDES: Slide[] = [
         app.
       </p>
     )
+  },
+  {
+    kicker: "Deep dive · author identity",
+    title: "ORCID OAuth — authors prove ownership, then bind on-chain.",
+    clip: {
+      src: "/clips/qa-orcid.mp4",
+      label: "ORCID claim flow",
+      shot: "Claim page · ORCID OAuth + wallet bind UI.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Real ORCID OAuth — not just typing a number. After login, the
+        author signs an EIP-712 claim that binds <code>ORCID → wallet</code>{" "}
+        in the on-chain <code>NameRegistry</code>. From then on, future
+        citations route straight to their real wallet.
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · zero-gas UX",
+    title: "User pays nothing. Agent holds no KITE. Ever.",
+    clip: {
+      src: "/clips/qa-gasless.mp4",
+      label: "Gasless paymaster",
+      shot: "Gasless page · live paymaster balance + USDC postOp flow.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Kite's paymaster fronts gas in native KITE, pulls its cost back
+        in USDC from the agent's smart account inside the same UserOp,
+        atomically. The user never signs a transaction. The agent
+        never touches a gas token.
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · live ledger",
+    title: "Activity feed — every paid query, real-time.",
+    clip: {
+      src: "/clips/qa-activity.mp4",
+      label: "Dashboard activity",
+      shot: "Dashboard activity table · QueryAttested events streamed live.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Reads <code>QueryAttested</code> events straight off the
+        AttributionLedger via RPC — Goldsky subgraph is an optional
+        fast path, never the trust path. The chain is the source of
+        truth; the dashboard never lies about what's on it.
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · author leaderboard",
+    title: "Earnings page — who got paid, how much, when.",
+    clip: {
+      src: "/clips/qa-earnings.mp4",
+      label: "Earnings dashboard",
+      shot: "Earnings · podium + per-author rows.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        109 author wallets paid across attested queries — top 3 podium,
+        full ranked list, sub-cent precision. Click any author to open
+        their on-chain history. <strong>Numbers come from the ledger,
+        not a spreadsheet.</strong>
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · governance",
+    title: "2-of-3 Safe multisig governs the ecosystem fund.",
+    clip: {
+      src: "/clips/qa-governance.mp4",
+      label: "Safe multisig",
+      shot: "Governance page · Safe v1.4.1 signers + threshold.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Even if one signer's key leaks, funds stay put. Attestations
+        keep flowing through the agent AA (fast path); config changes
+        and ecosystem-fund moves require two signatures (slow path).
+        Live <code>Safe v1.4.1</code> on Kite testnet.
+      </p>
+    )
+  },
+  {
+    kicker: "Deep dive · research history",
+    title: "Every past query, persisted with its digest.",
+    clip: {
+      src: "/clips/qa-history.mp4",
+      label: "Research history",
+      shot: "History page · persisted summaries with hash digests.",
+      duration: "≈ 8 s"
+    },
+    body: (
+      <p className="t-body ink-2 max-w-[620px] mt-1">
+        Each research run is persisted to Vercel Blob — query, full
+        synthesis, keccak256 digest, payout count. Survives serverless
+        cold starts. <strong>Trail of evidence, not just a UI.</strong>
+      </p>
+    )
   }
 ];
 
@@ -345,11 +452,15 @@ function ClipSlot({ clip }: { clip: ClipSpec }) {
   const [loaded, setLoaded] = useState(false);
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState<number>(1);
+  const [current, setCurrent] = useState(0);
+  const [total, setTotal] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   // Try .webm first (Playwright output), fall back to .mp4 (manual
-  // captures). Browser uses the first source it can load; placeholder
-  // stays visible if neither file exists yet.
+  // captures). Same name with .jpg suffix is the poster — ffmpeg
+  // generates it at 0.5s into the trimmed clip, killing the black
+  // pre-decode flash.
   const webmSrc = clip.src.replace(/\.mp4$/, ".webm");
+  const posterSrc = clip.src.replace(/\.(mp4|webm)$/, ".jpg");
 
   function togglePlay() {
     const v = videoRef.current;
@@ -367,18 +478,28 @@ function ClipSlot({ clip }: { clip: ClipSpec }) {
     if (v) v.playbackRate = s;
     setSpeed(s);
   }
+  function scrub(t: number) {
+    const v = videoRef.current;
+    if (v && Number.isFinite(t)) {
+      v.currentTime = t;
+      setCurrent(t);
+    }
+  }
 
   return (
     <div className={`deck-clip${clip.small ? " deck-clip--small" : ""}`}>
       <video
         ref={videoRef}
         key={clip.src}
+        poster={posterSrc}
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         onLoadedData={() => setLoaded(true)}
+        onLoadedMetadata={(e) => setTotal(e.currentTarget.duration || 0)}
+        onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
       >
@@ -401,6 +522,16 @@ function ClipSlot({ clip }: { clip: ClipSpec }) {
         >
           {playing ? "⏸" : "▶"}
         </button>
+        <input
+          type="range"
+          min={0}
+          max={total || 1}
+          step={0.05}
+          value={current}
+          onChange={(e) => scrub(parseFloat(e.target.value))}
+          className="deck-clip__scrub"
+          aria-label="Scrub"
+        />
         <div className="deck-clip__speeds">
           {SPEEDS.map((s) => (
             <button

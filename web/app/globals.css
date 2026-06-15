@@ -648,6 +648,9 @@ body > * {
   .deck__dots {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 60vw;
   }
   .deck__dot {
     width: 9px;
@@ -836,6 +839,43 @@ body > * {
   }
   .deck-clip__btn--speed {
     padding: 4px 7px;
+  }
+  /* Draggable scrub bar — sits between play and speed buttons.
+     Native range styled to read like a Vimeo/YouTube scrubber. */
+  .deck-clip__scrub {
+    flex: 1;
+    min-width: 80px;
+    height: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: color-mix(in srgb, #fff 22%, transparent);
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+    margin: 0 4px;
+  }
+  .deck-clip__scrub::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--kite-500);
+    border: 2px solid #fff;
+    cursor: grab;
+    transition: transform 100ms;
+  }
+  .deck-clip__scrub::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.25);
+  }
+  .deck-clip__scrub::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--kite-500);
+    border: 2px solid #fff;
+    cursor: grab;
   }
 
   /* finale: "Three moats" — 3 column grid for slide 4. */

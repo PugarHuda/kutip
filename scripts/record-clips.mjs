@@ -85,6 +85,13 @@ function cursorInit() {
   }
 }
 
+// Per-clip trim — landing has a longer above-fold animation, so it
+// needs a deeper cut. Everything else cuts the standard 1.5 s blank.
+const TRIM_SEC = {
+  landing: 3.0,
+  default: 1.5
+};
+
 async function record(name, fn) {
   console.log(`\n▸ Recording ${name}.webm …`);
   const browser = await chromium.launch({ headless: true });
@@ -95,7 +102,6 @@ async function record(name, fn) {
   await context.addInitScript(cursorInit);
   const page = await context.newPage();
   try {
-    // Park cursor mid-screen so it has a starting position visible.
     await page.mouse.move(640, 360);
     await fn(page);
   } catch (err) {
@@ -111,22 +117,20 @@ async function record(name, fn) {
   if (existsSync(final)) console.log(`  · overwriting ${final}`);
   renameSync(tmp, final);
   console.log(`  ✓ saved ${final}`);
-  trimVideo(final);
+  trimVideo(final, TRIM_SEC[name] ?? TRIM_SEC.default);
+  generatePoster(final);
 }
 
 // Playwright recordings start at context creation → the first ~1.5 s is
 // always blank → white as the page boots. Trim that off and re-encode
 // in webm/vp9 so each clip opens directly on the demo content. ffmpeg
 // is required — script no-ops cleanly if it's missing.
-function trimVideo(srcPath) {
+function trimVideo(srcPath, seconds) {
   const tmp = srcPath.replace(/\.webm$/, ".trim.webm");
-  // execFileSync (not exec/execSync) — args go straight to ffmpeg, no
-  // shell interpretation, so paths with spaces/quotes can never be
-  // mis-parsed even though we control them.
   const args = [
     "-y",
     "-loglevel", "error",
-    "-ss", "1.5",
+    "-ss", String(seconds),
     "-i", srcPath,
     "-c:v", "libvpx-vp9",
     "-b:v", "1200k",
@@ -139,9 +143,32 @@ function trimVideo(srcPath) {
     });
     if (existsSync(srcPath)) unlinkSync(srcPath);
     renameSync(tmp, srcPath);
-    console.log(`  ✂  trimmed first 1.5 s`);
+    console.log(`  ✂  trimmed first ${seconds} s`);
   } catch (err) {
     console.warn(`  · ffmpeg trim skipped: ${err.message}`);
+  }
+}
+
+// Poster frame eliminates the black-frame flash <video> shows before
+// the first frame decodes. Pulled at 0.5 s in — past any trim residue.
+function generatePoster(srcPath) {
+  const jpg = srcPath.replace(/\.webm$/, ".jpg");
+  const args = [
+    "-y",
+    "-loglevel", "error",
+    "-ss", "0.5",
+    "-i", srcPath,
+    "-frames:v", "1",
+    "-q:v", "4",
+    jpg
+  ];
+  try {
+    execFileSync("ffmpeg", args, {
+      stdio: ["ignore", "ignore", "inherit"]
+    });
+    console.log(`  🖼  poster ${jpg.split(/[\\/]/).pop()}`);
+  } catch (err) {
+    console.warn(`  · poster skipped: ${err.message}`);
   }
 }
 
@@ -302,6 +329,72 @@ async function qaMcp(page) {
   await page.waitForTimeout(2200);
 }
 
+async function qaOrcid(page) {
+  await page.goto(`${BASE}/claim`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1500);
+  await page.mouse.move(640, 280, { steps: 25 });
+  await page.waitForTimeout(1500);
+  await scrollAndPoint(page, 300, [500, 380]);
+  await page.waitForTimeout(2200);
+  await scrollAndPoint(page, 700, [820, 420]);
+  await page.waitForTimeout(2200);
+}
+
+async function qaGasless(page) {
+  await page.goto(`${BASE}/dashboard/gasless`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1500);
+  await page.mouse.move(640, 280, { steps: 25 });
+  await page.waitForTimeout(1500);
+  await scrollAndPoint(page, 400, [500, 380]);
+  await page.waitForTimeout(2400);
+  await scrollAndPoint(page, 900, [820, 420]);
+  await page.waitForTimeout(2200);
+}
+
+async function qaActivity(page) {
+  await page.goto(`${BASE}/dashboard/activity`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1800);
+  await page.mouse.move(640, 280, { steps: 25 });
+  await page.waitForTimeout(1500);
+  await scrollAndPoint(page, 400, [500, 380]);
+  await page.waitForTimeout(2400);
+  await scrollAndPoint(page, 900, [820, 420]);
+  await page.waitForTimeout(2200);
+}
+
+async function qaEarnings(page) {
+  await page.goto(`${BASE}/dashboard/earnings`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1500);
+  await page.mouse.move(640, 280, { steps: 25 });
+  await page.waitForTimeout(1500);
+  await scrollAndPoint(page, 500, [500, 380]);
+  await page.waitForTimeout(2400);
+  await scrollAndPoint(page, 1100, [820, 420]);
+  await page.waitForTimeout(2200);
+}
+
+async function qaGovernance(page) {
+  await page.goto(`${BASE}/dashboard/governance`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1500);
+  await page.mouse.move(640, 280, { steps: 25 });
+  await page.waitForTimeout(1500);
+  await scrollAndPoint(page, 400, [500, 380]);
+  await page.waitForTimeout(2400);
+  await scrollAndPoint(page, 900, [820, 420]);
+  await page.waitForTimeout(2200);
+}
+
+async function qaHistory(page) {
+  await page.goto(`${BASE}/dashboard/history`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1800);
+  await page.mouse.move(640, 280, { steps: 25 });
+  await page.waitForTimeout(1500);
+  await scrollAndPoint(page, 300, [500, 380]);
+  await page.waitForTimeout(2200);
+  await scrollAndPoint(page, 700, [820, 420]);
+  await page.waitForTimeout(2200);
+}
+
 // ─── RUN ALL ─────────────────────────────────────────────────────────
 
 await record("landing", landing);
@@ -314,6 +407,12 @@ await record("qa-reverse-x402", qaReverseX402);
 await record("qa-escrow", qaEscrow);
 await record("qa-bounties", qaBounties);
 await record("qa-mcp", qaMcp);
+await record("qa-orcid", qaOrcid);
+await record("qa-gasless", qaGasless);
+await record("qa-activity", qaActivity);
+await record("qa-earnings", qaEarnings);
+await record("qa-governance", qaGovernance);
+await record("qa-history", qaHistory);
 
 console.log("\n▸ Done. Commit:");
 console.log("   git add web/public/clips/*.webm");
