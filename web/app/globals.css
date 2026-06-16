@@ -646,12 +646,12 @@ body > * {
      720p+ windows. vh-aware so the title auto-shrinks if the viewport
      is short. */
   .deck__title {
-    font-size: clamp(20px, min(3vw, 3.8vh), 34px);
+    font-size: clamp(22px, min(3.4vw, 4.2vh), 38px);
     line-height: 1.12;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--ink);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
     max-width: 22ch;
   }
   .deck__body {
@@ -725,14 +725,14 @@ body > * {
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
     max-width: 640px;
   }
   .deck-list li {
     position: relative;
     padding-left: 22px;
-    font-size: 13px;
-    line-height: 1.35;
+    font-size: 15px;
+    line-height: 1.45;
     color: var(--ink-2);
   }
   .deck-list li::before {
@@ -770,19 +770,19 @@ body > * {
   .deck-split {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     max-width: 520px;
   }
   .deck-split__row {
     display: flex;
     align-items: baseline;
-    gap: 14px;
+    gap: 16px;
   }
   .deck-split__pct {
     font-family: var(--font-jetbrains), monospace;
     font-weight: 800;
-    font-size: 22px;
-    width: 64px;
+    font-size: 28px;
+    width: 80px;
     flex: none;
   }
 
