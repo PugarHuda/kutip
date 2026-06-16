@@ -196,6 +196,60 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
+## 🥊 Pivot lines · pakai kalau pesaing menonjol sebelum kamu
+
+Format positive statement yang implisit counter pesaing — JANGAN pernah
+sebut nama mereka. Swap-in natural di slide tertentu.
+
+### 🟦 Anti-NEXUS (kalau pitch "agent economy" / "agents pay each other")
+
+> "This isn't just agent-to-agent payment. **It's agents paying
+> humans.** The loop only closes when the people who made the
+> knowledge get paid."
+
+**Sisipkan di Slide 3 (Solution)** sebagai kalimat ke-3, atau jadikan
+penutup Slide 9 (Infrastructure).
+
+Mengapa: Nexus framing "agents pay each other" = abstract loop.
+Kutip framing "agents pay humans" = puncture abstraction. Stephen
+(BD) akan ingat karena konstituen manusia konkret.
+
+### 🟦 Anti-QUITTANCE (kalau pitch "x402 proof-of-delivery / escrow")
+
+> "Kutip uses x402 in production today — **226 settled transfers on
+> Kite**. Not a layer above x402; the spec running natively,
+> on-chain, verifiable right now."
+
+**Sisipkan di Slide 4 (Flow)** saat sebut "pays via x402," atau
+Slide 6 (moat #3) sebagai bukti.
+
+Mengapa: Quittance positions sebagai infrastruktur **untuk** x402.
+Kutip menunjukkan x402 sudah ship dan **digunakan**. Builders-built
+> builders-planned di mata Scott.
+
+### 🟦 Anti-KITE GARDEN (kalau pitch "AI agent security / chaos theory")
+
+> "Kutip is the kind of agent worth securing — an agent that moves
+> USDC to real human wallets, with on-chain proof of every transfer."
+
+**Sisipkan di Q&A only**, kalau juri tanya tentang security.
+
+Mengapa: Implicit acknowledgment security matters, sambil framing
+Kutip sebagai substrate yang lebih primer.
+
+### Rules of pivot delivery
+
+- **Jangan sebut nama pesaing.** Pernah disebut = pitch terasa
+  defensive/cheap shot.
+- **Ucapkan natural, tidak agitated.** Pivot line harus seamless di
+  alur narasi normal.
+- **Maksimal 1 pivot line per pitch.** Pilih yang paling relevan
+  berdasarkan urutan pitch. Pakai semua = pitch jadi reactive.
+- **Kalau tidak ada pesaing yang menonjol, jangan pakai.** Pivot lines
+  hanya ammunition; aman kalau tidak ditembakkan.
+
+---
+
 ## 🧑‍⚖️ Juri profile & strategi
 
 **Scott Shi** — Co-Founder + CTO @ Kite AI. Dia *bikin* infrastrukturnya
