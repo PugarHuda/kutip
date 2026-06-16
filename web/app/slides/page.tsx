@@ -122,28 +122,22 @@ const SLIDES: Slide[] = [
       duration: "≈ 12 s"
     },
     body: (
-      <div className="flex flex-col gap-3">
-        <div className="deck-split">
-          {[
-            ["80%", "Cited authors", "var(--emerald-600)"],
-            ["15%", "Operator", "var(--kite-700)"],
-            ["5%", "Kite ecosystem", "var(--ink-3)"]
-          ].map(([pct, label, color]) => (
-            <div key={label} className="deck-split__row">
-              <span
-                className="deck-split__pct"
-                style={{ color: color as string }}
-              >
-                {pct}
-              </span>
-              <span className="t-body">{label}</span>
-            </div>
-          ))}
-        </div>
-        <p className="t-small ink-3 max-w-[520px]">
-          Every receipt also mirrors to Avalanche Fuji within seconds —
-          cross-chain proof, same atomic settle.
-        </p>
+      <div className="deck-split">
+        {[
+          ["80%", "Cited authors", "var(--emerald-600)"],
+          ["15%", "Operator", "var(--kite-700)"],
+          ["5%", "Kite ecosystem", "var(--ink-3)"]
+        ].map(([pct, label, color]) => (
+          <div key={label} className="deck-split__row">
+            <span
+              className="deck-split__pct"
+              style={{ color: color as string }}
+            >
+              {pct}
+            </span>
+            <span className="t-body">{label}</span>
+          </div>
+        ))}
       </div>
     )
   },

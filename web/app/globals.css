@@ -751,11 +751,13 @@ body > * {
      the file exists so the deck still reads pre-recording. */
   .deck-clip {
     position: relative;
-    width: min(820px, 100%);
-    /* Cap height so clip + title + body fit a single 720p viewport.
-       Was 50vh; that overflowed when paired with a 4-line list or the
-       80/15/5 split block. 36vh leaves ~30% of window for text. */
-    max-height: 36vh;
+    /* Width drives height via aspect-ratio. Cap width by both the
+       container (100%, max 820px) AND the width that would produce
+       36vh height — so the clip never overflows vertically, and the
+       16:9 aspect-ratio is always respected. Earlier `max-height: 36vh`
+       fought aspect-ratio: container got wider than 16:9 on short
+       windows, object-fit cover cropped the video. */
+    width: min(820px, 100%, calc(36vh * 16 / 9));
     aspect-ratio: 16 / 9;
     border-radius: 14px;
     overflow: hidden;
@@ -766,7 +768,10 @@ body > * {
   .deck-clip video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* `contain` (not `cover`) — never crop the recording. Container is
+       16:9 from aspect-ratio above so this normally matches exactly;
+       on any edge case it letterboxes instead of hiding content. */
+    object-fit: contain;
     display: block;
     background: #000;
   }
