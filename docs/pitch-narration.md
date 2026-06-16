@@ -199,6 +199,45 @@ dengar semua. Atau drop satu moat di Slide 6.
 
 ---
 
+## 🧑‍⚖️ Juri profile & strategi
+
+**Scott Shi** — Co-Founder + CTO @ Kite AI · ex-Uber, ex-Salesforce ·
+Stanford StartX. Dia *bikin* infrastrukturnya — paymaster, AA stack,
+x402 wiring. Dia akan dengar dua kalimat dan tahu apakah kamu benar
+pakai Kite atau sekadar "deploy ke chain ini." Solusi: **sebut nama
+primitives secara eksplisit** — `gokite-aa-sdk`, Kite Passport, x402
+spec, paymaster `postOp`.
+
+**Stephen Allen** — Strategic Partnerships, Digital Assets & DeFi.
+Dia cari: market positioning, partnership angle, ecosystem fit.
+Solusi: **frame Kutip sebagai growth-driver Kite**, bukan parasit.
+Setiap query = transaksi tambahan di Kite's payment surface.
+
+## 🎯 Q&A persiapan — antisipasi Scott (tech)
+
+Slide tidak cukup; siapkan jawaban 1 kalimat untuk dipakai live:
+
+| Pertanyaan Scott | Jawaban siap |
+|------------------|--------------|
+| "How do you prevent x402 replay?" | "Each payment txHash logged on-chain; route rejects if seen before." |
+| "Gas profile per attestation?" | "~180k for 5 citations, ~80k for 1 — paymaster pulls equivalent USDC postOp." |
+| "Why ERC-8004 over a simpler reputation system?" | "Portable — the Researcher AA can graduate to a DAO-owned identity later without state migration." |
+| "Why Vercel Blob over IPFS for summaries?" | "Same tamper-evidence via keccak256 hash, far faster cold-start. Easy to swap to IPFS later — the hash is the contract." |
+| "What breaks at 10× scale?" | "AA nonce serialization — one userOp per signer at a time. Mitigation: round-robin sub-agents or batch attestations." |
+| "Why not run the LLM on-chain?" | "Cost. Deterministic synthesis would burn ~$50/query in gas. Off-chain LLM + on-chain attestation = cheap + verifiable." |
+
+## 🤝 Q&A persiapan — antisipasi Stephen (partnerships)
+
+| Pertanyaan Stephen | Jawaban siap |
+|--------------------|--------------|
+| "Who's your first customer beyond hackathon?" | "Open-access journals — eLife, PLOS — already track citations; we add payment rail." |
+| "How does this grow Kite's TVL?" | "Every attestation moves USDC through Kite. Every MCP-integrated agent multiplies that." |
+| "ORCID partnership — what would it look like?" | "ORCID issues credentials; Kite verifies + binds on-chain. Authors authenticate once, get paid forever." |
+| "Token model?" | "USDC-denominated, no native token. The 80/15/5 split is the model. Kite ecosystem fund earns 5% of every query." |
+| "What if AI labs refuse to pay?" | "Reverse-x402 already paywalls summaries. They'll pay because the alternative is missing the latest research their competitors cite." |
+
+---
+
 ## 💡 Soal Requirements & Judging Criteria
 
 **Requirements** (`Shows AI agent`, `executes paid actions`, `live demo`,

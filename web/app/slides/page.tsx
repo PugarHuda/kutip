@@ -60,8 +60,9 @@ const SLIDES: Slide[] = [
     body: (
       <div className="flex flex-col gap-3 max-w-[640px] mt-1">
         <p className="t-body ink-2">
-          AI-generated content is already the majority of new web pages.
-          Every LLM answer rests on millions of human-authored papers.
+          Common Crawl — the corpus most LLMs train on — paid creators{" "}
+          <strong>zero</strong>. Scholar indexes 400 million-plus papers.
+          Every LLM answer rests on millions of human-authored works.
         </p>
         <p className="t-body ink-2">
           The people who fund knowledge with their careers earn{" "}
@@ -153,29 +154,30 @@ const SLIDES: Slide[] = [
       <div className="deck-moats">
         <div className="deck-moat">
           <div className="deck-moat__n">01</div>
-          <div className="deck-moat__title">Multi-agent on EIP-4337</div>
+          <div className="deck-moat__title">Multi-agent on Kite's AA stack</div>
           <div className="deck-moat__body">
-            Researcher + Summarizer = two separate smart accounts. The
-            Summarizer earns its own 5% sub-agent fee, atomically. One
-            EIP-712 Passport delegation → full autonomy within a cap.
+            Researcher + Summarizer — two smart accounts via{" "}
+            <code>gokite-aa-sdk</code>. Sub-agent earns its own fee
+            atomically. One <strong>Kite Passport</strong> EIP-712
+            delegation → full autonomy within a spending cap.
           </div>
         </div>
         <div className="deck-moat">
           <div className="deck-moat__n">02</div>
-          <div className="deck-moat__title">Truly gasless</div>
+          <div className="deck-moat__title">Truly gasless via Kite paymaster</div>
           <div className="deck-moat__body">
-            Kite paymaster fronts gas in USDC. Agent never holds KITE.
-            User pays zero gas in any currency. Not "abstracted" —
-            actually zero.
+            Kite paymaster fronts gas in native KITE, pulls cost back
+            in USDC <code>postOp</code> from the agent AA — same UserOp,
+            atomic. User pays <strong>zero gas, any currency</strong>.
           </div>
         </div>
         <div className="deck-moat">
           <div className="deck-moat__n">03</div>
-          <div className="deck-moat__title">Verifiable, not just visible</div>
+          <div className="deck-moat__title">Verifiable, not visible</div>
           <div className="deck-moat__body">
-            Every synthesis is <code>keccak256</code>-digested and
-            persisted. One endpoint exports a portable JSON proof — the
-            attestation, the payouts, and the synthesis text together.
+            Real <strong>x402 spec</strong> on Kite settlement. Every
+            synthesis <code>keccak256</code>-digested. One endpoint
+            exports the whole proof — attestation, payouts, synthesis.
           </div>
         </div>
       </div>
@@ -245,34 +247,44 @@ const SLIDES: Slide[] = [
     kicker: "This isn't a demo — it's infrastructure",
     title: "ORCID. Escrow. MCP.",
     body: (
-      <div className="deck-moats" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-        <div className="deck-moat">
-          <div className="deck-moat__n">ORCID</div>
-          <div className="deck-moat__title">Real OAuth + on-chain bind</div>
-          <div className="deck-moat__body">
-            Authors prove identity at orcid.org, then sign EIP-712 to
-            bind their wallet in NameRegistry. Future citations route
-            automatically.
+      <div className="flex flex-col gap-3">
+        <div
+          className="deck-moats"
+          style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+        >
+          <div className="deck-moat">
+            <div className="deck-moat__n">ORCID</div>
+            <div className="deck-moat__title">Real OAuth + on-chain bind</div>
+            <div className="deck-moat__body">
+              Authors prove identity at orcid.org, then sign EIP-712 to
+              bind their wallet in NameRegistry. Future citations route
+              automatically.
+            </div>
+          </div>
+          <div className="deck-moat">
+            <div className="deck-moat__n">5% APY</div>
+            <div className="deck-moat__title">Yield-bearing escrow</div>
+            <div className="deck-moat__body">
+              Citations for un-bound authors don't get burned — they
+              accrue in <code>UnclaimedYieldEscrow</code> until claimed.
+              No use-it-or-lose-it.
+            </div>
+          </div>
+          <div className="deck-moat">
+            <div className="deck-moat__n">MCP</div>
+            <div className="deck-moat__title">Any LLM client, natively</div>
+            <div className="deck-moat__body">
+              Claude Desktop, Cursor, Cline call{" "}
+              <code>kutip.research</code> directly.{" "}
+              <strong>External calls still pay authors on-chain.</strong>
+            </div>
           </div>
         </div>
-        <div className="deck-moat">
-          <div className="deck-moat__n">5% APY</div>
-          <div className="deck-moat__title">Yield-bearing escrow</div>
-          <div className="deck-moat__body">
-            Citations for un-bound authors don't get burned — they
-            accrue in <code>UnclaimedYieldEscrow</code> until claimed.
-            No use-it-or-lose-it.
-          </div>
-        </div>
-        <div className="deck-moat">
-          <div className="deck-moat__n">MCP</div>
-          <div className="deck-moat__title">Any LLM client, natively</div>
-          <div className="deck-moat__body">
-            Claude Desktop, Cursor, Cline call <code>kutip.research</code>{" "}
-            directly. <strong>Every external call still pays cited
-            authors on-chain.</strong>
-          </div>
-        </div>
+        <p className="t-small ink-3 max-w-[700px] mt-1">
+          Every Kutip query — and every external MCP call —{" "}
+          <strong>adds load to Kite's payment surface</strong>. Kutip
+          grows Kite's transaction volume by doing what it's built to do.
+        </p>
       </div>
     )
   },
@@ -281,10 +293,21 @@ const SLIDES: Slide[] = [
     title: "Thank you.",
     body: (
       <div className="flex flex-col gap-4 mt-1">
-        <p className="t-body ink-2 max-w-[520px]">
-          Solo. Seven weeks. On Kite. Questions welcome.
+        <p className="t-body ink-2 max-w-[560px]">
+          Solo. Seven weeks. On Kite.
         </p>
-        <div className="flex flex-wrap gap-2.5">
+        <ul className="deck-list">
+          <li>
+            <strong>Scott</strong> — happy to walk you through any
+            contract internals or paymaster integration.
+          </li>
+          <li>
+            <strong>Stephen</strong> — would love to discuss
+            ORCID-Kite credentialing partnerships and ecosystem
+            growth.
+          </li>
+        </ul>
+        <div className="flex flex-wrap gap-2.5 mt-1">
           <Link href="/research" className="btn btn--primary">
             kutip-zeta.vercel.app <ArrowRightIcon size={14} />
           </Link>
