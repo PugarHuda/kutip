@@ -250,40 +250,47 @@ const SLIDES: Slide[] = [
       <div className="flex flex-col gap-3">
         <div
           className="deck-moats"
-          style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+          style={{ gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}
         >
-          <div className="deck-moat">
-            <div className="deck-moat__n">ORCID</div>
-            <div className="deck-moat__title">Real OAuth + on-chain bind</div>
-            <div className="deck-moat__body">
-              Authors prove identity at orcid.org, then sign EIP-712 to
-              bind their wallet in NameRegistry. Future citations route
-              automatically.
-            </div>
-          </div>
-          <div className="deck-moat">
-            <div className="deck-moat__n">5% APY</div>
-            <div className="deck-moat__title">Yield-bearing escrow</div>
-            <div className="deck-moat__body">
-              Citations for un-bound authors don't get burned — they
-              accrue in <code>UnclaimedYieldEscrow</code> until claimed.
-              No use-it-or-lose-it.
-            </div>
-          </div>
-          <div className="deck-moat">
-            <div className="deck-moat__n">MCP</div>
-            <div className="deck-moat__title">Any LLM client, natively</div>
-            <div className="deck-moat__body">
-              Claude Desktop, Cursor, Cline call{" "}
-              <code>kutip.research</code> directly.{" "}
-              <strong>External calls still pay authors on-chain.</strong>
-            </div>
-          </div>
+          <FeatureClip
+            tag="ORCID"
+            src="/clips/qa-orcid"
+            title="Real OAuth + on-chain bind"
+            body={
+              <>
+                Authors prove identity at orcid.org, then sign EIP-712
+                to bind their wallet in <code>NameRegistry</code>.
+              </>
+            }
+          />
+          <FeatureClip
+            tag="5% APY"
+            src="/clips/qa-escrow"
+            title="Yield-bearing escrow"
+            body={
+              <>
+                Citations for un-bound authors accrue in{" "}
+                <code>UnclaimedYieldEscrow</code> until claimed. No
+                use-it-or-lose-it.
+              </>
+            }
+          />
+          <FeatureClip
+            tag="MCP"
+            src="/clips/qa-mcp"
+            title="Any LLM client, natively"
+            body={
+              <>
+                Claude Desktop, Cursor, Cline call{" "}
+                <code>kutip.research</code> directly.{" "}
+                <strong>External calls still pay authors on-chain.</strong>
+              </>
+            }
+          />
         </div>
         <p className="t-small ink-3 max-w-[700px] mt-1">
           Every Kutip query — and every external MCP call —{" "}
-          <strong>adds load to Kite's payment surface</strong>. Kutip
-          grows Kite's transaction volume by doing what it's built to do.
+          <strong>adds load to Kite's payment surface</strong>.
         </p>
       </div>
     )
@@ -377,7 +384,7 @@ function FeatureClip({
   tag: string;
   src: string;
   title: string;
-  body: string;
+  body: React.ReactNode;
 }) {
   return (
     <div className="deck-moat deck-moat--compact">
