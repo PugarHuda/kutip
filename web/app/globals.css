@@ -639,11 +639,14 @@ body > * {
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--ink);
-    margin: 0 0 16px;
+    margin: 0 0 10px;
     max-width: 20ch;
   }
   .deck__body {
     font-size: 15.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
   .deck__nav {
     display: flex;
@@ -682,14 +685,14 @@ body > * {
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 8px;
     max-width: 640px;
   }
   .deck-list li {
     position: relative;
     padding-left: 22px;
-    font-size: 16.5px;
-    line-height: 1.5;
+    font-size: 14.5px;
+    line-height: 1.45;
     color: var(--ink-2);
   }
   .deck-list li::before {
@@ -727,7 +730,7 @@ body > * {
   .deck-split {
     display: flex;
     flex-direction: column;
-    gap: 11px;
+    gap: 6px;
     max-width: 520px;
   }
   .deck-split__row {
@@ -738,8 +741,8 @@ body > * {
   .deck-split__pct {
     font-family: var(--font-jetbrains), monospace;
     font-weight: 800;
-    font-size: 32px;
-    width: 86px;
+    font-size: 26px;
+    width: 76px;
     flex: none;
   }
 
@@ -749,14 +752,16 @@ body > * {
   .deck-clip {
     position: relative;
     width: min(820px, 100%);
-    /* Cap height so the clip never pushes title/body off-screen. */
-    max-height: 50vh;
+    /* Cap height so clip + title + body fit a single 720p viewport.
+       Was 50vh; that overflowed when paired with a 4-line list or the
+       80/15/5 split block. 36vh leaves ~30% of window for text. */
+    max-height: 36vh;
     aspect-ratio: 16 / 9;
     border-radius: 14px;
     overflow: hidden;
     background: color-mix(in srgb, var(--ink) 5%, transparent);
     border: 1px solid var(--border);
-    margin-top: 10px;
+    margin-top: 8px;
   }
   .deck-clip video {
     width: 100%;
