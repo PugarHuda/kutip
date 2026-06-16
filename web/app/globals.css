@@ -639,8 +639,9 @@ body > * {
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--ink);
-    margin: 0 0 10px;
-    max-width: 20ch;
+    /* Block centered; text inside stays left-aligned. */
+    margin: 0 auto 10px;
+    max-width: 22ch;
   }
   .deck__body {
     font-size: 15.5px;
@@ -751,19 +752,19 @@ body > * {
      the file exists so the deck still reads pre-recording. */
   .deck-clip {
     position: relative;
-    /* Width drives height via aspect-ratio. Cap width by both the
-       container (100%, max 820px) AND the width that would produce
-       36vh height — so the clip never overflows vertically, and the
-       16:9 aspect-ratio is always respected. Earlier `max-height: 36vh`
-       fought aspect-ratio: container got wider than 16:9 on short
-       windows, object-fit cover cropped the video. */
-    width: min(820px, 100%, calc(36vh * 16 / 9));
+    /* Width derived from height cap so aspect-ratio is honored — clip
+       never overflows vertically AND never gets cropped. 50vh restored
+       per user request — Slides 4/5 originals were big. Slide 5's Fuji
+       footer was removed earlier so it still fits. */
+    width: min(820px, 100%, calc(50vh * 16 / 9));
     aspect-ratio: 16 / 9;
     border-radius: 14px;
     overflow: hidden;
     background: color-mix(in srgb, var(--ink) 5%, transparent);
     border: 1px solid var(--border);
-    margin-top: 8px;
+    /* Centered horizontally so a narrow window doesn't push the clip
+       to the left edge. */
+    margin: 8px auto 0;
   }
   .deck-clip video {
     width: 100%;
@@ -902,6 +903,7 @@ body > * {
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
     max-width: 880px;
+    margin-inline: auto;
   }
   .deck-moat {
     border: 1px solid var(--border);
@@ -991,6 +993,7 @@ body > * {
     grid-template-columns: repeat(4, 1fr);
     gap: 14px;
     max-width: 880px;
+    margin-inline: auto;
   }
   .deck-number {
     border: 1px solid var(--border);
