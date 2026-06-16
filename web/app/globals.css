@@ -598,17 +598,29 @@ body > * {
 /* ---- /slides pitch deck ---- */
 @layer components {
   .deck {
+    position: relative;
     height: 100vh;
     height: 100dvh;
     display: flex;
     flex-direction: column;
-    padding: 18px clamp(20px, 6vw, 96px) 16px;
+    /* Chrome (top bar + nav + hint) is absolute-positioned and hidden
+       by default. Deck padding only reserves a thin breathing border. */
+    padding: 8px clamp(20px, 6vw, 96px);
     overflow: hidden;
   }
+  /* TOP CHROME — logo + slide counter. Hidden until hover/focus. */
   .deck__top {
+    position: absolute;
+    top: 14px;
+    left: clamp(20px, 6vw, 96px);
+    right: clamp(20px, 6vw, 96px);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
   }
   .deck__slide {
     flex: 1 1 auto;
@@ -648,11 +660,21 @@ body > * {
     flex-direction: column;
     gap: 8px;
   }
+  /* BOTTOM CHROME — nav buttons + dot navigator. Hidden until
+     hover/focus. */
   .deck__nav {
+    position: absolute;
+    left: clamp(20px, 6vw, 96px);
+    right: clamp(20px, 6vw, 96px);
+    bottom: 26px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
   }
   .deck__dots {
     display: flex;
@@ -676,8 +698,26 @@ body > * {
     transform: scale(1.3);
   }
   .deck__hint {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8px;
     text-align: center;
-    margin-top: 10px;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  /* Reveal all chrome on hover OR keyboard focus (Prev/Next buttons,
+     dot nav). Slide content unchanged; chrome just fades in. */
+  .deck:hover .deck__top,
+  .deck:hover .deck__nav,
+  .deck:hover .deck__hint,
+  .deck:focus-within .deck__top,
+  .deck:focus-within .deck__nav,
+  .deck:focus-within .deck__hint {
+    opacity: 1;
+    pointer-events: auto;
   }
   .deck-list {
     list-style: none;
