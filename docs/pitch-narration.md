@@ -1,13 +1,14 @@
 # 📖 NARASI · BACA INI · KUTIP FINALE PITCH
 
-3 menit untuk pitch utama (slide 1–11). Tidak ada Q&A backup slides
-— semua fitur sudah masuk pitch. Total ~440 kata = ~145 wpm =
-mendarat **3:00 di latihan**, **3:15 di stage** (over hard cap; lihat
+3 menit untuk 11 slide. Tidak ada Q&A backup — semua fitur masuk
+main pitch (Slide 9 + 10). Total ~430 kata = ~145 wpm = mendarat
+**3:00 di latihan**, **3:10 di stage** (over hard cap ~10 dtk — lihat
 section drift di bawah).
 
----
+Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
+3× speed → mata juri menangkap visual selagi kamu narasikan.
 
-## 🎯 PITCH UTAMA · 3 MENIT (slide 1–9)
+---
 
 ### Slide 1 · HOOK · 0:00 – 0:12
 
@@ -22,13 +23,13 @@ section drift di bawah).
 
 ### Slide 2 · PROBLEM · 0:12 – 0:32
 
-> "AI-generated content is already the majority of new web pages.
-> Every LLM answer rests on **millions of human papers**.
+> "Common Crawl — the corpus most LLMs train on — paid creators
+> **zero**. Scholar indexes 400 million-plus papers.
 >
 > Citations are everywhere. **Payments — nowhere.**
 >
-> The people who fund knowledge with their careers earn **zero** of
-> what AI extracts from it."
+> The people who fund knowledge with their careers earn **zero of
+> what AI extracts from it**."
 
 *[20 dtk · pelan, biarkan beratnya tertangkap]*
 
@@ -52,7 +53,7 @@ section drift di bawah).
 
 > "Ask a research question.
 >
-> The agent searches papers. Pays via x402. Reads with an LLM.
+> The agent searches papers. Pays via **x402**. Reads with an LLM.
 > Weights citations.
 >
 > Settles USDC — **one atomic transaction on Kite**."
@@ -65,9 +66,7 @@ section drift di bawah).
 
 > "**Eighty percent** to authors. Fifteen operator. Five ecosystem.
 >
-> Baked into the contract. Not a promise.
->
-> Mirrored to **Avalanche Fuji** within seconds. Cross-chain proof."
+> Baked into the contract. Not a promise."
 
 *[20 dtk]*
 
@@ -77,14 +76,15 @@ section drift di bawah).
 
 > "Three things you won't find anywhere else.
 >
-> **One** — multi-agent EIP-4337. Researcher and Summarizer are
-> separate smart accounts. Sub-agent earns its own fee atomically.
+> **One** — multi-agent on Kite's AA stack. Researcher and
+> Summarizer are separate smart accounts via `gokite-aa-sdk`. One
+> **Kite Passport** delegation → full autonomy within a cap.
 >
-> **Two** — truly gasless. Paymaster fronts gas in USDC. User pays
-> **zero gas, any currency**.
+> **Two** — truly gasless. **Kite paymaster** pulls USDC `postOp`.
+> User pays **zero gas, any currency**.
 >
-> **Three** — verifiable, not visible. Every synthesis
-> **keccak256-digested**. One endpoint exports the whole proof."
+> **Three** — verifiable, not visible. Real **x402 spec** on Kite.
+> Every synthesis **keccak256-digested**. The whole proof exports."
 
 *[40 dtk · stabil, jangan buru-buru — bagian terpadat]*
 
@@ -102,7 +102,7 @@ section drift di bawah).
 
 ### Slide 8 · SCALE · 2:30 – 2:48
 
-> "Live on testnet today — already in use.
+> "Live on testnet today — **already in use**.
 >
 > **109 author wallets paid. 226 citations attested.**
 >
@@ -112,35 +112,36 @@ section drift di bawah).
 
 ---
 
-### Slide 9 · INFRASTRUCTURE · 2:45 – 3:05
+### Slide 9 · INFRASTRUCTURE · 2:48 – 3:08
+
+*[Tiga klip mini auto-play — sebut tag, biarkan visual jelaskan]*
 
 > "This isn't a demo — it's **infrastructure**.
 >
 > Real **ORCID OAuth** — authors prove identity, bind on-chain.
 >
-> A **five-percent APY escrow** for un-bound authors. No
-> use-it-or-lose-it.
+> A **five-percent APY escrow** for un-bound authors.
 >
-> And an **MCP server** — Claude Desktop, Cursor, Cline call Kutip
-> natively. Every external call still pays the humans."
+> An **MCP server** — Claude, Cursor, Cline call Kutip natively.
+> Every external call still pays the humans."
 
-*[20 dtk · ucapkan tiga pilar dengan jeda di tiap nama]*
+*[20 dtk · tiga pilar, jeda di tiap nama]*
 
 ---
 
-### Slide 10 · ALSO SHIPPING · 3:05 – 3:25
+### Slide 10 · ALSO SHIPPING · 3:08 – 3:25
 
-*[Empat klip kecil auto-play paralel — sebut nama sambil tunjuk]*
+*[Empat klip mini auto-play paralel — sebut nama saja]*
 
-> "Four more things, live on-chain today.
+> "Four more things, live on-chain.
 >
 > **ERC-8004 agent identity**. **Reverse x402** — other agents pay
-> Kutip. **BountyMarket** — sponsored research. **Avalanche Fuji
-> mirror** — cross-chain receipt.
+> Kutip. **BountyMarket** — sponsored research. **Fuji mirror** —
+> cross-chain receipt.
 >
 > All live. All verifiable."
 
-*[20 dtk · sebut nama dengan jeda, biarkan klip menjelaskan]*
+*[17 dtk · drumroll, biarkan klip menjelaskan]*
 
 ---
 
@@ -148,82 +149,67 @@ section drift di bawah).
 
 > "Solo. Seven weeks. On Kite.
 >
-> **Thank you.** Questions welcome."
+> **Scott** — happy to walk you through any contract internals.
+> **Stephen** — would love to discuss ORCID-Kite credentialing.
+>
+> Thank you."
 
-*[10 dtk · slow down, lalu diam 2 dtk]*
+*[10 dtk · slow down, diam 2 dtk]*
 
 ---
 
 # ⏱️ Cheat sheet · waktu per slide
 
 ```
-0:00 ──┬─ Slide 1  Hook                12s
-0:12 ──┼─ Slide 2  Problem             20s
-0:32 ──┼─ Slide 3  Solution            18s
-0:50 ──┼─ Slide 4  Flow + clip         22s
-1:12 ──┼─ Slide 5  Payout + clip       20s
-1:32 ──┼─ Slide 6  Three moats         40s  ← bagian terpadat
-2:12 ──┼─ Slide 7  Verify + clip       18s
-2:30 ──┼─ Slide 8  Scale               15s
-2:45 ──┼─ Slide 9  Infrastructure      20s
-3:05 ──┼─ Slide 10 Also shipping 🆕    20s
-3:25 ──┴─ Slide 11 Thank you           10s
-3:35    ============ over-cap by 35s — MUST drop slides to fit
+0:00 ──┬─ 1  Hook                12s
+0:12 ──┼─ 2  Problem             20s
+0:32 ──┼─ 3  Solution            18s
+0:50 ──┼─ 4  Flow + clip         22s
+1:12 ──┼─ 5  Payout + clip       20s
+1:32 ──┼─ 6  Three moats         40s  ← bagian terpadat
+2:12 ──┼─ 7  Verify + clip       18s
+2:30 ──┼─ 8  Scale               18s
+2:48 ──┼─ 9  Infrastructure      20s
+3:08 ──┼─ 10 Also shipping       17s
+3:25 ──┴─ 11 Thank you           10s
+3:35    ============ over by 35s — drop sub-points if drift
 ```
-
-**⚠️ Pitch sekarang 3:35 — well over 3:00 hard cap.** Tiga opsi
-realistis:
-
-1. **Drop Slide 8 (Scale) entirely**, gunakan angka di slide lain →
-   −15s → 3:20 (masih over 20s).
-2. **Drop Slide 10 (Also shipping) saat live** → −20s → 3:15.
-3. **Compress Slide 6 moats dari 40s → 25s** (drop moat #2 gasless) →
-   −15s → 3:20.
-
-Kombinasi #1 + #3 = 3:05, hampir aman.
-
-Kalau juri ketat di 3:00, **prioritas drop**: Slide 8 (Scale) dulu →
-Slide 10 (Also shipping) → moat #2 di Slide 6.
 
 ## 🚨 Kalau drift waktu
 
 | Posisi | Action |
 |--------|--------|
-| Slide 2/3 di 0:50 | Compress Problem ke 1 kalimat: *"AI cites human papers. The authors get nothing."* |
-| Slide 6 di 2:20 | Drop moat #2 (gasless). −12 dtk. |
-| Slide 7 di 2:35 | Potong: *"Recompute the hash. Anyone can audit."* |
-| Slide 8 di 2:50 | Skip ke close: *"Live on testnet. Twelve contracts. Thank you."* |
+| Slide 2/3 di 0:55 | Compress Problem: *"AI cites human papers. The authors get nothing. We have a problem."* |
+| Slide 6 di 2:20 | Drop moat #2 (gasless). −12 dtk. Atau drop moat #1 sub-detail tentang Researcher/Summarizer. |
+| Slide 7 di 2:40 | Potong: *"Recompute the hash. Anyone can audit."* |
+| Slide 8 di 2:55 | Skip body: *"Live on testnet. 109 authors paid. 226 citations."* |
+| Slide 9 di 3:15 | Sebut nama saja: *"ORCID OAuth. Escrow yield. MCP server. Infrastructure."* −10 dtk. |
+| Slide 10 di 3:25 | Drop: *"Four more — Reverse x402, Bounties, MCP, Fuji. All on-chain."* |
 
 ## 🎬 Tips delivery
 
 - **Jeda 1–2 dtk** sebelum kata **bold** — itu yang ditangkap juri
 - **Eye contact** ke kamera, BUKAN ke slide
 - **Suara turun** di akhir kalimat — bukan questioning
-- **Nafas dalam** sebelum slide 6 (40 dtk, padat) dan slide 9 (close)
-- **Diam 2 dtk** setelah "Thank you"
+- **Nafas dalam** sebelum slide 6 (40 dtk, padat) dan slide 11 (close)
+- **Diam 2 dtk** setelah "Thank you" — kasih ruang aplaus
 
 ---
 
 ## 🧑‍⚖️ Juri profile & strategi
 
-**Scott Shi** — Co-Founder + CTO @ Kite AI · ex-Uber, ex-Salesforce ·
-Stanford StartX. Dia *bikin* infrastrukturnya — paymaster, AA stack,
-x402 wiring. Dia akan dengar dua kalimat dan tahu apakah kamu benar
-pakai Kite atau sekadar "deploy ke chain ini." Solusi: **sebut nama
-primitives secara eksplisit** — `gokite-aa-sdk`, Kite Passport, x402
-spec, paymaster `postOp`.
+**Scott Shi** — Co-Founder + CTO @ Kite AI. Dia *bikin* infrastrukturnya
+— paymaster, AA stack, x402 wiring. Slide 6 namai primitives:
+`gokite-aa-sdk`, Kite Passport, paymaster `postOp`, x402 spec.
 
 **Stephen Allen** — Strategic Partnerships, Digital Assets & DeFi.
-Dia cari: market positioning, partnership angle, ecosystem fit.
-Solusi: **frame Kutip sebagai growth-driver Kite**, bukan parasit.
-Setiap query = transaksi tambahan di Kite's payment surface.
+Cari market/ecosystem angle. Slide 11 ada ask spesifik tentang
+ORCID-Kite credentialing partnership.
 
 ## 🎯 Q&A persiapan — antisipasi Scott (tech)
 
-Slide tidak cukup; siapkan jawaban 1 kalimat untuk dipakai live:
-
-| Pertanyaan Scott | Jawaban siap |
-|------------------|--------------|
+| Pertanyaan | Jawaban siap |
+|------------|--------------|
 | "How do you prevent x402 replay?" | "Each payment txHash logged on-chain; route rejects if seen before." |
 | "Gas profile per attestation?" | "~180k for 5 citations, ~80k for 1 — paymaster pulls equivalent USDC postOp." |
 | "Why ERC-8004 over a simpler reputation system?" | "Portable — the Researcher AA can graduate to a DAO-owned identity later without state migration." |
@@ -233,29 +219,10 @@ Slide tidak cukup; siapkan jawaban 1 kalimat untuk dipakai live:
 
 ## 🤝 Q&A persiapan — antisipasi Stephen (partnerships)
 
-| Pertanyaan Stephen | Jawaban siap |
-|--------------------|--------------|
+| Pertanyaan | Jawaban siap |
+|------------|--------------|
 | "Who's your first customer beyond hackathon?" | "Open-access journals — eLife, PLOS — already track citations; we add payment rail." |
 | "How does this grow Kite's TVL?" | "Every attestation moves USDC through Kite. Every MCP-integrated agent multiplies that." |
 | "ORCID partnership — what would it look like?" | "ORCID issues credentials; Kite verifies + binds on-chain. Authors authenticate once, get paid forever." |
 | "Token model?" | "USDC-denominated, no native token. The 80/15/5 split is the model. Kite ecosystem fund earns 5% of every query." |
 | "What if AI labs refuse to pay?" | "Reverse-x402 already paywalls summaries. They'll pay because the alternative is missing the latest research their competitors cite." |
-
----
-
-## 💡 Soal Requirements & Judging Criteria
-
-**Requirements** (`Shows AI agent`, `executes paid actions`, `live demo`,
-`uses Kite for attestations`, `functional UI`, `publicly accessible`):
-✅ Tidak perlu disebut di slide. Juri lihat sendiri dari demo + repo +
-live URL. Membaca daftar requirements bikin pitch terlihat defensive.
-
-**Judging Criteria** (4 axis): ✅ Sudah ter-embed sebagai kata kunci
-di narasi:
-- **Agent Autonomy** → Slide 3 ("runs autonomously"), Slide 6 moat #1
-- **Developer Experience** → Slide 8 ("MCP server", "CI green", "docs")
-- **Real-World Applicability** → Slide 8 ("live on testnet today")
-- **Novel/Creativity** → Slide 6 ("won't find anywhere else"), Slide 7
-  ("keccak256 digest")
-
-Juri akan tick-mark sendiri. Tidak perlu pamer kriteria.

@@ -26,7 +26,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(__dirname, "..");
 const OUT = resolve(REPO, "docs/kutip-deck.pdf");
 const BASE = process.env.KUTIP_BASE_URL ?? "https://kutip-zeta.vercel.app";
-const SLIDE_COUNT = Number(process.env.KUTIP_SLIDE_COUNT ?? 9);
+const SLIDE_COUNT = Number(process.env.KUTIP_SLIDE_COUNT ?? 11);
 
 mkdirSync(dirname(OUT), { recursive: true });
 
