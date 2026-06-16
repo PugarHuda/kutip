@@ -82,9 +82,9 @@ const SLIDES: Slide[] = [
           <strong>On-chain. Atomic. The moment the citation lands.</strong>
         </p>
         <p className="t-body ink-2">
-          An AI research agent that runs autonomously inside a
-          cryptographic spending cap, performs paid actions via x402,
-          and settles USDC to every cited author — verifiable on Kite.
+          And when another agent cites that summary,{" "}
+          <strong>more payment flows back to the original authors</strong>.
+          Humans get paid forever — not just once.
         </p>
       </div>
     )
@@ -198,42 +198,47 @@ const SLIDES: Slide[] = [
     kicker: "Live on testnet today — already in use",
     title: "Real, deployable, not a sketch.",
     body: (
-      <div className="deck-numbers">
-        {/* Traction first — bukti pemakaian aktual, paling kuat untuk
-            axis "Real-World Applicability". Swap two weakest static
-            tiles (Safe + CI) with on-chain usage numbers. */}
-        <div className="deck-number">
-          <div className="deck-number__v">109</div>
-          <div className="deck-number__l">author wallets paid</div>
+      <div className="flex flex-col gap-3">
+        <div className="deck-numbers">
+          {/* Traction first — bukti pemakaian aktual, paling kuat untuk
+              axis "Real-World Applicability". Swap two weakest static
+              tiles (Safe + CI) with on-chain usage numbers. */}
+          <div className="deck-number">
+            <div className="deck-number__v">109</div>
+            <div className="deck-number__l">author wallets paid</div>
+          </div>
+          <div className="deck-number">
+            <div className="deck-number__v">226</div>
+            <div className="deck-number__l">citations attested</div>
+          </div>
+          <div className="deck-number">
+            <div className="deck-number__v">12</div>
+            <div className="deck-number__l">Solidity contracts</div>
+          </div>
+          <div className="deck-number">
+            <div className="deck-number__v">2</div>
+            <div className="deck-number__l">chains (Kite + Fuji)</div>
+          </div>
+          <div className="deck-number">
+            <div className="deck-number__v">56</div>
+            <div className="deck-number__l">Foundry tests + fuzz</div>
+          </div>
+          <div className="deck-number">
+            <div className="deck-number__v">149</div>
+            <div className="deck-number__l">Vitest cases</div>
+          </div>
+          <div className="deck-number">
+            <div className="deck-number__v">80 / 15 / 5</div>
+            <div className="deck-number__l">on-chain split</div>
+          </div>
+          <div className="deck-number">
+            <div className="deck-number__v">ORCID</div>
+            <div className="deck-number__l">real OAuth + binding</div>
+          </div>
         </div>
-        <div className="deck-number">
-          <div className="deck-number__v">226</div>
-          <div className="deck-number__l">citations attested</div>
-        </div>
-        <div className="deck-number">
-          <div className="deck-number__v">12</div>
-          <div className="deck-number__l">Solidity contracts</div>
-        </div>
-        <div className="deck-number">
-          <div className="deck-number__v">2</div>
-          <div className="deck-number__l">chains (Kite + Fuji)</div>
-        </div>
-        <div className="deck-number">
-          <div className="deck-number__v">56</div>
-          <div className="deck-number__l">Foundry tests + fuzz</div>
-        </div>
-        <div className="deck-number">
-          <div className="deck-number__v">149</div>
-          <div className="deck-number__l">Vitest cases</div>
-        </div>
-        <div className="deck-number">
-          <div className="deck-number__v">80 / 15 / 5</div>
-          <div className="deck-number__l">on-chain split</div>
-        </div>
-        <div className="deck-number">
-          <div className="deck-number__v">ORCID</div>
-          <div className="deck-number__l">real OAuth + binding</div>
-        </div>
+        <p className="t-small ink-3 text-center mt-1">
+          <strong>Real money. Real authors. On-chain.</strong>
+        </p>
       </div>
     )
   },
@@ -249,11 +254,12 @@ const SLIDES: Slide[] = [
           <FeatureClip
             tag="ORCID"
             src="/clips/qa-orcid"
-            title="Real OAuth + on-chain bind"
+            title="Real OAuth — not just typing a number"
             body={
               <>
-                Authors prove identity at orcid.org, then sign EIP-712
-                to bind their wallet in <code>NameRegistry</code>.
+                Authors sign in at <strong>orcid.org</strong>, then
+                EIP-712 to bind their wallet in{" "}
+                <code>NameRegistry</code>. <strong>This is real.</strong>
               </>
             }
           />

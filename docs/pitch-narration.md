@@ -35,17 +35,19 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
-### Slide 3 · SOLUTION · 0:32 – 0:50
+### Slide 3 · SOLUTION · 0:32 – 0:55
 
 > "Kutip flips that.
 >
 > **Every citation IS a payment.** On-chain. Atomic. The moment it
 > lands.
 >
-> An AI agent that runs autonomously, performs paid actions via
-> x402, and settles USDC to every cited author — verifiable on Kite."
+> And when another agent cites that summary, **more payment flows
+> back to the original authors**. Humans get paid forever — not
+> just once."
 
-*[18 dtk]*
+*[23 dtk · Reverse x402 loop story sebagai closer — naikkan suara di
+"forever, not just once"]*
 
 ---
 
@@ -100,32 +102,37 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
-### Slide 8 · SCALE · 2:30 – 2:48
+### Slide 8 · SCALE · 2:30 – 2:52
 
 > "Live on testnet today — **already in use**.
 >
-> **109 author wallets paid. 226 citations attested.**
+> **One hundred nine** author wallets paid. **Two hundred
+> twenty-six** citations attested.
 >
-> Twelve contracts. Two chains. Two hundred tests."
+> Twelve contracts. Two chains. Two hundred tests.
+>
+> **Real money. Real authors. On-chain.**"
 
-*[18 dtk · ucapkan angka traksi pelan dan tegas — itu anchor utama]*
+*[22 dtk · last line sebagai mic-drop — drop suara di akhir]*
 
 ---
 
-### Slide 9 · INFRASTRUCTURE · 2:48 – 3:08
+### Slide 9 · INFRASTRUCTURE · 2:52 – 3:14
 
 *[Tiga klip mini auto-play — sebut tag, biarkan visual jelaskan]*
 
 > "This isn't a demo — it's **infrastructure**.
 >
-> Real **ORCID OAuth** — authors prove identity, bind on-chain.
+> Real ORCID OAuth — **not just typing a number**. Authors sign in
+> at orcid.org, bind their wallet on-chain.
 >
 > A **five-percent APY escrow** for un-bound authors.
 >
 > An **MCP server** — Claude, Cursor, Cline call Kutip natively.
 > Every external call still pays the humans."
 
-*[20 dtk · tiga pilar, jeda di tiap nama]*
+*[22 dtk · jeda dramatic di "not just typing a number" — itu yang
+puncture skeptisisme juri tentang demo authors]*
 
 ---
 
@@ -163,16 +170,20 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 ```
 0:00 ──┬─ 1  Hook                12s
 0:12 ──┼─ 2  Problem             20s
-0:32 ──┼─ 3  Solution            18s
-0:50 ──┼─ 4  Flow + clip         22s
-1:12 ──┼─ 5  Payout + clip       20s
-1:32 ──┼─ 6  Three moats         40s  ← bagian terpadat
-2:12 ──┼─ 7  Verify + clip       18s
-2:30 ──┼─ 8  Scale               18s
-2:48 ──┼─ 9  Infrastructure      20s
-3:08 ──┼─ 10 Also shipping       17s
-3:25 ──┴─ 11 Thank you           10s
-3:35    ============ over by 35s — drop sub-points if drift
+0:32 ──┼─ 3  Solution            23s  ← +5: Reverse x402 callback
+0:55 ──┼─ 4  Flow + clip         22s
+1:17 ──┼─ 5  Payout + clip       20s
+1:37 ──┼─ 6  Three moats         40s  ← bagian terpadat
+2:17 ──┼─ 7  Verify + clip       18s
+2:35 ──┼─ 8  Scale               22s  ← +4: "real money, real authors, on-chain"
+2:57 ──┼─ 9  Infrastructure      22s  ← +2: "not just typing a number"
+3:19 ──┼─ 10 Also shipping       17s
+3:36 ──┴─ 11 Thank you           10s
+3:46    ============ over by 46s — MUST drop content to fit
+
+Total tambahan dari 3 boost: +11 dtk. Kalau ingin landing ≤3:00,
+ikuti drift section di bawah — drop Slide 6 moat #2 (gasless) →
+−12 dtk → balance.
 ```
 
 ## 🚨 Kalau drift waktu
