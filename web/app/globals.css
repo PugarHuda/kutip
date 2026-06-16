@@ -616,7 +616,7 @@ body > * {
     flex-direction: column;
     justify-content: center;
     width: 100%;
-    max-width: 720px;
+    max-width: 920px;
     margin: 0 auto;
     padding: 12px 0;
     min-height: 0;
@@ -751,13 +751,12 @@ body > * {
      the file exists so the deck still reads pre-recording. */
   .deck-clip {
     position: relative;
-    /* Width drives height via aspect-ratio. Cap width by both the
-       container (100%, max 820px) AND the width that would produce
-       36vh height — so the clip never overflows vertically, and the
-       16:9 aspect-ratio is always respected. Earlier `max-height: 36vh`
-       fought aspect-ratio: container got wider than 16:9 on short
-       windows, object-fit cover cropped the video. */
-    width: min(820px, 100%, calc(36vh * 16 / 9));
+    /* Width derived from height cap so aspect-ratio is honored — clip
+       never overflows vertically AND never gets cropped. 50vh restored
+       per user: clip at 36vh was visibly too small on slides 4/5/7.
+       Slide 5 still fits without scroll because the Fuji footer was
+       removed earlier; Slide 4's list font was reduced to 14.5px. */
+    width: min(820px, 100%, calc(50vh * 16 / 9));
     aspect-ratio: 16 / 9;
     border-radius: 14px;
     overflow: hidden;
