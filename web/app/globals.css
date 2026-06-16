@@ -616,7 +616,7 @@ body > * {
     flex-direction: column;
     justify-content: center;
     width: 100%;
-    max-width: 920px;
+    max-width: 720px;
     margin: 0 auto;
     padding: 12px 0;
     min-height: 0;
