@@ -51,7 +51,7 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
-### Slide 4 · FLOW (clip auto-play) · 0:50 – 1:12
+### Slide 4 · FLOW (clip auto-play) · 0:55 – 1:17
 
 > "Ask a research question.
 >
@@ -64,7 +64,7 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
-### Slide 5 · PAYOUT (clip auto-play) · 1:12 – 1:32
+### Slide 5 · PAYOUT (clip auto-play) · 1:17 – 1:37
 
 > "**Eighty percent** to authors. Fifteen operator. Five ecosystem.
 >
@@ -74,7 +74,7 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
-### Slide 6 · THREE MOATS · 1:32 – 2:12
+### Slide 6 · THREE MOATS · 1:37 – 2:17
 
 > "Three things you won't find anywhere else.
 >
@@ -92,7 +92,7 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
-### Slide 7 · VERIFY (clip auto-play) · 2:12 – 2:30
+### Slide 7 · VERIFY (clip auto-play) · 2:17 – 2:35
 
 > "Recompute the hash. Catch any tampering.
 >
@@ -102,7 +102,7 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
-### Slide 8 · SCALE · 2:30 – 2:52
+### Slide 8 · SCALE · 2:35 – 2:57
 
 > "Live on testnet today — **already in use**.
 >
@@ -117,7 +117,7 @@ Ucapkan natural, jeda 1-2 dtk sebelum kata **bold**. Klip auto-play
 
 ---
 
-### Slide 9 · INFRASTRUCTURE · 2:52 – 3:14
+### Slide 9 · INFRASTRUCTURE · 2:57 – 3:19
 
 *[Tiga klip mini auto-play — sebut tag, biarkan visual jelaskan]*
 
@@ -136,7 +136,7 @@ puncture skeptisisme juri tentang demo authors]*
 
 ---
 
-### Slide 10 · ALSO SHIPPING · 3:08 – 3:25
+### Slide 10 · ALSO SHIPPING · 3:19 – 3:36
 
 *[Empat klip mini auto-play paralel — sebut nama saja]*
 
@@ -152,7 +152,7 @@ puncture skeptisisme juri tentang demo authors]*
 
 ---
 
-### Slide 11 · THANK YOU · 3:25 – 3:35
+### Slide 11 · THANK YOU · 3:36 – 3:46
 
 > "Solo. Seven weeks. On Kite.
 >
