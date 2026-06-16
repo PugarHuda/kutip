@@ -288,6 +288,49 @@ const SLIDES: Slide[] = [
       </div>
     )
   },
+  // "Also shipping today" — four more features in a 4-column mini-clip
+  // grid. Each card autoplays a silent loop while the presenter names
+  // the feature. Replaces the old Q&A backup section so every feature
+  // gets seen, no extra slides hidden after Thank you.
+  {
+    kicker: "Also shipping today",
+    title: "Four more things live on-chain.",
+    body: (
+      <div
+        className="deck-moats"
+        style={{
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: "10px",
+          maxWidth: "100%"
+        }}
+      >
+        <FeatureClip
+          tag="ERC-8004"
+          src="/clips/qa-agents"
+          title="Agent identity NFTs"
+          body="Researcher + Summarizer hold reputation NFTs with token-bound accounts. Portable on-chain identity."
+        />
+        <FeatureClip
+          tag="Reverse x402"
+          src="/clips/qa-reverse-x402"
+          title="Agents pay Kutip back"
+          body="Other agents pay via x402 to cite a summary. Flows back to authors. Recursive royalties."
+        />
+        <FeatureClip
+          tag="BountyMarket"
+          src="/clips/qa-bounties"
+          title="Sponsored research"
+          body="Anyone funds a topic. Kutip earns the bounty on a matching citation — extra payout."
+        />
+        <FeatureClip
+          tag="Fuji mirror"
+          src="/clips/qa-mirror"
+          title="Cross-chain receipt"
+          body="Every attestation replicates to Avalanche Fuji within seconds. LayerZero-pattern."
+        />
+      </div>
+    )
+  },
   {
     kicker: "Kutip · the research agent that pays its sources",
     title: "Thank you.",
@@ -322,80 +365,41 @@ const SLIDES: Slide[] = [
         </div>
       </div>
     )
-  },
-  // Deep-dive slides — ORCID/Escrow/MCP got promoted to the main
-  // pitch's Infrastructure slide. What's left here is everything that
-  // didn't quite fit the 3-minute story but still answers a likely
-  // judge question.
-  {
-    kicker: "Deep dive · agent identity",
-    title: "Agents that own NFTs and wallets.",
-    clip: {
-      src: "/clips/qa-agents.mp4",
-      label: "ERC-8004 + ERC-6551",
-      shot: "Agents page · Researcher + Summarizer NFT cards.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Each agent holds an ERC-8004 reputation NFT with a token-bound
-        account (ERC-6551). Portable identity, future DAO governance —
-        Kutip is one of the few real ERC-8004 deployments on testnet.
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · recursive royalties",
-    title: "Other agents pay Kutip. Kutip pays authors.",
-    clip: {
-      src: "/clips/qa-reverse-x402.mp4",
-      label: "Reverse x402",
-      shot: "Verify page · paywalled summary endpoint card.",
-      duration: "≈ 7 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        When another agent cites a Kutip summary, they pay Kutip via
-        x402 — and that flows back to the original authors. The loop
-        closes: humans get paid forever, not just once.
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · sponsored research",
-    title: "Anyone can fund a question.",
-    clip: {
-      src: "/clips/qa-bounties.mp4",
-      label: "BountyMarket",
-      shot: "Bounties page · active + settled bounties.",
-      duration: "≈ 8 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Sponsor a topic with USDC; Kutip earns the bounty on a matching
-        citation, paying it on top of the user fee. Researchers earn
-        even when the asker doesn't know the paper exists.
-      </p>
-    )
-  },
-  {
-    kicker: "Deep dive · cross-chain proof",
-    title: "Every receipt mirrors to Avalanche Fuji.",
-    clip: {
-      src: "/clips/qa-mirror.mp4",
-      label: "Cross-chain mirror",
-      shot: "Verify page → tx hash chip · LayerZero-pattern replication.",
-      duration: "≈ 7 s"
-    },
-    body: (
-      <p className="t-body ink-2 max-w-[620px] mt-1">
-        Same atomic attestation, replicated to <code>CitationMirror</code>{" "}
-        on Fuji within seconds. Cross-chain proof. Swaps to DVN-attested
-        the moment Kite exposes its LZ endpoint.
-      </p>
-    )
   }
 ];
+
+function FeatureClip({
+  tag,
+  src,
+  title,
+  body
+}: {
+  tag: string;
+  src: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="deck-moat deck-moat--compact">
+      <div className="deck-moat__clip">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={`${src}.jpg`}
+        >
+          <source src={`${src}.webm`} type="video/webm" />
+          <source src={`${src}.mp4`} type="video/mp4" />
+        </video>
+        <div className="deck-moat__clip-tag">{tag}</div>
+      </div>
+      <div className="deck-moat__title">{title}</div>
+      <div className="deck-moat__body">{body}</div>
+    </div>
+  );
+}
 
 const SPEEDS = [1, 1.5, 2, 3] as const;
 // Default playback rate. 3× gives judges a brisk-but-readable

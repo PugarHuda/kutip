@@ -953,6 +953,28 @@ body > * {
     .deck-moats { grid-template-columns: 1fr; }
   }
 
+  /* 4-column variant for "Also shipping" slide — denser cards that fit
+     four side-by-side without scrolling. */
+  .deck-moat--compact {
+    padding: 10px 12px 12px;
+  }
+  .deck-moat--compact .deck-moat__title {
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .deck-moat--compact .deck-moat__body {
+    font-size: 12px;
+    line-height: 1.45;
+    margin-top: 4px;
+  }
+  .deck-moat--compact .deck-moat__clip {
+    margin-bottom: 8px;
+  }
+  .deck-moat--compact .deck-moat__clip-tag {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+
   /* finale: big-number scale slide. */
   .deck-numbers {
     display: grid;

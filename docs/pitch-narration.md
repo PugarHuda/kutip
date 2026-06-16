@@ -1,8 +1,9 @@
 # 📖 NARASI · BACA INI · KUTIP FINALE PITCH
 
-3 menit untuk pitch utama (slide 1–10). Slide 11–14 hanya kalau juri
-tanya. Total ~400 kata = ~145 wpm = mendarat **2:50 di latihan**,
-**3:00 di stage**.
+3 menit untuk pitch utama (slide 1–11). Tidak ada Q&A backup slides
+— semua fitur sudah masuk pitch. Total ~440 kata = ~145 wpm =
+mendarat **3:00 di latihan**, **3:15 di stage** (over hard cap; lihat
+section drift di bawah).
 
 ---
 
@@ -127,36 +128,29 @@ tanya. Total ~400 kata = ~145 wpm = mendarat **2:50 di latihan**,
 
 ---
 
-### Slide 10 · THANK YOU · 3:05 – 3:15
+### Slide 10 · ALSO SHIPPING · 3:05 – 3:25
+
+*[Empat klip kecil auto-play paralel — sebut nama sambil tunjuk]*
+
+> "Four more things, live on-chain today.
+>
+> **ERC-8004 agent identity**. **Reverse x402** — other agents pay
+> Kutip. **BountyMarket** — sponsored research. **Avalanche Fuji
+> mirror** — cross-chain receipt.
+>
+> All live. All verifiable."
+
+*[20 dtk · sebut nama dengan jeda, biarkan klip menjelaskan]*
+
+---
+
+### Slide 11 · THANK YOU · 3:25 – 3:35
 
 > "Solo. Seven weeks. On Kite.
 >
 > **Thank you.** Questions welcome."
 
 *[10 dtk · slow down, lalu diam 2 dtk]*
-
----
-
-# 🎙️ Q&A · DEEP DIVES (slide 11–14, hanya kalau ditanya)
-
-ORCID, Escrow, dan MCP sudah masuk main pitch slide 9. Yang sisanya
-disini sebagai jawaban-siap untuk pertanyaan juri. Tiap baris ~8 dtk.
-
-### Slide 11 · Agent identity · ERC-8004 + ERC-6551
-> "Each agent holds an **ERC-8004 reputation NFT** with a token-bound
-> account. Portable identity. **Auditable on-chain.**"
-
-### Slide 12 · Recursive royalties · Reverse x402
-> "Other agents pay Kutip via x402 to cite a summary — that flows
-> back to authors. Humans get paid **forever, not just once**."
-
-### Slide 13 · Sponsored research · BountyMarket
-> "Anyone funds a topic. Kutip earns the bounty on a matching
-> citation — extra payout on top of the user fee."
-
-### Slide 14 · Cross-chain proof · Fuji mirror
-> "Every attestation replicates to **Avalanche Fuji** within seconds.
-> LayerZero-pattern. **Cross-chain proof, live today.**"
 
 ---
 
@@ -171,14 +165,25 @@ disini sebagai jawaban-siap untuk pertanyaan juri. Tiap baris ~8 dtk.
 1:32 ──┼─ Slide 6  Three moats         40s  ← bagian terpadat
 2:12 ──┼─ Slide 7  Verify + clip       18s
 2:30 ──┼─ Slide 8  Scale               15s
-2:45 ──┼─ Slide 9  Infrastructure 🆕   20s
-3:05 ──┴─ Slide 10 Thank you           10s
-3:15    ============ over-cap by 15s — drop slides if drift
+2:45 ──┼─ Slide 9  Infrastructure      20s
+3:05 ──┼─ Slide 10 Also shipping 🆕    20s
+3:25 ──┴─ Slide 11 Thank you           10s
+3:35    ============ over-cap by 35s — MUST drop slides to fit
 ```
 
-**⚠️ Time budget tight.** Kalau di latihan kamu finish 3:15, **drop
-Slide 8 (Scale)** dulu — tile-tilenya numerik, juri tidak butuh
-dengar semua. Atau drop satu moat di Slide 6.
+**⚠️ Pitch sekarang 3:35 — well over 3:00 hard cap.** Tiga opsi
+realistis:
+
+1. **Drop Slide 8 (Scale) entirely**, gunakan angka di slide lain →
+   −15s → 3:20 (masih over 20s).
+2. **Drop Slide 10 (Also shipping) saat live** → −20s → 3:15.
+3. **Compress Slide 6 moats dari 40s → 25s** (drop moat #2 gasless) →
+   −15s → 3:20.
+
+Kombinasi #1 + #3 = 3:05, hampir aman.
+
+Kalau juri ketat di 3:00, **prioritas drop**: Slide 8 (Scale) dulu →
+Slide 10 (Also shipping) → moat #2 di Slide 6.
 
 ## 🚨 Kalau drift waktu
 
