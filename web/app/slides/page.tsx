@@ -199,10 +199,21 @@ const SLIDES: Slide[] = [
     )
   },
   {
-    kicker: "Live on testnet today",
+    kicker: "Live on testnet today — already in use",
     title: "Real, deployable, not a sketch.",
     body: (
       <div className="deck-numbers">
+        {/* Traction first — bukti pemakaian aktual, paling kuat untuk
+            axis "Real-World Applicability". Swap two weakest static
+            tiles (Safe + CI) with on-chain usage numbers. */}
+        <div className="deck-number">
+          <div className="deck-number__v">109</div>
+          <div className="deck-number__l">author wallets paid</div>
+        </div>
+        <div className="deck-number">
+          <div className="deck-number__v">226</div>
+          <div className="deck-number__l">citations attested</div>
+        </div>
         <div className="deck-number">
           <div className="deck-number__v">12</div>
           <div className="deck-number__l">Solidity contracts</div>
@@ -226,14 +237,6 @@ const SLIDES: Slide[] = [
         <div className="deck-number">
           <div className="deck-number__v">ORCID</div>
           <div className="deck-number__l">real OAuth + binding</div>
-        </div>
-        <div className="deck-number">
-          <div className="deck-number__v">Safe</div>
-          <div className="deck-number__l">2-of-3 governance</div>
-        </div>
-        <div className="deck-number">
-          <div className="deck-number__v">CI</div>
-          <div className="deck-number__l">green on every push</div>
         </div>
       </div>
     )

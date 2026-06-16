@@ -99,14 +99,15 @@ tanya. Total ~400 kata = ~145 wpm = mendarat **2:50 di latihan**,
 
 ---
 
-### Slide 8 · SCALE · 2:30 – 2:45
+### Slide 8 · SCALE · 2:30 – 2:48
 
-> "Live on testnet today.
+> "Live on testnet today — already in use.
 >
-> **Twelve contracts. Two chains. Two hundred tests.** CI green every
-> push."
+> **109 author wallets paid. 226 citations attested.**
+>
+> Twelve contracts. Two chains. Two hundred tests."
 
-*[15 dtk · ucapkan angka pelan]*
+*[18 dtk · ucapkan angka traksi pelan dan tegas — itu anchor utama]*
 
 ---
 
